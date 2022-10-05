@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Menu, Space, Image, Typography } from "antd";
 import Heading from "../Heading";
 import Button from "../Button";
@@ -39,8 +39,9 @@ function Sidebar({ className }) {
     },
   ];
 
+  const navigate = useNavigate();
   const handleLogout = () => {
-    // Logout
+    navigate("/sign-in");
   };
 
   return (
