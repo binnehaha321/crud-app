@@ -1,0 +1,71 @@
+.fixed-sidebar {
+  background-color: var(--bg-secondary) !important;
+  padding: 1rem;
+
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+
+  .heading {
+    font-weight: 700;
+  }
+
+  .profile {
+    margin-top: 2rem;
+    .avatar {
+      width: 128px;
+      height: 128px;
+      border-radius: 100rem;
+      object-fit: cover;
+    }
+
+    .role {
+      color: var(--btn-primary);
+    }
+  }
+
+  .menu {
+    width: 100%;
+  }
+
+  .ant-space-item {
+    &:nth-child(3) {
+      margin-top: 3rem;
+    }
+    &:last-child {
+      margin-top: auto;
+    }
+  }
+
+  .ant-menu-item {
+    padding-inline: 3.5rem;
+
+    img {
+      width: 18px;
+      height: 18px;
+      object-fit: contain;
+    }
+
+    span {
+      font-weight: 600;
+    }
+
+    a:hover,
+    &-selected a {
+      color: #000;
+    }
+  }
+
+  .logout {
+    padding-inline: 3.5rem;
+
+    &:hover {
+      background-color: var(--btn-danger);
+    }
+
+    img {
+      margin-left: 1.5rem;
+    }
+  }
+}

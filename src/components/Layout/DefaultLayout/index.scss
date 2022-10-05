@@ -1,0 +1,30 @@
+.default-layout {
+  display: grid;
+  grid-template-columns: 270px auto;
+  grid-template-areas:
+    "sidebar header header"
+    "sidebar children children";
+
+  .sidebar {
+    --sidebar-max-width: 270px;
+    grid-area: sidebar;
+    max-width: var(--sidebar-max-width);
+    width: var(--sidebar-max-width);
+  }
+
+  .header {
+    grid-area: header;
+    width: 100%;
+    margin-left: auto;
+    display: flex;
+    justify-content: space-between;
+    margin-block: 1rem;
+    padding-inline: 2rem;
+  }
+  
+  & > div:last-child {
+    grid-area: children;
+    padding-inline: 2rem;
+    background-color: var(--bg-gray);
+  }
+}

@@ -1,0 +1,10 @@
+.heading {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  &::before {
+    content: "";
+    border: 3px solid #f8d442;
+    background-color: #f8d442;
+  }
+}

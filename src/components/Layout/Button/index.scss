@@ -1,0 +1,13 @@
+button {
+    border: none;
+    background-color: transparent;
+    font-weight: 600;
+    line-height: 40px;
+    cursor: pointer;
+
+    &:hover {
+        transition: all .25s linear;
+        color: #FFF;
+        opacity: unset;
+    }
+}

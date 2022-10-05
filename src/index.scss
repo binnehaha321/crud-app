@@ -1,0 +1,71 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap");
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Montserrat", sans-serif;
+}
+
+// Variables
+:root {
+  --bg-primary: linear-gradient(71.17deg, #feaf00 19.35%, #f8d442 90.12%);
+  --bg-secondary: #f2eae1;
+  --bg-gray: #f8f8f8;
+
+  --btn-primary: #feaf00;
+  --btn-danger: #ff4d4f;
+  --opacity: 0.8;
+
+  --border-radius-lg: 20px;
+  --border-radius-md: 8px;
+  --border-radius-sm: 4px;
+}
+
+// INPUT
+input {
+  border-radius: var(--border-radius-sm) !important;
+}
+
+// BUTTON
+button {
+  border-radius: var(--border-radius-sm) !important;
+
+  &:hover {
+    opacity: var(--opacity);
+  }
+}
+.ant-btn-primary {
+  background-color: var(--btn-primary);
+  border-color: var(--btn-primary);
+
+  &:hover {
+    background-color: var(--btn-primary);
+    border-color: var(--btn-primary);
+  }
+}
+
+// OTHERS
+.ant-input-password {
+  border-radius: var(--border-radius-sm);
+}
+
+.ant-menu-item {
+  border-radius: var(--border-radius-sm);
+  &:hover,
+  &:focus,
+  &:active,
+  &:focus-visible {
+    background-color: var(--btn-primary);
+    color: #000 !important;
+  }
+
+  &-selected {
+    background-color: var(--btn-primary) !important;
+  }
+}
+
+.ant-pagination-item-link {
+  display: flex!important;
+  align-items: center!important;
+  justify-content: center!important;
+}

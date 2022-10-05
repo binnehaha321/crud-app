@@ -1,0 +1,17 @@
+.ant-card {
+    border-radius: var(--border-radius-md)!important;
+
+    h4.ant-typography {
+        text-align: right;
+        font-size: 30px;
+        font-weight: 700;
+        margin-bottom: 0;
+    }
+
+    &:nth-child(3) {
+        h4.ant-typography::before {
+            content: '$ ';
+            font-size: 20px;
+        }
+    }
+}

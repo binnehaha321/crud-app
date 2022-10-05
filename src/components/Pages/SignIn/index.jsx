@@ -1,5 +1,7 @@
+import { Link } from "react-router-dom";
+import Heading from "~/components/Layout/Heading";
 import { Row, Col, Typography, Form, Input, Button } from "antd";
-// import styles from "./index.scss";
+import styles from "./index.module.scss";
 
 function SignIn() {
   const { Text, Title } = Typography;
@@ -9,15 +11,13 @@ function SignIn() {
       justify="center"
       align="middle"
       style={{ minHeight: "100vh" }}
-      // className={styles.row}
+      className={styles.row}
     >
-      <Col span={8}>
-        <Title level={2} align="center">
-          CRUD OPERATIONS
-        </Title>
-        <Row type="flex" justify="center">
+      <Col span={8} className={styles.col}>
+        <Heading level={2} align="center" />
+        <Row type="flex" justify="center" style={{ marginBottom: "50px" }}>
           <Col align="center">
-            <Title level={4}>Sign In</Title>
+            <Title level={4}>SIGN IN</Title>
             <Text>Enter your credentials to access your account</Text>
           </Col>
         </Row>
@@ -41,7 +41,7 @@ function SignIn() {
               },
             ]}
           >
-            <Input type="email" />
+            <Input type="email" placeholder="Enter your email" />
           </Form.Item>
 
           <Form.Item
@@ -54,12 +54,21 @@ function SignIn() {
               },
             ]}
           >
-            <Input.Password />
+            <Input.Password placeholder="Enter your password" />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit" block>
-              Submit
+              SIGN IN
             </Button>
+          </Form.Item>
+          <Form.Item>
+            <Text>
+              Forgot your password?
+              <Link className={styles["reset-pw"]} to="reset-password">
+                {" "}
+                Reset Password
+              </Link>
+            </Text>
           </Form.Item>
         </Form>
       </Col>
