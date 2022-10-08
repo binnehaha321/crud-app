@@ -2,9 +2,26 @@ import { Link } from "react-router-dom";
 import Heading from "~/components/Layout/Heading";
 import { Row, Col, Typography, Form, Input, Button } from "antd";
 import styles from "./index.module.scss";
+import axios from "axios";
+// import handleLogin from "~/services/userService";
 
 function SignIn() {
   const { Text, Title } = Typography;
+
+  const onFinish = (values) => {
+    console.log("Success:", values);
+    axios({
+      method: "POST",
+      url: "http://localhost:8080/api/login",
+      data: values,
+    }).then((result) => {
+      console.log(result);
+    });
+  };
+
+  const onFinishFailed = (errorInfo) => {
+    console.log("Failed:", errorInfo);
+  };
   return (
     <Row
       type="flex"
@@ -27,8 +44,8 @@ function SignIn() {
           initialValues={{
             remember: true,
           }}
-          //   onFinish={onFinish}
-          //   onFinishFailed={onFinishFailed}
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
           autoComplete="off"
         >
           <Form.Item
