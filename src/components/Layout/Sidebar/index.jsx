@@ -4,6 +4,7 @@ import Heading from "../Heading";
 import Button from "../Button";
 import * as icon from "~/assets/images/Sidebar";
 import "./index.scss";
+import { UserOutlined } from "@ant-design/icons";
 
 function Sidebar({ className }) {
   const sidebarElements = [
@@ -11,6 +12,11 @@ function Sidebar({ className }) {
       label: <Link to="/">Home</Link>,
       key: "home",
       icon: <img src={icon.HOME} alt="home" />,
+    },
+    {
+      label: <Link to="/users">Users</Link>,
+      key: "user",
+      icon: <UserOutlined />,
     },
     {
       label: <Link to="/course">Course</Link>,

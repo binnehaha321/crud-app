@@ -1,0 +1,25 @@
+h3.ant-typography {
+  margin-bottom: 0;
+}
+
+.gap-2 {
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem !important;
+
+  img {
+    cursor: pointer;
+  }
+}
+
+.ant-image {
+  &-img {
+    object-fit: cover;
+    border-radius: var(--border-radius-md);
+  }
+}
+
+.ant-btn {
+  border-radius: var(--border-radius-sm);
+}

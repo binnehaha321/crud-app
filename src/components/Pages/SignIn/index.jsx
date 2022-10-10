@@ -32,6 +32,7 @@ function SignIn() {
       } else {
         toast.error(result.message);
       }
+      setIsLoaded(true);
     };
     fetchApi();
   };
@@ -59,10 +60,10 @@ function SignIn() {
           </Row>
           <Form
             layout="vertical"
-            name="basic"
-            initialValues={{
-              remember: true,
-            }}
+            name="signin"
+            // initialValues={{
+            //   remember: true,
+            // }}
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
             autoComplete="off"

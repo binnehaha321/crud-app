@@ -41,7 +41,8 @@
   .ant-menu-item {
     padding-inline: 3.5rem;
 
-    img {
+    img,
+    svg {
       width: 18px;
       height: 18px;
       object-fit: contain;
@@ -52,6 +53,7 @@
     }
 
     a:hover,
+    &-selected,
     &-selected a {
       color: #000;
     }
