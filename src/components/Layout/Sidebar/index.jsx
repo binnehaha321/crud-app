@@ -18,7 +18,7 @@ function Sidebar({ className }) {
       icon: <img src={icon.COURSE} alt="course" />,
     },
     {
-      label: <Link to="/student-list">Students</Link>,
+      label: <Link to="/students">Students</Link>,
       key: "students",
       icon: <img src={icon.STUDENTS} alt="students" />,
     },

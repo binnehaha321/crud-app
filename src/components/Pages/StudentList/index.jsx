@@ -1,4 +1,5 @@
-import { Space, Image, Typography, Button as ButtonAnt } from "antd";
+import { Space, Image, Typography } from "antd";
+import { Link } from "react-router-dom";
 import Button from "~/components/Layout/Button";
 import * as icon from "~/assets/images/StudentList";
 import "./index.scss";
@@ -174,7 +175,7 @@ function StudentList() {
       columns={columns}
       data={data}
     >
-      <ButtonAnt type="primary">ADD NEW STUDENT</ButtonAnt>
+      <Link to="./add" className="ant-btn ant-btn-primary">ADD NEW STUDENT</Link>
     </Table>
   );
 }

@@ -65,7 +65,12 @@ button {
 }
 
 .ant-pagination-item-link {
-  display: flex!important;
-  align-items: center!important;
-  justify-content: center!important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+// Organize
+.py-30 {
+  padding-block: 30px;
 }
