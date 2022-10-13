@@ -1,10 +1,10 @@
 import SignIn from "~/components/Pages/SignIn";
 import Home from "~/components/Pages/Home";
 import Payment from "~/components/Pages/Payment";
-import StudentList from "~/components/Pages/StudentList";
-import AddNewStudent from "~/components/Pages/AddNewStudent";
-import UserList from "~/components/Pages/UserList";
-import AddNewUser from "~/components/Pages/AddNewUser";
+import StudentList from "~/components/Pages/Student/StudentList";
+import AddNewStudent from "~/components/Pages/Student/AddNewStudent";
+import UserList from "~/components/Pages/User/UserList";
+import AddNewUser from "~/components/Pages/User/AddNewUser";
 import NotFound from "~/components/Pages/NotFound";
 
 const publicRoutes = [{ path: "/sign-in", component: <SignIn /> }];

@@ -11,17 +11,17 @@ function SignIn() {
   const [isLoaded, setIsLoaded] = useState(true);
   const navigate = useNavigate();
 
-  const onFinish = (values) => {
+  const handleSubmit = (values) => {
     const fetchApi = async () => {
       setIsLoaded(false);
       const result = await authService.auth(values);
-      if (result?.errCode !== 1 && result?.errCode !== 3) {
+      if (result?.errCode === 0) {
         const user = result?.user;
         const userData = {
           userId: user?.userId,
           email: user?.email,
           fullName: user?.fullName,
-          gender: user?.gender,
+          gender: user.gender,
           avatar: user?.avatar,
           phoneNumber: user?.phoneNumber,
           roleId: user?.roleId,
@@ -37,9 +37,9 @@ function SignIn() {
     fetchApi();
   };
 
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
-  };
+  // const onFinishFailed = (errorInfo) => {
+  //   console.log("Failed:", errorInfo);
+  // };
   return (
     <Row
       type="flex"
@@ -64,8 +64,8 @@ function SignIn() {
             // initialValues={{
             //   remember: true,
             // }}
-            onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
+            onFinish={handleSubmit}
+            // onFinishFailed={onFinishFailed}
             autoComplete="off"
           >
             <Form.Item

@@ -66,7 +66,7 @@ function Sidebar({ className }) {
       </Space>
       <Menu
         items={sidebarElements}
-        style={{ backgroundColor: "transparent" }}
+        style={{ backgroundColor: "transparent", border: "none" }}
         className="menu"
       />
       <Button onClick={handleLogout} value="Logout" className="logout">

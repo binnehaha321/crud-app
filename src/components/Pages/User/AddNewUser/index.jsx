@@ -12,6 +12,8 @@ import {
   Divider,
 } from "antd";
 import request from "~/utils/request";
+import { ToastContainer, toast } from "react-toastify";
+import roles from "../roleList.js";
 import "./index.scss";
 
 function AddNewUser() {
@@ -20,12 +22,15 @@ function AddNewUser() {
       .post("register", values, {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       })
-      .then((res) => console.log(res))
-      .catch((err) => console.log(err));
+      .then((res) => {
+        toast.success(res.data.message);
+      })
+      .catch((err) => toast.error(err.message));
   };
 
   return (
     <Col className="py-30">
+      <ToastContainer />
       <Space direction="horizental" size={"middle"}>
         <UserAddOutlined
           style={{ fontSize: "2rem", color: "var(--btn-primary)" }}
@@ -50,17 +55,19 @@ function AddNewUser() {
                 <Input />
               </Form.Item>
               <Form.Item label="Role" name="roleId">
-                <Select allowClear mode="multiple">
-                  <Select.Option value={0}>ADMIN</Select.Option>
-                  <Select.Option value={1}>USER</Select.Option>
-                  <Select.Option value={2}>TEACHER</Select.Option>
-                  <Select.Option value={3}>STUDENT</Select.Option>
+                <Select allowClear maxTagCount="responsive">
+                  {roles?.map((role, index) => (
+                    <Select.Option value={role.value} key={index}>
+                      {role.label}
+                    </Select.Option>
+                  ))}
                 </Select>
               </Form.Item>
               <Form.Item label="Gender" name="gender">
                 <Select allowClear="true">
-                  <Select.Option value="0">Male</Select.Option>
-                  <Select.Option value="1">Female</Select.Option>
+                  <Select.Option value="Male">Male</Select.Option>
+                  <Select.Option value="Female">Female</Select.Option>
+                  <Select.Option value="Other">Other</Select.Option>
                 </Select>
               </Form.Item>
             </Space>
@@ -92,8 +99,23 @@ function AddNewUser() {
                 autoSize={{ minRows: 5 }}
               />
             </Form.Item>
-            <Form.Item label="Avatar" valuePropName="fileList" name="avatar">
-              <Upload action="/upload.do" listType="picture-card">
+            <Form.Item
+              hidden // this function is building
+              label="Avatar"
+              valuePropName="fileList"
+              name="avatar"
+              getValueFromEvent={(e) => {
+                if (Array.isArray(e)) {
+                  return e;
+                }
+                return e && e.fileList;
+              }}
+            >
+              <Upload
+                // action={process.env.REACT_APP_BACKEND_URL}
+                listType="picture-card"
+                type="image/*"
+              >
                 <div>
                   <PlusOutlined />
                   <div
@@ -107,12 +129,12 @@ function AddNewUser() {
               </Upload>
             </Form.Item>
           </Col>
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              Add User
-            </Button>
-          </Form.Item>
         </Row>
+        <Form.Item align="center">
+          <Button type="primary" htmlType="submit">
+            Add User
+          </Button>
+        </Form.Item>
       </Form>
     </Col>
   );

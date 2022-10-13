@@ -18,6 +18,20 @@ function AddNewStudent() {
   const onChange = (date, dateString) => {
     console.log(date, dateString);
   };
+  const majorList = [
+    {
+      label: "Computing",
+      value: "computing",
+    },
+    {
+      label: "BUSINESS",
+      value: "business",
+    },
+    {
+      label: "MARKETING",
+      value: "marketing",
+    },
+  ];
   return (
     <Col className="py-30">
       <Space direction="horizental" size={"middle"}>
@@ -43,11 +57,7 @@ function AddNewStudent() {
                 <Input />
               </Form.Item>
               <Form.Item label="Major">
-                <Select allowClear="true">
-                  <Select.Option value="computing">COMPUTING</Select.Option>
-                  <Select.Option value="business">BUSINESS</Select.Option>
-                  <Select.Option value="marketing">MARKETING</Select.Option>
-                </Select>
+                <Select allowClear options={majorList} />
               </Form.Item>
               <Form.Item label="Enroll Number">
                 <Input type="number" />
@@ -66,9 +76,10 @@ function AddNewStudent() {
                 <Input />
               </Form.Item>
               <Form.Item label="Gender">
-                <Select allowClear="true">
-                  <Select.Option value="0">Male</Select.Option>
-                  <Select.Option value="1">Female</Select.Option>
+                <Select allowClear>
+                  <Select.Option value="Male">Male</Select.Option>
+                  <Select.Option value="Female">Female</Select.Option>
+                  <Select.Option value="Other">Other</Select.Option>
                 </Select>
               </Form.Item>
               <Form.Item label="Date Of Admission">
