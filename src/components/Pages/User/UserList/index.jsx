@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Form, Input, Select, Upload, Space, Modal, Spin, Image } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { ExclamationCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import Button from "~/components/Layout/Button";
 import * as icon from "~/assets/images/StudentList";
 import Table from "~/components/Layout/Table";
 import request from "~/utils/request";
-import showDeleteConfirm from "./deleteUser";
 import roles from "../roleList";
 import { toast, ToastContainer } from "react-toastify";
 import "./index.scss";
@@ -100,6 +99,9 @@ function UserList() {
   const [currentUserValues, setCurrentUserValues] = useState({});
 
   // GET USERS
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [id, setId] = useState(null);
+
   useEffect(() => {
     setIsLoaded(false);
     request
@@ -120,7 +122,7 @@ function UserList() {
             gender: user.gender,
             address: user.address,
             phoneNumber: user.phoneNumber,
-            roleId: user.roleId.toUpperCase(),
+            roleId: user.roleId,
           };
           return userData;
         });
@@ -137,8 +139,6 @@ function UserList() {
     form.setFieldsValue(currentUserValues);
   }, [form, currentUserValues]);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [id, setId] = useState(null);
   const handleGetUserById = (id) => {
     setId(id);
     request
@@ -166,7 +166,7 @@ function UserList() {
       });
   };
 
-  const handleSubmit = (values) => {
+  const handleUpdateUser = (values) => {
     request
       .put(`users?id=${id}`, values, {
         headers: {
@@ -199,6 +199,55 @@ function UserList() {
       .catch((err) => {
         toast.error(err?.data?.message);
       });
+  };
+
+  // DELETE USER
+  const handleDelete = (id) => {
+    request
+      .delete(`users?id=${id}`, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      })
+      .then((res) => {
+        toast.success(res?.data?.message);
+        const users = res?.data?.users;
+        let userData = {};
+        const result = users.map((user) => {
+          userData = {
+            key: user.id,
+            userId: user.userId,
+            avatar: user.avatar,
+            email: user.email,
+            fullName: user.fullName,
+            username: user.username,
+            gender: user.gender,
+            address: user.address,
+            phoneNumber: user.phoneNumber,
+            roleId: user.roleId,
+          };
+          return userData;
+        });
+        setData(result);
+      })
+      .catch((err) => {
+        toast.error(err?.data?.message);
+      });
+  };
+
+  const showDeleteConfirm = (id) => {
+    Modal.confirm({
+      title: "Are you sure delete this user?",
+      icon: <ExclamationCircleOutlined />,
+      content: "Click No to cancel.",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+
+      onOk() {
+        handleDelete(id);
+      },
+    });
   };
 
   return (
@@ -235,7 +284,7 @@ function UserList() {
               }}
               layout="vertical"
               form={form}
-              onFinish={handleSubmit}
+              onFinish={handleUpdateUser}
               initialValues={currentUserValues}
               className="update-user"
             >
