@@ -9,6 +9,7 @@ import request from "~/utils/request";
 import roles from "../roleList";
 import { toast, ToastContainer } from "react-toastify";
 import "./index.scss";
+import { useSelector, useDispatch } from "react-redux";
 
 function UserList() {
   const columns = [
@@ -102,32 +103,32 @@ function UserList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [id, setId] = useState(null);
 
+  const handleUserDataList = (users) => {
+    let userData = {};
+    return users?.map((user) => {
+      userData = {
+        key: user?.id,
+        userId: user?.userId,
+        avatar: user?.avatar,
+        email: user?.email,
+        fullName: user?.fullName,
+        username: user?.username,
+        gender: user?.gender,
+        address: user?.address,
+        phoneNumber: user?.phoneNumber,
+        roleId: user?.roleId,
+      };
+      return userData;
+    });
+  };
+
   useEffect(() => {
     setIsLoaded(false);
-    request
-      .get("users?id=ALL", {
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      })
-      .then((res) => {
-        const users = res?.data?.users;
-        let userData = {};
-        const result = users.map((user) => {
-          userData = {
-            key: user.id,
-            userId: user.userId,
-            avatar: user.avatar,
-            email: user.email,
-            fullName: user.fullName,
-            username: user.username,
-            gender: user.gender,
-            address: user.address,
-            phoneNumber: user.phoneNumber,
-            roleId: user.roleId,
-          };
-          return userData;
-        });
-        setData(result);
-      });
+    request.get("users?id=ALL").then((res) => {
+      const users = res?.data?.users;
+      const result = handleUserDataList(users);
+      setData(result);
+    });
     setIsLoaded(true);
   }, [isLoaded]);
 
@@ -142,9 +143,7 @@ function UserList() {
   const handleGetUserById = (id) => {
     setId(id);
     request
-      .get(`users?id=${id}`, {
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      })
+      .get(`users?id=${id}`)
       .then((res) => {
         const user = res?.data?.users;
         setCurrentUserValues({
@@ -168,30 +167,11 @@ function UserList() {
 
   const handleUpdateUser = (values) => {
     request
-      .put(`users?id=${id}`, values, {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      })
+      .put(`users?id=${id}`, values)
       .then((res) => {
         const data = res?.data;
-        let userData = {};
         const users = data?.users;
-        const result = users.map((user) => {
-          userData = {
-            key: user.id,
-            userId: user.userId,
-            avatar: user.avatar,
-            email: user.email,
-            fullName: user.fullName,
-            username: user.username,
-            gender: user.gender,
-            address: user.address,
-            phoneNumber: user.phoneNumber,
-            roleId: user.roleId,
-          };
-          return userData;
-        });
+        const result = handleUserDataList(users);
         setData(result);
         toast.success(data?.message);
         setIsModalOpen(false);
@@ -204,30 +184,11 @@ function UserList() {
   // DELETE USER
   const handleDelete = (id) => {
     request
-      .delete(`users?id=${id}`, {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      })
+      .delete(`users?id=${id}`)
       .then((res) => {
         toast.success(res?.data?.message);
         const users = res?.data?.users;
-        let userData = {};
-        const result = users.map((user) => {
-          userData = {
-            key: user.id,
-            userId: user.userId,
-            avatar: user.avatar,
-            email: user.email,
-            fullName: user.fullName,
-            username: user.username,
-            gender: user.gender,
-            address: user.address,
-            phoneNumber: user.phoneNumber,
-            roleId: user.roleId,
-          };
-          return userData;
-        });
+        const result = handleUserDataList(users);
         setData(result);
       })
       .catch((err) => {
@@ -235,6 +196,7 @@ function UserList() {
       });
   };
 
+  // Confirm modal
   const showDeleteConfirm = (id) => {
     Modal.confirm({
       title: "Are you sure delete this user?",
@@ -250,6 +212,12 @@ function UserList() {
     });
   };
 
+  // Handle refresh user list
+  const handleRefresh = () => {};
+
+  const usersList = useSelector((state) => state.users);
+  
+
   return (
     <>
       {isLoaded ? (
@@ -260,6 +228,7 @@ function UserList() {
             icon={icon.SORT}
             columns={columns}
             data={data}
+            onHandleRefresh={handleRefresh}
           >
             <Link to="./add" className="ant-btn ant-btn-primary">
               ADD NEW USER

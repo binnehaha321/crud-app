@@ -3,7 +3,7 @@ import Button from "../Button";
 import REFRESH_ICON from "~/assets/images/refresh.svg";
 import "./index.scss";
 
-function Table({ caption, icon, children, columns, data }) {
+function Table({ caption, icon, children, columns, data, onHandleRefresh }) {
   return (
     <Col>
       <Space
@@ -19,6 +19,7 @@ function Table({ caption, icon, children, columns, data }) {
               color: "var(--btn-primary)",
               cursor: "pointer",
             }}
+            onClick={onHandleRefresh}
           >
             <img src={REFRESH_ICON} alt="refresh" style={{ width: "70%" }} />
           </Button>

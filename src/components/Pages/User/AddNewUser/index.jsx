@@ -1,3 +1,6 @@
+import { useCallback } from "react";
+import { useNavigate } from "react-router";
+import { useDispatch } from "react-redux";
 import { PlusOutlined, UserAddOutlined } from "@ant-design/icons";
 import {
   Col,
@@ -11,22 +14,20 @@ import {
   Typography,
   Divider,
 } from "antd";
-import request from "~/utils/request";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import roles from "../roleList.js";
 import "./index.scss";
 
 function AddNewUser() {
-  const handleSubmit = (values) => {
-    request
-      .post("register", values, {
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      })
-      .then((res) => {
-        toast.success(res.data.message);
-      })
-      .catch((err) => toast.error(err.message));
-  };
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const handleAddUser = useCallback(
+    (values) => {
+      dispatch({ type: "ADD_USER", payload: values });
+      navigate("../users");
+    },
+    [dispatch, navigate]
+  );
 
   return (
     <Col className="py-30">
@@ -46,7 +47,7 @@ function AddNewUser() {
           span: 24,
         }}
         layout="vertical"
-        onFinish={handleSubmit}
+        onFinish={handleAddUser}
       >
         <Row className="add-new-user" align="space-between">
           <Col span="13">
@@ -81,7 +82,7 @@ function AddNewUser() {
             </Space>
             <Space style={{ display: "flex" }}>
               <Form.Item label="Phone Number" name="phoneNumber">
-                <Input />
+                <Input maxLength={10} />
               </Form.Item>
               <Form.Item label="Username" name="username">
                 <Input />
@@ -136,8 +137,18 @@ function AddNewUser() {
           </Button>
         </Form.Item>
       </Form>
+      {/* <button onClick={(data) => dispatch({ type: "ADD_USER", payload: data })}>
+        ADD USER
+      </button> */}
     </Col>
   );
 }
 
+// const mapStateToProps = (state) => {
+//   return {
+//     dataRedux: state.users,
+//   };
+// };
+// mapStateToProps(this.props.dataRedux);
+// export default connect(mapStateToProps)(AddNewUser);
 export default AddNewUser;
