@@ -1,3 +1,6 @@
+import { useCallback } from "react";
+import { useNavigate } from "react-router";
+import { useDispatch } from "react-redux";
 import { PlusOutlined, UserAddOutlined } from "@ant-design/icons";
 import {
   Col,
@@ -15,9 +18,6 @@ import {
 import "./index.scss";
 
 function AddNewStudent() {
-  const onChange = (date, dateString) => {
-    console.log(date, dateString);
-  };
   const majorList = [
     {
       label: "Computing",
@@ -32,6 +32,19 @@ function AddNewStudent() {
       value: "marketing",
     },
   ];
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleAddStudent = useCallback(
+    (values) => {
+      const data = JSON.stringify(values);
+      dispatch({ type: "ADD_STUDENT", payload: JSON.parse(data) });
+      navigate("../students");
+    },
+    [dispatch, navigate]
+  );
+
   return (
     <Col className="py-30">
       <Space direction="horizental" size={"middle"}>
@@ -49,53 +62,59 @@ function AddNewStudent() {
           span: 24,
         }}
         layout="vertical"
+        onFinish={handleAddStudent}
       >
         <Row className="add-new-student" align="space-between">
           <Col span="13">
             <Space style={{ display: "flex" }}>
-              <Form.Item label="Student ID">
+              <Form.Item label="Student ID" name="studentId">
                 <Input />
               </Form.Item>
-              <Form.Item label="Major">
+              <Form.Item label="Major" name="majorId">
                 <Select allowClear options={majorList} />
               </Form.Item>
-              <Form.Item label="Enroll Number">
+              <Form.Item label="Enroll Number" name="enrollNumber">
                 <Input type="number" />
               </Form.Item>
             </Space>
             <Space style={{ display: "flex" }}>
-              <Form.Item label="Fullname">
+              <Form.Item label="Fullname" name="fullName">
                 <Input />
               </Form.Item>
-              <Form.Item label="Email">
+              <Form.Item label="Email" name="email">
                 <Input type="email" />
               </Form.Item>
             </Space>
             <Space style={{ display: "flex" }}>
-              <Form.Item label="Phone Number">
-                <Input />
+              <Form.Item label="Phone Number" name="phoneNumber">
+                <Input maxLength={10} />
               </Form.Item>
-              <Form.Item label="Gender">
+              <Form.Item label="Gender" name="gender">
                 <Select allowClear>
                   <Select.Option value="Male">Male</Select.Option>
                   <Select.Option value="Female">Female</Select.Option>
                   <Select.Option value="Other">Other</Select.Option>
                 </Select>
               </Form.Item>
-              <Form.Item label="Date Of Admission">
-                <DatePicker onChange={onChange} />
+              <Form.Item label="Date Of Admission" name="dateOfAdmission">
+                <DatePicker format={"YYYY-MM-DD"} />
               </Form.Item>
             </Space>
           </Col>
           <Col span="10">
-            <Form.Item label="Address">
+            <Form.Item label="Address" name="address">
               <Input.TextArea
                 maxLength="255"
                 showCount="true"
                 autoSize={{ minRows: 5 }}
               />
             </Form.Item>
-            <Form.Item label="Avatar" valuePropName="fileList">
+            <Form.Item
+              label="Avatar"
+              valuePropName="fileList"
+              name="avatar"
+              hidden
+            >
               <Upload action="/upload.do" listType="picture-card">
                 <div>
                   <PlusOutlined />
@@ -111,7 +130,9 @@ function AddNewStudent() {
             </Form.Item>
           </Col>
           <Form.Item>
-            <Button type="primary">Add Student</Button>
+            <Button type="primary" htmlType="submit">
+              Add Student
+            </Button>
           </Form.Item>
         </Row>
       </Form>

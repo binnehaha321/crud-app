@@ -137,18 +137,8 @@ function AddNewUser() {
           </Button>
         </Form.Item>
       </Form>
-      {/* <button onClick={(data) => dispatch({ type: "ADD_USER", payload: data })}>
-        ADD USER
-      </button> */}
     </Col>
   );
 }
 
-// const mapStateToProps = (state) => {
-//   return {
-//     dataRedux: state.users,
-//   };
-// };
-// mapStateToProps(this.props.dataRedux);
-// export default connect(mapStateToProps)(AddNewUser);
 export default AddNewUser;

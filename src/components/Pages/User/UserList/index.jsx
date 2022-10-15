@@ -9,7 +9,6 @@ import request from "~/utils/request";
 import roles from "../roleList";
 import { toast, ToastContainer } from "react-toastify";
 import "./index.scss";
-import { useSelector, useDispatch } from "react-redux";
 
 function UserList() {
   const columns = [
@@ -32,15 +31,17 @@ function UserList() {
       dataIndex: "userId",
       key: "userId",
     },
-    {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
-    },
+
     {
       title: "Fullname",
       dataIndex: "fullName",
       key: "fullName",
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+      render: (email) => <a href={`mailto:${email}`}>{email}</a>,
     },
     {
       title: "Username",
@@ -122,13 +123,17 @@ function UserList() {
     });
   };
 
-  useEffect(() => {
-    setIsLoaded(false);
+  const handleCallUserList = () => {
     request.get("users?id=ALL").then((res) => {
       const users = res?.data?.users;
       const result = handleUserDataList(users);
       setData(result);
     });
+  };
+
+  useEffect(() => {
+    setIsLoaded(false);
+    handleCallUserList();
     setIsLoaded(true);
   }, [isLoaded]);
 
@@ -212,12 +217,6 @@ function UserList() {
     });
   };
 
-  // Handle refresh user list
-  const handleRefresh = () => {};
-
-  const usersList = useSelector((state) => state.users);
-  
-
   return (
     <>
       {isLoaded ? (
@@ -228,7 +227,6 @@ function UserList() {
             icon={icon.SORT}
             columns={columns}
             data={data}
-            onHandleRefresh={handleRefresh}
           >
             <Link to="./add" className="ant-btn ant-btn-primary">
               ADD NEW USER

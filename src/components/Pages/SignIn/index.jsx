@@ -37,9 +37,6 @@ function SignIn() {
     fetchApi();
   };
 
-  // const onFinishFailed = (errorInfo) => {
-  //   console.log("Failed:", errorInfo);
-  // };
   return (
     <Row
       type="flex"
@@ -61,11 +58,7 @@ function SignIn() {
           <Form
             layout="vertical"
             name="signin"
-            // initialValues={{
-            //   remember: true,
-            // }}
             onFinish={handleSubmit}
-            // onFinishFailed={onFinishFailed}
             autoComplete="off"
           >
             <Form.Item
@@ -101,7 +94,7 @@ function SignIn() {
             <Form.Item>
               <Text>
                 Forgot your password?
-                <Link className={styles["reset-pw"]} to="reset-password">
+                <Link className={styles["reset-pw"]} to="../reset-password">
                   {" "}
                   Reset Password
                 </Link>

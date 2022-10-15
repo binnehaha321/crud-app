@@ -1,35 +1,46 @@
+import { useEffect, useState } from "react";
 import { Card, Typography, Space, Row } from "antd";
 import * as icon from "~/assets/images/Home";
+import request from "~/utils/request";
 import "./index.scss";
 
 function Home() {
+  const [amountUser, setAmountUser] = useState(0);
+
+  useEffect(() => {
+    request.get("users?id=ALL").then((res) => {
+      setAmountUser(res?.data?.users?.length);
+    });
+  }, []);
+
   const { Title, Text } = Typography;
+
   const items = [
     {
       label: "Students",
       icon: icon.STUDENTS,
-      number: "243",
+      amount: "243",
       bgColor: "#F0F9FF",
       color: "#000",
     },
     {
       label: "Course",
       icon: icon.COURSE,
-      number: "13",
+      amount: "13",
       bgColor: "#FEF6FB",
       color: "#000",
     },
     {
       label: "Payments",
       icon: icon.PAYMENT,
-      number: "556,000",
+      amount: "556,000",
       bgColor: "#FEFBEC",
       color: "#000",
     },
     {
       label: "User",
       icon: icon.USERS,
-      number: "3",
+      amount: amountUser,
       bgColor: "linear-gradient(110.42deg, #FEAF00 18.27%, #F8D442 91.84%)",
       color: "#FFF",
     },
@@ -49,7 +60,7 @@ function Home() {
             <img src={item.icon} alt={item.label} key={index} />
             <Text style={{ color: item.color }}>{item.label}</Text>
           </Space>
-          <Title level={4}>{item.number}</Title>
+          <Title level={4}>{item.amount}</Title>
         </Card>
       ))}
     </Row>
