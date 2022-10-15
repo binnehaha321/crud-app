@@ -24,8 +24,8 @@ function Home() {
       color: "#000",
     },
     {
-      label: "Course",
-      icon: icon.COURSE,
+      label: "Courses",
+      icon: icon.COURSES,
       amount: "13",
       bgColor: "#FEF6FB",
       color: "#000",

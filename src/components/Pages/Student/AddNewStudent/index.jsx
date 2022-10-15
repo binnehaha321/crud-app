@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useNavigate } from "react-router";
 import { useDispatch } from "react-redux";
 import { PlusOutlined, UserAddOutlined } from "@ant-design/icons";
@@ -18,7 +18,7 @@ import {
 import "./index.scss";
 
 function AddNewStudent() {
-  const majorList = [
+  const [majorList, setMajorList] = useState([
     {
       label: "Computing",
       value: "computing",
@@ -31,7 +31,7 @@ function AddNewStudent() {
       label: "MARKETING",
       value: "marketing",
     },
-  ];
+  ]);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -102,18 +102,10 @@ function AddNewStudent() {
             </Space>
           </Col>
           <Col span="10">
-            <Form.Item label="Address" name="address">
-              <Input.TextArea
-                maxLength="255"
-                showCount="true"
-                autoSize={{ minRows: 5 }}
-              />
-            </Form.Item>
             <Form.Item
               label="Avatar"
               valuePropName="fileList"
               name="avatar"
-              hidden
             >
               <Upload action="/upload.do" listType="picture-card">
                 <div>

@@ -1,6 +1,6 @@
-import COURSE from "./course.png";
+import COURSES from "./courses.png";
 import PAYMENT from "./payment.png";
 import STUDENTS from "./students.png";
 import USERS from "./users.png";
 
-export { COURSE, PAYMENT, STUDENTS, USERS };
+export { COURSES, PAYMENT, STUDENTS, USERS };

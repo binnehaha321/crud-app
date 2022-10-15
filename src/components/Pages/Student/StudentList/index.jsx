@@ -1,10 +1,21 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Space, Image } from "antd";
+import {
+  Space,
+  Image,
+  Spin,
+  Upload,
+  Input,
+  Select,
+  Modal,
+  DatePicker,
+  Form,
+} from "antd";
+import { ExclamationCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import Button from "~/components/Layout/Button";
 import * as icon from "~/assets/images/StudentList";
 import Table from "~/components/Layout/Table";
-import { ToastContainer } from "react-toastify";
-import { useEffect, useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
 import request from "~/utils/request";
 import moment from "moment";
 import "./index.scss";
@@ -64,19 +75,18 @@ function StudentList() {
     {
       title: "",
       key: "action",
-      render: () => (
+      render: (id) => (
         <Space size="middle">
-          <Button>
+          <Button onClick={() => handleGetStudentById(id.key)}>
             <img src={icon.EDIT} alt="edit" />
           </Button>
-          <Button>
+          <Button onClick={() => showDeleteConfirm(id.key)}>
             <img src={icon.DELETE} alt="delete" />
           </Button>
         </Space>
       ),
     },
   ];
-
   const [isLoaded, setIsLoaded] = useState(false);
   const [data, setData] = useState([
     {
@@ -94,6 +104,11 @@ function StudentList() {
       classId: "",
     },
   ]);
+  const [currentStudentValues, setCurrentStudentValues] = useState({});
+
+  // GET STUDENTS
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [id, setId] = useState(null);
 
   const handleStudentDataList = (students) => {
     let studentData = {};
@@ -115,7 +130,6 @@ function StudentList() {
 
   const handleCallStudentList = () => {
     request.get("students?id=ALL").then((res) => {
-      console.log(res);
       const students = res?.data?.students;
       const result = handleStudentDataList(students);
       setData(result);
@@ -127,19 +141,200 @@ function StudentList() {
     handleCallStudentList();
     setIsLoaded(true);
   }, [isLoaded]);
+
+  // UPDATE STUDENT
+  const [form] = Form.useForm();
+
+  // Get current student's data by id
+  useEffect(() => {
+    form.setFieldsValue(currentStudentValues);
+  }, [form, currentStudentValues]);
+
+  const handleGetStudentById = (id) => {
+    setId(id);
+    request
+      .get(`students?id=${id}`)
+      .then((res) => {
+        const student = res?.data?.students;
+        setCurrentStudentValues({
+          key: student?.id,
+          studentId: student?.studentId,
+          // avatar: student?.avatar,
+          email: student?.email,
+          fullName: student?.fullName,
+          gender: student?.gender,
+          phoneNumber: student?.phoneNumber,
+          enrollNumber: student?.enrollNumber,
+          dateOfAdmission: moment(student?.dateOfAdmission),
+          majorId: student?.majorId,
+          classId: student?.classId,
+        });
+        setIsModalOpen(true);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const handleUpdateStudent = (values) => {
+    request
+      .put(`students?id=${id}`, values)
+      .then((res) => {
+        const data = res?.data;
+        const students = data?.students;
+        const result = handleStudentDataList(students);
+        setData(result);
+        toast.success(data?.message);
+        setIsModalOpen(false);
+      })
+      .catch((err) => {
+        toast.error(err?.data?.message);
+      });
+  };
+
+  // DELETE STUDENT
+  const handleDelete = (id) => {
+    request
+      .delete(`students?id=${id}`)
+      .then((res) => {
+        toast.success(res?.data?.message);
+        const students = res?.data?.students;
+        const result = handleStudentDataList(students);
+        setData(result);
+      })
+      .catch((err) => {
+        toast.error(err?.data?.message);
+      });
+  };
+
+  // Confirm modal
+  const showDeleteConfirm = (id) => {
+    Modal.confirm({
+      title: "Are you sure delete this student?",
+      icon: <ExclamationCircleOutlined />,
+      content: "Click No to cancel.",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+
+      onOk() {
+        handleDelete(id);
+      },
+    });
+  };
+
+  // GET MAJOR LIST
+  const [majorList, setMajorList] = useState([
+    {
+      label: "Computing",
+      value: "computing",
+    },
+    {
+      label: "BUSINESS",
+      value: "business",
+    },
+    {
+      label: "MARKETING",
+      value: "marketing",
+    },
+  ]);
+
   return (
     <>
-      <ToastContainer />
-      <Table
-        caption="Student List"
-        icon={icon.SORT}
-        columns={columns}
-        data={data}
-      >
-        <Link to="./add" className="ant-btn ant-btn-primary">
-          ADD NEW STUDENT
-        </Link>
-      </Table>
+      {isLoaded ? (
+        <>
+          <ToastContainer />
+          <Table
+            caption="Student List"
+            icon={icon.SORT}
+            columns={columns}
+            data={data}
+          >
+            <Link to="./add" className="ant-btn ant-btn-primary">
+              ADD NEW STUDENT
+            </Link>
+          </Table>
+          <Modal
+            title="UPDATE A STUDENT"
+            forceRender
+            open={isModalOpen}
+            onOk={form.submit}
+            onCancel={() => setIsModalOpen(false)}
+          >
+            <Form
+              onKeyPress={(e) => {
+                if (e.key === "Enter") form.submit();
+              }}
+              labelCol={{
+                span: 24,
+              }}
+              wrapperCol={{
+                span: 24,
+              }}
+              layout="vertical"
+              form={form}
+              onFinish={handleUpdateStudent}
+              initialValues={currentStudentValues}
+              className="update-student"
+            >
+              <Space style={{ display: "flex" }}>
+                <Form.Item label="Student ID" name="studentId">
+                  <Input />
+                </Form.Item>
+                <Form.Item label="Major" name="majorId">
+                  <Select allowClear options={majorList} />
+                </Form.Item>
+                <Form.Item label="Enroll Number" name="enrollNumber">
+                  <Input type="number" />
+                </Form.Item>
+              </Space>
+              <Space style={{ display: "flex" }}>
+                <Form.Item label="Fullname" name="fullName">
+                  <Input />
+                </Form.Item>
+                <Form.Item label="Email" name="email">
+                  <Input type="email" />
+                </Form.Item>
+              </Space>
+              <Space style={{ display: "flex" }}>
+                <Form.Item label="Phone Number" name="phoneNumber">
+                  <Input maxLength={10} />
+                </Form.Item>
+                <Form.Item label="Gender" name="gender">
+                  <Select allowClear>
+                    <Select.Option value="Male">Male</Select.Option>
+                    <Select.Option value="Female">Female</Select.Option>
+                    <Select.Option value="Other">Other</Select.Option>
+                  </Select>
+                </Form.Item>
+                <Form.Item label="Date Of Admission" name="dateOfAdmission">
+                  <DatePicker format={"YYYY-MM-DD"} />
+                </Form.Item>
+              </Space>
+              <Form.Item
+                label="Avatar"
+                valuePropName="fileList"
+                name="avatar"
+              >
+                <Upload action="/upload.do" listType="picture-card">
+                  <div>
+                    <PlusOutlined />
+                    <div
+                      style={{
+                        marginTop: 8,
+                      }}
+                    >
+                      Upload
+                    </div>
+                  </div>
+                </Upload>
+              </Form.Item>
+            </Form>
+          </Modal>
+        </>
+      ) : (
+        <Spin />
+      )}
     </>
   );
 }
