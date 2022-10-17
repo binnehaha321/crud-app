@@ -12,12 +12,11 @@ import {
   Form,
 } from "antd";
 import { ExclamationCircleOutlined, PlusOutlined } from "@ant-design/icons";
-import Button from "~/components/Layout/Button";
-import * as icon from "~/assets/images/StudentList";
-import Table from "~/components/Layout/Table";
 import { toast, ToastContainer } from "react-toastify";
-import request from "~/utils/request";
 import moment from "moment";
+import { Table, Button } from "~/components/Layout";
+import * as icon from "~/assets/images/ActionIcons";
+import request from "~/utils/request";
 import "./index.scss";
 
 function StudentList() {
@@ -311,11 +310,7 @@ function StudentList() {
                   <DatePicker format={"YYYY-MM-DD"} />
                 </Form.Item>
               </Space>
-              <Form.Item
-                label="Avatar"
-                valuePropName="fileList"
-                name="avatar"
-              >
+              <Form.Item label="Avatar" valuePropName="fileList" name="avatar">
                 <Upload action="/upload.do" listType="picture-card">
                   <div>
                     <PlusOutlined />

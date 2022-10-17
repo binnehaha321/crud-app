@@ -1,0 +1,15 @@
+.row {
+  background: var(--bg-primary);
+
+  .col {
+    min-width: 475px;
+    padding: 40px 30px;
+    background-color: #fff;
+    border-radius: var(--border-radius-lg);
+  }
+
+  .reset-pw {
+    color: var(--btn-primary) !important;
+    text-decoration: underline !important;
+  }
+}

@@ -1,6 +1,5 @@
-import Table from "~/components/Layout/Table";
-import Button from "~/components/Layout/Button";
-import { SORT } from "~/assets/images/StudentList";
+import { Table, Button } from "~/components/Layout";
+import { SORT } from "~/assets/images/ActionIcons";
 import EYE from "~/assets/images/Payment/eye.png";
 import "./index.scss";
 

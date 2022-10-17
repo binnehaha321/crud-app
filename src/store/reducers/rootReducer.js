@@ -25,6 +25,14 @@ const rootReducer = (state = initialState, action) => {
         })
         .catch((err) => toast.error(err.message));
       return { ...state };
+    case "ADD_MAJOR":
+      request
+        .post("majors/add", action.payload)
+        .then((res) => {
+          toast.success(res.data.message);
+        })
+        .catch((err) => toast.error(err.message));
+      return { ...state };
 
     default:
       return state;

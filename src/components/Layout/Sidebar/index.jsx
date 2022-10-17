@@ -19,9 +19,9 @@ function Sidebar({ className }) {
       icon: <UserOutlined />,
     },
     {
-      label: <Link to="/courses">Courses</Link>,
-      key: "courses",
-      icon: <img src={icon.COURSES} alt="courses" />,
+      label: <Link to="/majors">Majors</Link>,
+      key: "majors",
+      icon: <img src={icon.MAJORS} alt="majors" />,
     },
     {
       label: <Link to="/students">Students</Link>,
