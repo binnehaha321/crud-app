@@ -48,13 +48,13 @@ function AddNewMajor() {
             onFinish={handleAddMajor}
           >
             <Form.Item label="Major ID" name="majorId">
-              <Input />
+              <Input className="need-uppercase" />
             </Form.Item>
             <Form.Item label="Major Name (EN)" name="majorName_EN">
-              <Input />
+              <Input className="need-capitalize" />
             </Form.Item>
             <Form.Item label="Major Name (VI)" name="majorName_VI">
-              <Input />
+              <Input className="need-capitalize" />
             </Form.Item>
             <Form.Item label="Description" name="description">
               <Input.TextArea

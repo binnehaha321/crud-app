@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useDispatch } from "react-redux";
 import { PlusOutlined, UserAddOutlined } from "@ant-design/icons";
@@ -16,22 +16,15 @@ import {
   DatePicker,
 } from "antd";
 import "./index.scss";
+import request from "~/utils/request";
 
 function AddNewStudent() {
-  const [majorList, setMajorList] = useState([
-    {
-      label: "Computing",
-      value: "computing",
-    },
-    {
-      label: "BUSINESS",
-      value: "business",
-    },
-    {
-      label: "MARKETING",
-      value: "marketing",
-    },
-  ]);
+  const [majorList, setMajorList] = useState([]);
+
+  // GET MAJOR LIST
+  useEffect(() => {
+    request.get("majors?id=ALL").then((res) => setMajorList(res?.data?.majors));
+  }, []);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -68,10 +61,16 @@ function AddNewStudent() {
           <Col span="13">
             <Space style={{ display: "flex" }}>
               <Form.Item label="Student ID" name="studentId">
-                <Input />
+                <Input className="need-uppercase" />
               </Form.Item>
               <Form.Item label="Major" name="majorId">
-                <Select allowClear options={majorList} />
+                <Select allowClear showSearch>
+                  {majorList?.map((major) => (
+                    <Select.Option key={major?.id} value={major?.majorId}>
+                      {major?.majorName_EN}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Form.Item>
               <Form.Item label="Enroll Number" name="enrollNumber">
                 <Input type="number" />
@@ -79,10 +78,10 @@ function AddNewStudent() {
             </Space>
             <Space style={{ display: "flex" }}>
               <Form.Item label="Fullname" name="fullName">
-                <Input />
+                <Input className="need-capitalize" />
               </Form.Item>
               <Form.Item label="Email" name="email">
-                <Input type="email" />
+                <Input type="email" className="need-lowercase" />
               </Form.Item>
             </Space>
             <Space style={{ display: "flex" }}>
@@ -102,11 +101,7 @@ function AddNewStudent() {
             </Space>
           </Col>
           <Col span="10">
-            <Form.Item
-              label="Avatar"
-              valuePropName="fileList"
-              name="avatar"
-            >
+            <Form.Item label="Avatar" valuePropName="fileList" name="avatar">
               <Upload action="/upload.do" listType="picture-card">
                 <div>
                   <PlusOutlined />

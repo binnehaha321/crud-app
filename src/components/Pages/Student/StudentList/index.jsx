@@ -10,6 +10,7 @@ import {
   Modal,
   DatePicker,
   Form,
+  Typography,
 } from "antd";
 import { ExclamationCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { toast, ToastContainer } from "react-toastify";
@@ -39,17 +40,27 @@ function StudentList() {
       title: "Student ID",
       dataIndex: "studentId",
       key: "studentId",
+      render: (studentId) => (
+        <Typography.Text className="need-uppercase">
+          {studentId}
+        </Typography.Text>
+      ),
     },
     {
       title: "Fullname",
       dataIndex: "fullName",
       key: "fullName",
+      render: (fullName) => (
+        <Typography.Text className="need-capitalize">
+          {fullName}
+        </Typography.Text>
+      ),
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
-      render: (email) => <a href={`mailto:${email}`}>{email}</a>,
+      render: (email) => <a className="need-lowercase" href={`mailto:${email}`}>{email}</a>,
     },
     {
       title: "Gender",

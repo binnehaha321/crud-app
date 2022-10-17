@@ -24,9 +24,9 @@ function AddNewUser() {
   const handleAddUser = useCallback(
     (values) => {
       dispatch({ type: "ADD_USER", payload: values });
-      navigate("../users");
+      // navigate("../users");
     },
-    [dispatch, navigate]
+    [dispatch]
   );
 
   return (
@@ -53,7 +53,7 @@ function AddNewUser() {
           <Col span="13">
             <Space style={{ display: "flex" }}>
               <Form.Item label="User ID" name="userId">
-                <Input />
+                <Input className="need-uppercase" />
               </Form.Item>
               <Form.Item label="Role" name="roleId">
                 <Select allowClear maxTagCount="responsive">
@@ -74,10 +74,10 @@ function AddNewUser() {
             </Space>
             <Space style={{ display: "flex" }}>
               <Form.Item label="Fullname" name="fullName">
-                <Input />
+                <Input className="need-capitalize" />
               </Form.Item>
               <Form.Item label="Email" name="email">
-                <Input type="email" />
+                <Input type="email" className="need-lowercase" />
               </Form.Item>
             </Space>
             <Space style={{ display: "flex" }}>

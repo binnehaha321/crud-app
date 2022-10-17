@@ -13,7 +13,7 @@ const rootReducer = (state = initialState, action) => {
       request
         .post("register", action.payload)
         .then((res) => {
-          toast.success(res.data.message);
+          toast.success(res?.data?.message);
         })
         .catch((err) => toast.error(err.message));
       return { ...state };
@@ -21,7 +21,7 @@ const rootReducer = (state = initialState, action) => {
       request
         .post("students/add", action.payload)
         .then((res) => {
-          toast.success(res.data.message);
+          toast.success(res?.data?.message);
         })
         .catch((err) => toast.error(err.message));
       return { ...state };
@@ -29,7 +29,7 @@ const rootReducer = (state = initialState, action) => {
       request
         .post("majors/add", action.payload)
         .then((res) => {
-          toast.success(res.data.message);
+          toast.success(res?.data?.message);
         })
         .catch((err) => toast.error(err.message));
       return { ...state };

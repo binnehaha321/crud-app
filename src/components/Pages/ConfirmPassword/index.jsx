@@ -20,14 +20,17 @@ function ConfirmPassword() {
     >
       <ToastContainer />
       {isLoaded ? (
-        <Col span={8} className={styles.col}>
+        <Col
+          md={{ span: 12 }}
+          sm={{ span: 16 }}
+          xs={{ span: 22 }}
+          className={styles.col}
+        >
           <Heading level={2} align="center" />
           <Row type="flex" justify="center" style={{ marginBottom: "50px" }}>
             <Col align="center">
               <Typography.Title level={4}>CONFIRM PASSWORD</Typography.Title>
-              <Typography.Text>
-                Confirm to reset your password
-              </Typography.Text>
+              <Typography.Text>Confirm to reset your password</Typography.Text>
             </Col>
           </Row>
           <Form
@@ -46,7 +49,7 @@ function ConfirmPassword() {
                 },
               ]}
             >
-              <Input.Password placeholder="Confirm your password" />
+              <Input.Password placeholder="Enter your password" />
             </Form.Item>
             <Form.Item
               label="Confirm Password"
@@ -58,7 +61,7 @@ function ConfirmPassword() {
                 },
               ]}
             >
-              <Input.Password placeholder="Enter your password" />
+              <Input.Password placeholder="Confirm your password" />
             </Form.Item>
             <Form.Item>
               <Button type="primary" htmlType="submit" block>

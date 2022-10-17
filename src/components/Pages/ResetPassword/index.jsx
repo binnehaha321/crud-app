@@ -20,7 +20,12 @@ function ResetPassword() {
     >
       <ToastContainer />
       {isLoaded ? (
-        <Col span={8} className={styles.col}>
+        <Col
+          md={{ span: 12 }}
+          sm={{ span: 16 }}
+          xs={{ span: 22 }}
+          className={styles.col}
+        >
           <Heading level={2} align="center" />
           <Row type="flex" justify="center" style={{ marginBottom: "50px" }}>
             <Col align="center">

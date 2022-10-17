@@ -1,19 +1,19 @@
 const roles = [
   {
     label: "ADMIN",
-    value: "admin",
+    value: "ADMIN",
   },
   {
     label: "USER",
-    value: "user",
+    value: "USER",
   },
   {
     label: "TEACHER",
-    value: "teacher",
+    value: "TEACHER",
   },
   {
     label: "STUDENT",
-    value: "student",
+    value: "STUDENT",
   },
 ];
 

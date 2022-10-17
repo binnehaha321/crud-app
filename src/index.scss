@@ -75,8 +75,19 @@ button {
   padding-block: 30px;
 }
 
-input[type=number]::-webkit-inner-spin-button, 
-input[type=number]::-webkit-outer-spin-button { 
-  -webkit-appearance: none; 
-  margin: 0; 
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.need-lowercase {
+  text-transform: lowercase;
+}
+.need-capitalize {
+  text-transform: capitalize;
+}
+
+.need-uppercase {
+  text-transform: uppercase;
 }

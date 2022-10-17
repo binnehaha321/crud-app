@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Form, Input, Select, Upload, Space, Modal, Spin, Image } from "antd";
+import {
+  Form,
+  Input,
+  Select,
+  Upload,
+  Space,
+  Modal,
+  Spin,
+  Image,
+  Typography,
+} from "antd";
 import { ExclamationCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import * as icon from "~/assets/images/ActionIcons";
 import { Table, Button } from "~/components/Layout";
@@ -29,18 +39,30 @@ function UserList() {
       title: "User ID",
       dataIndex: "userId",
       key: "userId",
+      render: (userId) => (
+        <Typography.Text className="need-uppercase">{userId}</Typography.Text>
+      ),
     },
 
     {
       title: "Fullname",
       dataIndex: "fullName",
       key: "fullName",
+      render: (fullName) => (
+        <Typography.Text className="need-capitalize">
+          {fullName}
+        </Typography.Text>
+      ),
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
-      render: (email) => <a href={`mailto:${email}`}>{email}</a>,
+      render: (email) => (
+        <a className="need-lowercase" href={`mailto:${email}`}>
+          {email}
+        </a>
+      ),
     },
     {
       title: "Username",

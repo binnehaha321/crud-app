@@ -29,9 +29,9 @@ function Sidebar({ className }) {
       icon: <img src={icon.STUDENTS} alt="students" />,
     },
     {
-      label: <Link to="/payment">Payment</Link>,
-      key: "payment",
-      icon: <img src={icon.PAYMENT} alt="payment" />,
+      label: <Link to="/payments">Payments</Link>,
+      key: "payments",
+      icon: <img src={icon.PAYMENT} alt="payments" />,
     },
     {
       label: <Link to="/report">Report</Link>,
