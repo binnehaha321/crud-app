@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import {
   Form,
@@ -10,6 +10,7 @@ import {
   Spin,
   Image,
   Typography,
+  Tag,
 } from "antd";
 import { ExclamationCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import * as icon from "~/assets/images/ActionIcons";
@@ -20,11 +21,13 @@ import { toast, ToastContainer } from "react-toastify";
 import "./index.scss";
 
 function UserList() {
+  const formRef = useRef();
   const columns = [
     {
       title: "",
       dataIndex: "avatar",
       key: "avatar",
+      fixed: "left",
       // render: (img) => <Image src={img} width={65} height={55} />,
       render: () => (
         <Image
@@ -39,19 +42,9 @@ function UserList() {
       title: "User ID",
       dataIndex: "userId",
       key: "userId",
+      fixed: "left",
       render: (userId) => (
         <Typography.Text className="need-uppercase">{userId}</Typography.Text>
-      ),
-    },
-
-    {
-      title: "Fullname",
-      dataIndex: "fullName",
-      key: "fullName",
-      render: (fullName) => (
-        <Typography.Text className="need-capitalize">
-          {fullName}
-        </Typography.Text>
       ),
     },
     {
@@ -59,9 +52,13 @@ function UserList() {
       dataIndex: "email",
       key: "email",
       render: (email) => (
-        <a className="need-lowercase" href={`mailto:${email}`}>
+        <Typography.Text
+          style={{ width: 100 }}
+          ellipsis={{ tooltip: { email } }}
+          className="need-lowercase"
+        >
           {email}
-        </a>
+        </Typography.Text>
       ),
     },
     {
@@ -75,11 +72,6 @@ function UserList() {
       key: "gender",
     },
     {
-      title: "Address",
-      dataIndex: "address",
-      key: "address",
-    },
-    {
       title: "Phone",
       dataIndex: "phoneNumber",
       key: "phoneNumber",
@@ -88,6 +80,19 @@ function UserList() {
       title: "Role",
       dataIndex: "roleId",
       key: "roleId",
+      render: (roleId) => (
+        <Tag
+          color={
+            roleId === "ADMIN"
+              ? "volcano"
+              : roleId === "USER"
+              ? "blue"
+              : "green"
+          }
+        >
+          {roleId}
+        </Tag>
+      ),
     },
     {
       title: "",
@@ -113,7 +118,6 @@ function UserList() {
       fullName: "",
       username: "",
       gender: "",
-      address: "",
       phoneNumber: "",
       roleId: "",
     },
@@ -133,10 +137,8 @@ function UserList() {
         userId: user?.userId,
         avatar: user?.avatar,
         email: user?.email,
-        fullName: user?.fullName,
         username: user?.username,
         gender: user?.gender,
-        address: user?.address,
         phoneNumber: user?.phoneNumber,
         roleId: user?.roleId,
       };
@@ -163,7 +165,7 @@ function UserList() {
 
   // Get current user's data by id
   useEffect(() => {
-    form.setFieldsValue(currentUserValues);
+    if (formRef.current) form.setFieldsValue(currentUserValues);
   }, [form, currentUserValues]);
 
   const handleGetUserById = (id) => {
@@ -247,7 +249,7 @@ function UserList() {
             caption="User List"
             icon={icon.SORT}
             columns={columns}
-            data={data}
+            dataSource={data}
           >
             <Link to="./add" className="ant-btn ant-btn-primary">
               ADD NEW USER
@@ -255,12 +257,12 @@ function UserList() {
           </Table>
           <Modal
             title="UPDATE A USER"
-            forceRender
             open={isModalOpen}
             onOk={form.submit}
             onCancel={() => setIsModalOpen(false)}
           >
             <Form
+              ref={formRef}
               onKeyPress={(e) => {
                 if (e.key === "Enter") form.submit();
               }}

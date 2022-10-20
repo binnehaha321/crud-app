@@ -11,10 +11,6 @@ const roles = [
     label: "TEACHER",
     value: "TEACHER",
   },
-  {
-    label: "STUDENT",
-    value: "STUDENT",
-  },
 ];
 
 export default roles;

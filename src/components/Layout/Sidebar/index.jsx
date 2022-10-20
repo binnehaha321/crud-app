@@ -1,12 +1,15 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Menu, Space, Image, Typography } from "antd";
 import Heading from "../Heading";
 import Button from "../Button";
 import * as icon from "~/assets/images/Sidebar";
 import "./index.scss";
 import { UserOutlined } from "@ant-design/icons";
+import { useDispatch } from "react-redux";
+import { logOut } from "~/store/actions/authenAction";
 
 function Sidebar({ className }) {
+  const dispatch = useDispatch();
   const sidebarElements = [
     {
       label: <Link to="/">Home</Link>,
@@ -45,10 +48,7 @@ function Sidebar({ className }) {
     },
   ];
 
-  const navigate = useNavigate();
-  const handleLogout = () => {
-    navigate("/sign-in");
-  };
+  const userInfo = JSON.parse(localStorage.getItem("user_info"));
 
   return (
     <Space
@@ -60,16 +60,20 @@ function Sidebar({ className }) {
       <Space direction="vertical" align="center" className="profile">
         <Image src={icon.AVATAR} alt="avatar" className="avatar" />
         <Typography.Title level={5} style={{ fontWeight: "700" }}>
-          Khanh Truong
+          {userInfo.fullName}
         </Typography.Title>
-        <span className="role">Admin</span>
+        <span className="role">{userInfo.roleId}</span>
       </Space>
       <Menu
         items={sidebarElements}
         style={{ backgroundColor: "transparent", border: "none" }}
         className="menu"
       />
-      <Button onClick={handleLogout} value="Logout" className="logout">
+      <Button
+        onClick={() => dispatch(logOut("Log out successfully!"))}
+        value="Logout"
+        className="logout"
+      >
         <img src={icon.LOGOUT} alt="logout" />
       </Button>
     </Space>

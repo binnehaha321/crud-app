@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Space,
@@ -21,6 +21,7 @@ import request from "~/utils/request";
 import "./index.scss";
 
 function StudentList() {
+  const formRef = useRef();
   const columns = [
     {
       title: "",
@@ -60,7 +61,11 @@ function StudentList() {
       title: "Email",
       dataIndex: "email",
       key: "email",
-      render: (email) => <a className="need-lowercase" href={`mailto:${email}`}>{email}</a>,
+      render: (email) => (
+        <a className="need-lowercase" href={`mailto:${email}`}>
+          {email}
+        </a>
+      ),
     },
     {
       title: "Gender",
@@ -73,7 +78,7 @@ function StudentList() {
       key: "phoneNumber",
     },
     {
-      title: "Enroll Number",
+      title: "Enroll No.",
       dataIndex: "enrollNumber",
       key: "enrollNumber",
     },
@@ -124,7 +129,7 @@ function StudentList() {
     let studentData = {};
     return students?.map((student) => {
       studentData = {
-        key: student?.id,
+        key: student?.studentId,
         studentId: student?.studentId,
         avatar: student?.avatar,
         email: student?.email,
@@ -139,7 +144,7 @@ function StudentList() {
   };
 
   const handleCallStudentList = () => {
-    request.get("students?id=ALL").then((res) => {
+    request.get("students").then((res) => {
       const students = res?.data?.students;
       const result = handleStudentDataList(students);
       setData(result);
@@ -157,13 +162,13 @@ function StudentList() {
 
   // Get current student's data by id
   useEffect(() => {
-    form.setFieldsValue(currentStudentValues);
+    if (formRef.current) form.setFieldsValue(currentStudentValues);
   }, [form, currentStudentValues]);
 
   const handleGetStudentById = (id) => {
     setId(id);
     request
-      .get(`students?id=${id}`)
+      .get(`students?studentId=${id}`)
       .then((res) => {
         const student = res?.data?.students;
         setCurrentStudentValues({
@@ -188,7 +193,7 @@ function StudentList() {
 
   const handleUpdateStudent = (values) => {
     request
-      .put(`students?id=${id}`, values)
+      .put(`students?studentId=${id}`, values)
       .then((res) => {
         const data = res?.data;
         const students = data?.students;
@@ -205,7 +210,7 @@ function StudentList() {
   // DELETE STUDENT
   const handleDelete = (id) => {
     request
-      .delete(`students?id=${id}`)
+      .delete(`students?studentId=${id}`)
       .then((res) => {
         toast.success(res?.data?.message);
         const students = res?.data?.students;
@@ -258,7 +263,7 @@ function StudentList() {
             caption="Student List"
             icon={icon.SORT}
             columns={columns}
-            data={data}
+            dataSource={data}
           >
             <Link to="./add" className="ant-btn ant-btn-primary">
               ADD NEW STUDENT
@@ -272,6 +277,7 @@ function StudentList() {
             onCancel={() => setIsModalOpen(false)}
           >
             <Form
+              ref={formRef}
               onKeyPress={(e) => {
                 if (e.key === "Enter") form.submit();
               }}

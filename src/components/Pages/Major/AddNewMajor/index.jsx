@@ -11,7 +11,7 @@ import {
   Form,
   Row,
 } from "antd";
-import { UserAddOutlined } from "@ant-design/icons";
+import { InfoCircleOutlined } from "@ant-design/icons";
 import { ToastContainer } from "react-toastify";
 
 function AddNewMajor() {
@@ -29,7 +29,7 @@ function AddNewMajor() {
     <Col className="py-30">
       <ToastContainer />
       <Space direction="horizental" size={"middle"}>
-        <UserAddOutlined
+        <InfoCircleOutlined
           style={{ fontSize: "2rem", color: "var(--btn-primary)" }}
         />
         <Typography.Title level={3}>ADD NEW MAJOR</Typography.Title>

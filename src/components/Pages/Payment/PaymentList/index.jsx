@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Table, Button } from "~/components/Layout";
+import { Table } from "~/components/Layout";
 import moment from "moment";
 import { SORT } from "~/assets/images/ActionIcons";
 import EYE from "~/assets/images/Payment/eye.png";
 import request from "~/utils/request";
 import "./index.scss";
-import { Typography } from "antd";
+import { Tag, Typography } from "antd";
 
 function Payment() {
   const columns = [
@@ -21,19 +21,24 @@ function Payment() {
       ),
     },
     {
-      title: "Fullname",
-      dataIndex: "fullName",
-      key: "fullName",
-      render: (fullName) => (
-        <Typography.Text className="need-capitalize">
-          {fullName}
-        </Typography.Text>
-      ),
-    },
-    {
       title: "Payment Schedule",
       dataIndex: "paymentSchedule",
       key: "paymentSchedule",
+      render: (paymentSchedule) => (
+        <Tag
+          color={
+            paymentSchedule === "First"
+              ? "volcano"
+              : paymentSchedule === "Second"
+              ? "blue"
+              : paymentSchedule === "Third"
+              ? "green"
+              : "red"
+          }
+        >
+          {paymentSchedule}
+        </Tag>
+      ),
     },
     {
       title: "Bill Number",
@@ -58,10 +63,10 @@ function Payment() {
     {
       title: "",
       key: "view",
-      render: () => (
-        <Button>
-          <img src={EYE} alt="view" />
-        </Button>
+      render: (record) => (
+        <Link to={`${record.studentId}`}>
+          <img src={EYE} alt="view-detail" />
+        </Link>
       ),
     },
   ];
@@ -70,7 +75,6 @@ function Payment() {
     {
       key: "",
       studentId: "",
-      fullName: "",
       paymentSchedule: "",
       billNumber: 0,
       amountPaid: 0,
@@ -88,12 +92,11 @@ function Payment() {
         key: payment?.id,
         studentId: payment?.studentId,
         paymentId: payment?.paymentId,
-        fullName: payment?.fullName,
         paymentSchedule: payment?.paymentSchedule,
         billNumber: payment?.billNumber,
         amountPaid: payment?.amountPaid,
         balanceAmount: payment?.balanceAmount,
-        date: moment(payment?.date).format("YYYY-MM-DD"),
+        date: moment(payment?.paymentDate).format("YYYY-MM-DD"),
       };
       return paymentData;
     });
@@ -114,7 +117,12 @@ function Payment() {
   }, [isLoaded]);
 
   return (
-    <Table caption="Payment Details" icon={SORT} columns={columns} data={data}>
+    <Table
+      caption="Payment List"
+      icon={SORT}
+      columns={columns}
+      dataSource={data}
+    >
       <Link to="./add" className="ant-btn ant-btn-primary">
         ADD NEW PAYMENT
       </Link>

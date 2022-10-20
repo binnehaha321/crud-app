@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { PlusOutlined, UserAddOutlined } from "@ant-design/icons";
 import {
   Col,
@@ -15,8 +15,14 @@ import {
   Divider,
   DatePicker,
 } from "antd";
-import "./index.scss";
 import request from "~/utils/request";
+import {
+  addStudent,
+  addStudentSuccess,
+  addStudentFail,
+} from "~/store/actions/studentAction";
+import "./index.scss";
+import { toast } from "react-toastify";
 
 function AddNewStudent() {
   const [majorList, setMajorList] = useState([]);
@@ -31,12 +37,31 @@ function AddNewStudent() {
 
   const handleAddStudent = useCallback(
     (values) => {
-      const data = JSON.stringify(values);
-      dispatch({ type: "ADD_STUDENT", payload: JSON.parse(data) });
-      navigate("../students");
+      // const data = JSON.stringify(values);
+      // dispatch({ type: "ADD_STUDENT", payload: JSON.parse(data) });
+      request
+        .post("students/add", values)
+        .then((res) => {
+          if (!res) {
+            dispatch(addStudent());
+          } else {
+            dispatch(addStudentSuccess(res?.data?.message));
+            navigate("../students");
+          }
+        })
+        .catch((err) => {
+          dispatch(addStudentFail(err?.response?.data?.message));
+        });
     },
     [dispatch, navigate]
   );
+
+  let { msg } = useSelector((state) => state.student);
+  useEffect(() => {
+    if (msg) {
+      toast.error(msg);
+    }
+  }, [msg]);
 
   return (
     <Col className="py-30">
@@ -58,7 +83,7 @@ function AddNewStudent() {
         onFinish={handleAddStudent}
       >
         <Row className="add-new-student" align="space-between">
-          <Col span="13">
+          <Col xs={{ span: 24 }} lg={{ span: 13 }}>
             <Space style={{ display: "flex" }}>
               <Form.Item label="Student ID" name="studentId">
                 <Input className="need-uppercase" />
@@ -100,7 +125,7 @@ function AddNewStudent() {
               </Form.Item>
             </Space>
           </Col>
-          <Col span="10">
+          <Col xs={{ span: 24 }} lg={{ span: 10 }}>
             <Form.Item label="Avatar" valuePropName="fileList" name="avatar">
               <Upload action="/upload.do" listType="picture-card">
                 <div>

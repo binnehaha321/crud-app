@@ -24,9 +24,9 @@ function AddNewUser() {
   const handleAddUser = useCallback(
     (values) => {
       dispatch({ type: "ADD_USER", payload: values });
-      // navigate("../users");
+      navigate("../users");
     },
-    [dispatch]
+    [dispatch, navigate]
   );
 
   return (

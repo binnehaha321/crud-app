@@ -2,6 +2,7 @@ import SignIn from "~/components/Pages/SignIn";
 import Home from "~/components/Pages/Home";
 import Payment from "~/components/Pages/Payment/PaymentList";
 import AddNewPayment from "~/components/Pages/Payment/AddNewPayment";
+import PaymentDetail from "~/components/Pages/Payment/PaymentDetail";
 import StudentList from "~/components/Pages/Student/StudentList";
 import AddNewStudent from "~/components/Pages/Student/AddNewStudent";
 import UserList from "~/components/Pages/User/UserList";
@@ -21,6 +22,7 @@ const privateRoutes = [
   { path: "/", component: <Home /> },
   { path: "payments", component: <Payment /> },
   { path: "payments/add", component: <AddNewPayment /> },
+  { path: "payments/:id", component: <PaymentDetail /> },
   { path: "students", component: <StudentList /> },
   { path: "students/add", component: <AddNewStudent /> },
   { path: "users", component: <UserList /> },

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { Input, Modal, Space, Spin, Form } from "antd";
 import { toast, ToastContainer } from "react-toastify";
@@ -8,6 +8,7 @@ import request from "~/utils/request";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 
 function MajorList() {
+  const formRef = useRef();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [id, setId] = useState(null);
   const [form] = Form.useForm();
@@ -90,7 +91,7 @@ function MajorList() {
 
   // Get current major's data by id
   useEffect(() => {
-    form.setFieldsValue(currentMajorValues);
+    if (formRef.current) form.setFieldsValue(currentMajorValues);
   }, [form, currentMajorValues]);
 
   const handleGetMajorById = (id) => {
@@ -169,7 +170,7 @@ function MajorList() {
             caption="Major List"
             icon={icon.SORT}
             columns={columns}
-            data={data}
+            dataSource={data}
           >
             <Link to="./add" className="ant-btn ant-btn-primary">
               ADD NEW MAJOR
@@ -183,6 +184,7 @@ function MajorList() {
             onCancel={() => setIsModalOpen(false)}
           >
             <Form
+              ref={formRef}
               onKeyPress={(e) => {
                 if (e.key === "Enter") form.submit();
               }}

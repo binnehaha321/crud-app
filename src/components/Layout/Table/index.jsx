@@ -1,9 +1,9 @@
-import { Col, Divider, Space, Table as TableAnt, Typography } from "antd";
+import { Divider, Space, Table as TableAnt, Typography } from "antd";
 import "./index.scss";
 
-function Table({ caption, icon, children, columns, data }) {
+function Table({ caption, icon, children, columns, dataSource }) {
   return (
-    <Col>
+    <>
       <Space
         direction="horizental"
         align="center"
@@ -21,10 +21,10 @@ function Table({ caption, icon, children, columns, data }) {
       <Divider style={{ margin: "0" }} />
       <TableAnt
         columns={columns}
-        dataSource={data}
-        // scroll={{ x: "max-content" }}
+        dataSource={dataSource}
+        scroll={{ x: "fit-content" }}
       />
-    </Col>
+    </>
   );
 }
 

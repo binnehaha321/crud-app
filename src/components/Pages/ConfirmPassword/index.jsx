@@ -21,6 +21,8 @@ function ConfirmPassword() {
       <ToastContainer />
       {isLoaded ? (
         <Col
+          xl={{ span: 8 }}
+          lg={{ span: 10 }}
           md={{ span: 12 }}
           sm={{ span: 16 }}
           xs={{ span: 22 }}

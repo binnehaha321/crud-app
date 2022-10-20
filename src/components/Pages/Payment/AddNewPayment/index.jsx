@@ -10,46 +10,53 @@ import {
   Typography,
   Form,
   Select,
+  DatePicker,
 } from "antd";
-import { UserAddOutlined } from "@ant-design/icons";
+import { DollarCircleOutlined } from "@ant-design/icons";
 import { ToastContainer } from "react-toastify";
 import request from "~/utils/request";
+import schedule from "./schedule";
 import "./index.scss";
 
 function AddNewPayment() {
+  const [form] = Form.useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleAddPayment = useCallback(
     (values) => {
       dispatch({ type: "ADD_PAYMENT", payload: values });
-      navigate("../payments");
+      // navigate("../payments");
     },
     [dispatch, navigate]
   );
   const [students, setStudents] = useState([]);
-  const [studentId, setStudentId] = useState("");
   const [fullName, setFullName] = useState("");
 
-  // GET STUDENT ID LIST
+  // GET STUDENT (ID) LIST
   useEffect(() => {
     request
-      .get("students?id=ALL")
+      .get("students?studentId=ALL")
       .then((res) => setStudents(res?.data?.students));
   }, []);
 
   // Handle select studentId
   const handleSelectStudentId = useCallback((studentId) => {
-    setStudentId(studentId);
-    request.get(`students?id=${studentId}`).then((res) => {
+    request.get(`students?studentId=${studentId}`).then((res) => {
       setFullName(res?.data?.students?.fullName);
     });
   }, []);
 
   return (
-    <Col className="py-30">
+    <Col
+      className="py-30"
+      xs={{ span: 24 }}
+      md={{ span: 20 }}
+      lg={{ span: 12 }}
+    >
+      {" "}
       <ToastContainer />
       <Space direction="horizental" size={"middle"}>
-        <UserAddOutlined
+        <DollarCircleOutlined
           style={{ fontSize: "2rem", color: "var(--btn-primary)" }}
         />
         <Typography.Title level={3}>ADD NEW PAYMENT</Typography.Title>
@@ -65,43 +72,63 @@ function AddNewPayment() {
         layout="vertical"
         onFinish={handleAddPayment}
         className="add-new-payment"
+        form={form}
       >
         <Space style={{ display: "flex" }}>
           <Form.Item label="Student ID" name="studentId">
-            <Select showSearch onChange={handleSelectStudentId}>
+            <Select
+              showSearch
+              onChange={handleSelectStudentId}
+              value={students}
+              className="need-uppercase"
+            >
               {students.map((student) => (
-                <Select.Option key={student.id} value={student.id}>
+                <Select.Option
+                  key={student.id}
+                  value={student.id}
+                  className="need-uppercase"
+                >
                   {student.studentId}
                 </Select.Option>
               ))}
             </Select>
           </Form.Item>
           <Form.Item label="Fullname" name="fullName">
-            <Input disabled value={fullName} />
+            <Input
+              readOnly
+              placeholder={fullName}
+              className="need-capitalize"
+            />
           </Form.Item>
         </Space>
         <Space style={{ display: "flex" }}>
           <Form.Item label="Payment ID" name="paymentId">
-            <Input />
+            <Input maxLength={10} minLength={10} className="need-uppercase" />
           </Form.Item>
           <Form.Item label="Payment Schedule" name="paymentSchedule">
-            <Input />
+            <Select>
+              {schedule.map((time, index) => (
+                <Select.Option key={index} value={time.value}>
+                  {time.label}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
         </Space>
         <Space style={{ display: "flex" }}>
           <Form.Item label="Bill Number" name="billNumber">
-            <Input />
+            <Input type="number" prefix="#" />
           </Form.Item>
           <Form.Item label="Amount Paid" name="amountPaid">
-            <Input />
+            <Input type="number" prefix="$" />
           </Form.Item>
         </Space>
         <Space style={{ display: "flex" }}>
           <Form.Item label="Balance Amount" name="balanceAmount">
-            <Input />
+            <Input readOnly placeholder={0} />
           </Form.Item>
           <Form.Item label="Payment Date" name="paymentDate">
-            <Input />
+            <DatePicker format={"YYYY-MM-DD"} />
           </Form.Item>
         </Space>
         <Form.Item align="center">

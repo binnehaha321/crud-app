@@ -1,4 +1,4 @@
-import { Row } from "antd";
+import { Col, Row } from "antd";
 import Header from "../Header";
 import Sidebar from "../Sidebar";
 import "./index.scss";
@@ -8,7 +8,7 @@ function DefaultLayout({ children }) {
     <Row className="default-layout">
       <Sidebar className="sidebar" />
       <Header className="header" />
-      {children}
+      <Col style={{ overflow: "auto" }}>{children}</Col>
     </Row>
   );
 }

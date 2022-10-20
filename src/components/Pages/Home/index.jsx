@@ -3,6 +3,8 @@ import { Card, Typography, Space, Row, Spin } from "antd";
 import * as icon from "~/assets/images/Home";
 import request from "~/utils/request";
 import "./index.scss";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 function Home() {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -10,10 +12,17 @@ function Home() {
   const [amountMajor, setAmountMajor] = useState(0);
   const [amountPayment, setAmountPayment] = useState(0);
   const [amountUser, setAmountUser] = useState(0);
+  let { msg } = useSelector((state) => state.authen);
+
+  useEffect(() => {
+    if (msg) {
+      toast.success(msg);
+    }
+  }, [msg]);
 
   // STUDENTS
   const callStudentList = () =>
-    request.get("students?id=ALL").then((res) => {
+    request.get("students").then((res) => {
       setAmountStudent(res?.data?.students?.length);
     });
 
@@ -80,7 +89,11 @@ function Home() {
   return (
     <>
       {isLoaded ? (
-        <Row justify="space-between" style={{ backgroundColor: "transparent" }}>
+        <Row
+          justify="space-between"
+          gutter={[16, 16]}
+          style={{ paddingTop: "1rem" }}
+        >
           {items.map((item, index) => (
             <Card
               key={index}

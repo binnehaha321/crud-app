@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Button, Col, Input, Row, Spin, Typography, Form } from "antd";
 import { ToastContainer } from "react-toastify";
 import { Heading } from "~/components/Layout";
 import styles from "./index.module.scss";
+import { MailOutlined } from "@ant-design/icons";
 
 function ResetPassword() {
   const [isLoaded, setIsLoaded] = useState(true);
@@ -21,6 +22,8 @@ function ResetPassword() {
       <ToastContainer />
       {isLoaded ? (
         <Col
+          xl={{ span: 8 }}
+          lg={{ span: 10 }}
           md={{ span: 12 }}
           sm={{ span: 16 }}
           xs={{ span: 22 }}
@@ -51,12 +54,25 @@ function ResetPassword() {
                 },
               ]}
             >
-              <Input type="email" placeholder="Enter your email" />
+              <Input
+                type="email"
+                placeholder="Enter your email"
+                suffix={<MailOutlined />}
+              />
             </Form.Item>
             <Form.Item>
               <Button type="primary" htmlType="submit" block>
                 RESET PASSWORD
               </Button>
+            </Form.Item>
+            <Form.Item>
+              <Typography.Text>
+                Remember your password?
+                <Link className={styles["reset-pw"]} to="../sign-in">
+                  {" "}
+                  Sign In
+                </Link>
+              </Typography.Text>
             </Form.Item>
           </Form>
         </Col>
