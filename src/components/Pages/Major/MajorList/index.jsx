@@ -1,18 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Input, Modal, Space, Spin, Form } from "antd";
-import { toast, ToastContainer } from "react-toastify";
+import { Input, Modal, Space, Form } from "antd";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { toast } from "react-toastify";
 import { Table, Button } from "~/components/Layout";
 import * as icon from "~/assets/images/ActionIcons";
 import request from "~/utils/request";
-import { ExclamationCircleOutlined } from "@ant-design/icons";
 
 function MajorList() {
   const formRef = useRef();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [id, setId] = useState(null);
   const [form] = Form.useForm();
-  const [isLoaded, setIsLoaded] = useState(false);
   const [currentMajorValues, setCurrentMajorValues] = useState({});
   const columns = [
     {
@@ -65,7 +64,7 @@ function MajorList() {
     let majorData = {};
     return majors?.map((major) => {
       majorData = {
-        key: major?.id,
+        key: major?.majorId,
         majorId: major?.majorId,
         majorName_EN: major?.majorName_EN,
         majorName_VI: major?.majorName_VI,
@@ -76,7 +75,7 @@ function MajorList() {
   };
 
   const handleCallMajorList = () => {
-    request.get("majors?id=ALL").then((res) => {
+    request.get("majors").then((res) => {
       const majors = res?.data?.majors;
       const result = handleMajorDataList(majors);
       setData(result);
@@ -84,10 +83,8 @@ function MajorList() {
   };
 
   useEffect(() => {
-    setIsLoaded(false);
     handleCallMajorList();
-    setIsLoaded(true);
-  }, [isLoaded]);
+  }, []);
 
   // Get current major's data by id
   useEffect(() => {
@@ -97,7 +94,7 @@ function MajorList() {
   const handleGetMajorById = (id) => {
     setId(id);
     request
-      .get(`majors?id=${id}`)
+      .get(`majors?majorId=${id}`)
       .then((res) => {
         const major = res?.data?.majors;
         setCurrentMajorValues({
@@ -116,7 +113,7 @@ function MajorList() {
 
   const handleUpdateMajor = (values) => {
     request
-      .put(`majors?id=${id}`, values)
+      .put(`majors?majorId=${id}`, values)
       .then((res) => {
         const data = res?.data;
         const majors = data?.majors;
@@ -133,7 +130,7 @@ function MajorList() {
   // DELETE MAJOR
   const handleDelete = (id) => {
     request
-      .delete(`majors?id=${id}`)
+      .delete(`majors?majorId=${id}`)
       .then((res) => {
         toast.success(res?.data?.message);
         const majors = res?.data?.majors;
@@ -163,65 +160,58 @@ function MajorList() {
 
   return (
     <>
-      {isLoaded ? (
-        <>
-          <ToastContainer />
-          <Table
-            caption="Major List"
-            icon={icon.SORT}
-            columns={columns}
-            dataSource={data}
-          >
-            <Link to="./add" className="ant-btn ant-btn-primary">
-              ADD NEW MAJOR
-            </Link>
-          </Table>
-          <Modal
-            title="UPDATE A MAJOR"
-            forceRender
-            open={isModalOpen}
-            onOk={form.submit}
-            onCancel={() => setIsModalOpen(false)}
-          >
-            <Form
-              ref={formRef}
-              onKeyPress={(e) => {
-                if (e.key === "Enter") form.submit();
-              }}
-              labelCol={{
-                span: 24,
-              }}
-              wrapperCol={{
-                span: 24,
-              }}
-              layout="vertical"
-              form={form}
-              onFinish={handleUpdateMajor}
-              initialValues={currentMajorValues}
-              className="update-major"
-            >
-              <Form.Item label="Major ID" name="majorId">
-                <Input />
-              </Form.Item>
-              <Form.Item label="Major Name (EN)" name="majorName_EN">
-                <Input />
-              </Form.Item>
-              <Form.Item label="Major Name (VI)" name="majorName_VI">
-                <Input />
-              </Form.Item>
-              <Form.Item label="Description" name="description">
-                <Input.TextArea
-                  maxLength="255"
-                  showCount="true"
-                  autoSize={{ minRows: 5 }}
-                />
-              </Form.Item>
-            </Form>
-          </Modal>
-        </>
-      ) : (
-        <Spin />
-      )}
+      <Table
+        caption="Major List"
+        icon={icon.SORT}
+        columns={columns}
+        dataSource={data}
+      >
+        <Link to="./add" className="ant-btn ant-btn-primary">
+          ADD NEW MAJOR
+        </Link>
+      </Table>
+      <Modal
+        title="UPDATE A MAJOR"
+        forceRender
+        open={isModalOpen}
+        onOk={form.submit}
+        onCancel={() => setIsModalOpen(false)}
+      >
+        <Form
+          ref={formRef}
+          onKeyPress={(e) => {
+            if (e.key === "Enter") form.submit();
+          }}
+          labelCol={{
+            span: 24,
+          }}
+          wrapperCol={{
+            span: 24,
+          }}
+          layout="vertical"
+          form={form}
+          onFinish={handleUpdateMajor}
+          initialValues={currentMajorValues}
+          className="update-major"
+        >
+          <Form.Item label="Major ID" name="majorId">
+            <Input />
+          </Form.Item>
+          <Form.Item label="Major Name (EN)" name="majorName_EN">
+            <Input />
+          </Form.Item>
+          <Form.Item label="Major Name (VI)" name="majorName_VI">
+            <Input />
+          </Form.Item>
+          <Form.Item label="Description" name="description">
+            <Input.TextArea
+              maxLength="255"
+              showCount="true"
+              autoSize={{ minRows: 5 }}
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
     </>
   );
 }

@@ -28,19 +28,19 @@ function Home() {
 
   // MAJORS
   const callMajorList = () =>
-    request.get("majors?id=ALL").then((res) => {
+    request.get("majors").then((res) => {
       setAmountMajor(res?.data?.majors?.length);
     });
 
   // PAYMENTS
   // const callPaymentList = () =>
-  //   request.get("payments?id=ALL").then((res) => {
+  //   request.get("payments").then((res) => {
   //     setAmountPayment(res?.data?.payments?.length);
   //   });
 
   // USERS
   const callUserList = () =>
-    request.get("users?id=ALL").then((res) => {
+    request.get("users").then((res) => {
       setAmountUser(res?.data?.users?.length);
     });
 

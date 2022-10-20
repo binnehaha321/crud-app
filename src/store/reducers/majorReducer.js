@@ -1,8 +1,8 @@
 import {
-  ADD_STUDENT,
-  ADD_STUDENT_SUCCESS,
-  ADD_STUDENT_FAIL,
- } from "../constants/student";
+  ADD_MAJOR,
+  ADD_MAJOR_SUCCESS,
+  ADD_MAJOR_FAIL,
+} from "../constants/major";
 
 const initialState = {
   isLoading: false,
@@ -10,15 +10,15 @@ const initialState = {
   flag: false,
 };
 
-const studentReducer = (state = initialState, action) => {
+const majorReducer = (state = initialState, action) => {
   switch (action.type) {
-    case ADD_STUDENT: {
+    case ADD_MAJOR: {
       return {
         ...state,
         isLoading: true,
       };
     }
-    case ADD_STUDENT_SUCCESS: {
+    case ADD_MAJOR_SUCCESS: {
       return {
         ...state,
         isLoading: false,
@@ -26,7 +26,7 @@ const studentReducer = (state = initialState, action) => {
         flag: true,
       };
     }
-    case ADD_STUDENT_FAIL: {
+    case ADD_MAJOR_FAIL: {
       return {
         ...state,
         isLoading: false,
@@ -35,8 +35,8 @@ const studentReducer = (state = initialState, action) => {
       };
     }
     default:
-      return { ...state };
+      return state;
   }
 };
 
-export default studentReducer;
+export default majorReducer;

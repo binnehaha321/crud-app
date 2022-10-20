@@ -48,7 +48,7 @@ function Sidebar({ className }) {
     },
   ];
 
-  const userInfo = JSON.parse(localStorage.getItem("user_info"));
+  const { fullName, roleId } = JSON.parse(localStorage.getItem("user_info"));
 
   return (
     <Space
@@ -60,9 +60,9 @@ function Sidebar({ className }) {
       <Space direction="vertical" align="center" className="profile">
         <Image src={icon.AVATAR} alt="avatar" className="avatar" />
         <Typography.Title level={5} style={{ fontWeight: "700" }}>
-          {userInfo.fullName}
+          {fullName}
         </Typography.Title>
-        <span className="role">{userInfo.roleId}</span>
+        <span className="role">{roleId}</span>
       </Space>
       <Menu
         items={sidebarElements}

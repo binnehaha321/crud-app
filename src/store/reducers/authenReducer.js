@@ -25,7 +25,7 @@ const authenReducer = (state = initialState, action) => {
         ...state,
         isLoading: false,
         isLogin: true,
-        msg: action.payload.msg,
+        msg: action.payload,
         userInfo: action.payload.userInfo,
       };
     }

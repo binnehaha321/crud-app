@@ -21,15 +21,15 @@ import {
   addStudentSuccess,
   addStudentFail,
 } from "~/store/actions/studentAction";
-import "./index.scss";
 import { toast } from "react-toastify";
+import "./index.scss";
 
 function AddNewStudent() {
   const [majorList, setMajorList] = useState([]);
 
   // GET MAJOR LIST
   useEffect(() => {
-    request.get("majors?id=ALL").then((res) => setMajorList(res?.data?.majors));
+    request.get("majors").then((res) => setMajorList(res?.data?.majors));
   }, []);
 
   const dispatch = useDispatch();
@@ -37,8 +37,6 @@ function AddNewStudent() {
 
   const handleAddStudent = useCallback(
     (values) => {
-      // const data = JSON.stringify(values);
-      // dispatch({ type: "ADD_STUDENT", payload: JSON.parse(data) });
       request
         .post("students/add", values)
         .then((res) => {
@@ -56,12 +54,16 @@ function AddNewStudent() {
     [dispatch, navigate]
   );
 
-  let { msg } = useSelector((state) => state.student);
+  let { msg, flag } = useSelector((state) => state.student);
   useEffect(() => {
     if (msg) {
-      toast.error(msg);
+      if (flag) {
+        toast.success(msg);
+      } else {
+        toast.error(msg);
+      }
     }
-  }, [msg]);
+  }, [msg, flag]);
 
   return (
     <Col className="py-30">
