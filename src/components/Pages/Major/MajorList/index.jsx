@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Input, Modal, Space, Form } from "antd";
+import { Input, Modal, Space, Form, Typography } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import { Table, Button } from "~/components/Layout";
@@ -18,16 +18,29 @@ function MajorList() {
       title: "Major ID",
       dataIndex: "majorId",
       key: "majorId",
+      render: (majorId) => (
+        <Typography.Text className="need-uppercase">{majorId}</Typography.Text>
+      ),
     },
     {
       title: "Major Name (EN)",
       dataIndex: "majorName_EN",
       key: "majorName_EN",
+      render: (majorName_EN) => (
+        <Typography.Text className="need-capitalize">
+          {majorName_EN}
+        </Typography.Text>
+      ),
     },
     {
       title: "Major Name (VI)",
       dataIndex: "majorName_VI",
       key: "majorName_VI",
+      render: (majorName_VI) => (
+        <Typography.Text className="need-capitalize">
+          {majorName_VI}
+        </Typography.Text>
+      ),
     },
     {
       title: "Description",
@@ -195,13 +208,13 @@ function MajorList() {
           className="update-major"
         >
           <Form.Item label="Major ID" name="majorId">
-            <Input />
+            <Input className="need-uppercase" />
           </Form.Item>
           <Form.Item label="Major Name (EN)" name="majorName_EN">
-            <Input />
+            <Input className="need-capitalize" />
           </Form.Item>
           <Form.Item label="Major Name (VI)" name="majorName_VI">
-            <Input />
+            <Input className="need-capitalize" />
           </Form.Item>
           <Form.Item label="Description" name="description">
             <Input.TextArea

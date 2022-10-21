@@ -9,10 +9,9 @@ import {
   Space,
   Typography,
   Form,
-  Row,
 } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import request from "~/utils/request";
 import {
   addMajor,
@@ -62,7 +61,6 @@ function AddNewMajor() {
       lg={{ span: 10 }}
       xl={{ span: 8 }}
     >
-      <ToastContainer />
       <Space direction="horizental" size={"middle"}>
         <InfoCircleOutlined
           style={{ fontSize: "2rem", color: "var(--btn-primary)" }}

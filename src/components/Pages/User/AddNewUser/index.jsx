@@ -1,6 +1,6 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { PlusOutlined, UserAddOutlined } from "@ant-design/icons";
 import {
   Col,
@@ -14,24 +14,53 @@ import {
   Typography,
   Divider,
 } from "antd";
-import { ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import roles from "../roleList.js";
-import "./index.scss";
+import {
+  addUser,
+  addUserSuccess,
+  addUserFail,
+} from "~/store/actions/userAction";
+import request from "~/utils/request.js";
 
 function AddNewUser() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleAddUser = useCallback(
     (values) => {
-      dispatch({ type: "ADD_USER", payload: values });
-      navigate("../users");
+      request
+        .post("register", values)
+        .then((res) => {
+          if (!res) {
+            dispatch(addUser());
+          } else {
+            dispatch(addUserSuccess(res?.data?.message));
+            navigate("../users");
+          }
+        })
+        .catch((err) => dispatch(addUserFail(err?.response?.data?.message)));
     },
     [dispatch, navigate]
   );
 
+  let { msg, flag } = useSelector((state) => state.major);
+  useEffect(() => {
+    if (msg) {
+      if (flag) {
+        toast.success(msg);
+      } else {
+        toast.error(msg);
+      }
+    }
+  }, [msg, flag]);
+
   return (
-    <Col className="py-30">
-      <ToastContainer />
+    <Col
+      className="py-30"
+      xs={{ span: 24 }}
+      xl={{ span: 20 }}
+      xxl={{ span: 16 }}
+    >
       <Space direction="horizental" size={"middle"}>
         <UserAddOutlined
           style={{ fontSize: "2rem", color: "var(--btn-primary)" }}
@@ -49,50 +78,66 @@ function AddNewUser() {
         layout="vertical"
         onFinish={handleAddUser}
       >
-        <Row className="add-new-user" align="space-between">
-          <Col span="13">
-            <Space style={{ display: "flex" }}>
-              <Form.Item label="User ID" name="userId">
-                <Input className="need-uppercase" />
-              </Form.Item>
-              <Form.Item label="Role" name="roleId">
-                <Select allowClear maxTagCount="responsive">
-                  {roles?.map((role, index) => (
-                    <Select.Option value={role.value} key={index}>
-                      {role.label}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Form.Item>
-              <Form.Item label="Gender" name="gender">
-                <Select allowClear="true">
-                  <Select.Option value="Male">Male</Select.Option>
-                  <Select.Option value="Female">Female</Select.Option>
-                  <Select.Option value="Other">Other</Select.Option>
-                </Select>
-              </Form.Item>
-            </Space>
-            <Space style={{ display: "flex" }}>
-              <Form.Item label="Fullname" name="fullName">
-                <Input className="need-capitalize" />
-              </Form.Item>
-              <Form.Item label="Email" name="email">
-                <Input type="email" className="need-lowercase" />
-              </Form.Item>
-            </Space>
-            <Space style={{ display: "flex" }}>
-              <Form.Item label="Phone Number" name="phoneNumber">
-                <Input maxLength={10} />
-              </Form.Item>
-              <Form.Item label="Username" name="username">
-                <Input />
-              </Form.Item>
-              <Form.Item label="Password" name="password">
-                <Input.Password />
-              </Form.Item>
-            </Space>
+        <Row className="add-new-user" gutter={[16, 16]}>
+          <Col xl={12} lg={18} xs={24}>
+            <Row gutter={[8, 8]}>
+              <Col md={8} xs={24}>
+                <Form.Item label="User ID" name="userId">
+                  <Input className="need-uppercase" />
+                </Form.Item>
+              </Col>
+              <Col md={8} xs={24}>
+                <Form.Item label="Role" name="roleId">
+                  <Select allowClear maxTagCount="responsive">
+                    {roles?.map((role, index) => (
+                      <Select.Option value={role.value} key={index}>
+                        {role.label}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col md={8} xs={24}>
+                <Form.Item label="Gender" name="gender">
+                  <Select allowClear="true">
+                    <Select.Option value="Male">Male</Select.Option>
+                    <Select.Option value="Female">Female</Select.Option>
+                    <Select.Option value="Other">Other</Select.Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter={[8, 8]}>
+              <Col md={12} xs={24}>
+                <Form.Item label="Fullname" name="fullName">
+                  <Input className="need-capitalize" />
+                </Form.Item>
+              </Col>
+              <Col md={12} xs={24}>
+                <Form.Item label="Email" name="email">
+                  <Input type="email" className="need-lowercase" />
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter={[8, 8]}>
+              <Col md={8} xs={24}>
+                <Form.Item label="Phone Number" name="phoneNumber">
+                  <Input maxLength={10} />
+                </Form.Item>
+              </Col>
+              <Col md={8} xs={24}>
+                <Form.Item label="Username" name="username">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col md={8} xs={24}>
+                <Form.Item label="Password" name="password">
+                  <Input.Password />
+                </Form.Item>
+              </Col>
+            </Row>
           </Col>
-          <Col span="10">
+          <Col xl={12} lg={18} xs={24}>
             <Form.Item label="Address" name="address">
               <Input.TextArea
                 maxLength="255"

@@ -59,7 +59,7 @@ function Sidebar({ className }) {
       <Heading level={4} className="heading" />
       <Space direction="vertical" align="center" className="profile">
         <Image src={icon.AVATAR} alt="avatar" className="avatar" />
-        <Typography.Title level={5} style={{ fontWeight: "700" }}>
+        <Typography.Title level={5} style={{ fontWeight: "700" }} className="need-capitalize">
           {fullName}
         </Typography.Title>
         <span className="role">{roleId}</span>

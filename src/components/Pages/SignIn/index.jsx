@@ -41,13 +41,17 @@ function SignIn() {
           dispatch(signInFail(err?.response?.data?.message));
         });
     },
-    [dispatch]
+    [dispatch, navigate]
   );
 
-  let { msg } = useSelector((state) => state.authen);
+  let { msg, flag } = useSelector((state) => state.authen);
   useEffect(() => {
     if (msg) {
-      toast.error(msg);
+      if (flag) {
+        toast.success(msg);
+      } else {
+        toast.error(msg);
+      }
     }
   }, [msg]);
 

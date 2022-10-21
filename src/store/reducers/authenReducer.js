@@ -1,9 +1,15 @@
-import { SIGN_IN, SIGN_IN_SUCCESS, SIGN_IN_FAIL, LOG_OUT } from "../constants/authen";
+import {
+  SIGN_IN,
+  SIGN_IN_SUCCESS,
+  SIGN_IN_FAIL,
+  LOG_OUT,
+} from "../constants/authen";
 
 const initialState = {
   isLoading: false,
   isLogin: false,
   msg: null,
+  flag: false,
   userInfo: null,
 };
 
@@ -25,7 +31,8 @@ const authenReducer = (state = initialState, action) => {
         ...state,
         isLoading: false,
         isLogin: true,
-        msg: action.payload,
+        msg: action.payload.msg,
+        flag: true,
         userInfo: action.payload.userInfo,
       };
     }
@@ -34,11 +41,12 @@ const authenReducer = (state = initialState, action) => {
         ...state,
         isLoading: false,
         isLogin: false,
+        flag: false,
         msg: action.payload,
       };
     }
     case LOG_OUT: {
-      localStorage.removeItem("user_info")
+      localStorage.removeItem("user_info");
       localStorage.removeItem("is_login");
       return {
         ...state,

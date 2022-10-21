@@ -2,6 +2,7 @@ import { combineReducers } from "redux";
 import authenReducer from "./authenReducer";
 import studentReducer from "./studentReducer";
 import majorReducer from "./majorReducer";
+import userReducer from "./userReducer";
 
 // const rootReducer = (state, action) => {
 //   switch (action.type) {
@@ -56,4 +57,5 @@ export default combineReducers({
   authen: authenReducer,
   student: studentReducer,
   major: majorReducer,
+  user: userReducer,
 });

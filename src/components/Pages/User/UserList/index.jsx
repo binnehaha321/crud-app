@@ -7,17 +7,16 @@ import {
   Upload,
   Space,
   Modal,
-  Spin,
   Image,
   Typography,
   Tag,
 } from "antd";
 import { ExclamationCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { toast } from "react-toastify";
 import * as icon from "~/assets/images/ActionIcons";
 import { Table, Button } from "~/components/Layout";
 import request from "~/utils/request";
 import roles from "../roleList";
-import { toast, ToastContainer } from "react-toastify";
 import "./index.scss";
 
 function UserList() {
@@ -111,7 +110,7 @@ function UserList() {
   ];
   const [data, setData] = useState([
     {
-      key: 0,
+      key: "",
       userId: "",
       avatar: "",
       email: "",
@@ -122,7 +121,6 @@ function UserList() {
       roleId: "",
     },
   ]);
-  const [isLoaded, setIsLoaded] = useState(false);
   const [currentUserValues, setCurrentUserValues] = useState({});
 
   // GET USERS
@@ -133,7 +131,7 @@ function UserList() {
     let userData = {};
     return users?.map((user) => {
       userData = {
-        key: user?.id,
+        key: user?.userId,
         userId: user?.userId,
         avatar: user?.avatar,
         email: user?.email,
@@ -147,7 +145,7 @@ function UserList() {
   };
 
   const handleCallUserList = () => {
-    request.get("users?id=ALL").then((res) => {
+    request.get("users").then((res) => {
       const users = res?.data?.users;
       const result = handleUserDataList(users);
       setData(result);
@@ -155,10 +153,8 @@ function UserList() {
   };
 
   useEffect(() => {
-    setIsLoaded(false);
     handleCallUserList();
-    setIsLoaded(true);
-  }, [isLoaded]);
+  }, []);
 
   // UPDATE USER
   const [form] = Form.useForm();
@@ -171,11 +167,11 @@ function UserList() {
   const handleGetUserById = (id) => {
     setId(id);
     request
-      .get(`users?id=${id}`)
+      .get(`users?userId=${id}`)
       .then((res) => {
         const user = res?.data?.users;
         setCurrentUserValues({
-          key: user?.id,
+          key: user?.userId,
           userId: user?.userId,
           // avatar: user?.avatar,
           email: user?.email,
@@ -195,7 +191,7 @@ function UserList() {
 
   const handleUpdateUser = (values) => {
     request
-      .put(`users?id=${id}`, values)
+      .put(`users?userId=${id}`, values)
       .then((res) => {
         const data = res?.data;
         const users = data?.users;
@@ -212,7 +208,7 @@ function UserList() {
   // DELETE USER
   const handleDelete = (id) => {
     request
-      .delete(`users?id=${id}`)
+      .delete(`users?userId=${id}`)
       .then((res) => {
         toast.success(res?.data?.message);
         const users = res?.data?.users;
@@ -242,122 +238,115 @@ function UserList() {
 
   return (
     <>
-      {isLoaded ? (
-        <>
-          <ToastContainer />
-          <Table
-            caption="User List"
-            icon={icon.SORT}
-            columns={columns}
-            dataSource={data}
+      <Table
+        caption="User List"
+        icon={icon.SORT}
+        columns={columns}
+        dataSource={data}
+      >
+        <Link to="./add" className="ant-btn ant-btn-primary">
+          ADD NEW USER
+        </Link>
+      </Table>
+      <Modal
+        title="UPDATE A USER"
+        open={isModalOpen}
+        onOk={form.submit}
+        onCancel={() => setIsModalOpen(false)}
+      >
+        <Form
+          ref={formRef}
+          onKeyPress={(e) => {
+            if (e.key === "Enter") form.submit();
+          }}
+          labelCol={{
+            span: 24,
+          }}
+          wrapperCol={{
+            span: 24,
+          }}
+          layout="vertical"
+          form={form}
+          onFinish={handleUpdateUser}
+          initialValues={currentUserValues}
+          className="update-user"
+        >
+          <Space style={{ display: "flex" }}>
+            <Form.Item label="User ID" name="userId">
+              <Input />
+            </Form.Item>
+            <Form.Item label="Role" name="roleId">
+              <Select allowClear>
+                {roles?.map((role, index) => (
+                  <Select.Option value={role.value} key={index}>
+                    {role.label}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+            <Form.Item label="Gender" name="gender">
+              <Select allowClear>
+                <Select.Option value="Male">Male</Select.Option>
+                <Select.Option value="Female">Female</Select.Option>
+                <Select.Option value="Other">Other</Select.Option>
+              </Select>
+            </Form.Item>
+          </Space>
+          <Space style={{ display: "flex" }}>
+            <Form.Item label="Fullname" name="fullName">
+              <Input className="need-capitalize" />
+            </Form.Item>
+            <Form.Item label="Email" name="email">
+              <Input type="email" />
+            </Form.Item>
+          </Space>
+          <Space style={{ display: "flex" }}>
+            <Form.Item label="Phone Number" name="phoneNumber">
+              <Input type="number" />
+            </Form.Item>
+            <Form.Item label="Username" name="username">
+              <Input />
+            </Form.Item>
+          </Space>
+          <Form.Item label="Address" name="address">
+            <Input.TextArea
+              maxLength="255"
+              showCount="true"
+              autoSize={{ minRows: 5 }}
+            />
+          </Form.Item>
+          <Form.Item
+            hidden // this function is building
+            label="Avatar"
+            valuePropName="fileList"
+            name="avatar"
+            getValueFromEvent={(e) => {
+              if (Array.isArray(e)) {
+                return e;
+              }
+              return e && e.fileList;
+            }}
           >
-            <Link to="./add" className="ant-btn ant-btn-primary">
-              ADD NEW USER
-            </Link>
-          </Table>
-          <Modal
-            title="UPDATE A USER"
-            open={isModalOpen}
-            onOk={form.submit}
-            onCancel={() => setIsModalOpen(false)}
-          >
-            <Form
-              ref={formRef}
-              onKeyPress={(e) => {
-                if (e.key === "Enter") form.submit();
-              }}
-              labelCol={{
-                span: 24,
-              }}
-              wrapperCol={{
-                span: 24,
-              }}
-              layout="vertical"
-              form={form}
-              onFinish={handleUpdateUser}
-              initialValues={currentUserValues}
-              className="update-user"
+            <Upload
+              hidden
+              // action={process.env.REACT_APP_BACKEND_URL}
+              listType="picture-card"
+              type="image/*"
             >
-              <Space style={{ display: "flex" }}>
-                <Form.Item label="User ID" name="userId">
-                  <Input />
-                </Form.Item>
-                <Form.Item label="Role" name="roleId">
-                  <Select allowClear>
-                    {roles?.map((role, index) => (
-                      <Select.Option value={role.value} key={index}>
-                        {role.label}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-                <Form.Item label="Gender" name="gender">
-                  <Select allowClear>
-                    <Select.Option value="Male">Male</Select.Option>
-                    <Select.Option value="Female">Female</Select.Option>
-                    <Select.Option value="Other">Other</Select.Option>
-                  </Select>
-                </Form.Item>
-              </Space>
-              <Space style={{ display: "flex" }}>
-                <Form.Item label="Fullname" name="fullName">
-                  <Input />
-                </Form.Item>
-                <Form.Item label="Email" name="email">
-                  <Input type="email" />
-                </Form.Item>
-              </Space>
-              <Space style={{ display: "flex" }}>
-                <Form.Item label="Phone Number" name="phoneNumber">
-                  <Input type="number" />
-                </Form.Item>
-                <Form.Item label="Username" name="username">
-                  <Input />
-                </Form.Item>
-              </Space>
-              <Form.Item label="Address" name="address">
-                <Input.TextArea
-                  maxLength="255"
-                  showCount="true"
-                  autoSize={{ minRows: 5 }}
-                />
-              </Form.Item>
-              <Form.Item
-                hidden // this function is building
-                label="Avatar"
-                valuePropName="fileList"
-                name="avatar"
-                getValueFromEvent={(e) => {
-                  if (Array.isArray(e)) {
-                    return e;
-                  }
-                  return e && e.fileList;
-                }}
-              >
-                <Upload
-                  hidden
-                  // action={process.env.REACT_APP_BACKEND_URL}
-                  listType="picture-card"
-                  type="image/*"
+              <div>
+                <PlusOutlined />
+                <div
+                  style={{
+                    marginTop: 8,
+                  }}
                 >
-                  <div>
-                    <PlusOutlined />
-                    <div
-                      style={{
-                        marginTop: 8,
-                      }}
-                    >
-                      Upload
-                    </div>
-                  </div>
-                </Upload>
-              </Form.Item>
-            </Form>
-          </Modal>
-        </>
-      ) : (
-        <Spin />
-      )}
+                  Upload
+                </div>
+              </div>
+            </Upload>
+          </Form.Item>
+        </Form>
+      </Modal>
     </>
   );
 }
