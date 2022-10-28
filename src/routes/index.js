@@ -14,7 +14,7 @@ import ConfirmPassword from "~/components/Pages/ConfirmPassword";
 import NotFound from "~/components/Pages/NotFound";
 
 const publicRoutes = [
-  { path: "/sign-in", component: <SignIn /> },
+  { path: "sign-in", component: <SignIn /> },
   { path: "reset-password", component: <ResetPassword /> },
   { path: "confirm-password", component: <ConfirmPassword /> },
 ];

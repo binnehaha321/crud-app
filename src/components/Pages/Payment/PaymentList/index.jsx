@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Table } from "~/components/Layout";
+import { Tag, Typography } from "antd";
 import moment from "moment";
 import { SORT } from "~/assets/images/ActionIcons";
 import EYE from "~/assets/images/Payment/eye.png";
 import request from "~/utils/request";
-import "./index.scss";
-import { Tag, Typography } from "antd";
 
 function Payment() {
   const columns = [
@@ -82,14 +81,13 @@ function Payment() {
       date: "",
     },
   ]);
-  const [isLoaded, setIsLoaded] = useState(false);
 
   // GET PAYMENT LIST
   const handlePaymentDataList = (payments) => {
     let paymentData = {};
     return payments?.map((payment) => {
       paymentData = {
-        key: payment?.id,
+        key: payment?.paymentId,
         studentId: payment?.studentId,
         paymentId: payment?.paymentId,
         paymentSchedule: payment?.paymentSchedule,
@@ -103,7 +101,7 @@ function Payment() {
   };
 
   const handleCallPaymentList = () => {
-    request.get("payments?id=ALL").then((res) => {
+    request.get("payments").then((res) => {
       const payments = res?.data?.payments;
       const result = handlePaymentDataList(payments);
       setData(result);
@@ -111,10 +109,8 @@ function Payment() {
   };
 
   useEffect(() => {
-    setIsLoaded(false);
     handleCallPaymentList();
-    setIsLoaded(true);
-  }, [isLoaded]);
+  }, []);
 
   return (
     <Table

@@ -1,15 +1,16 @@
 .default-layout {
+  --sidebar-max-width: 270px;
   display: grid;
-  grid-template-columns: 270px auto;
+  grid-template-columns: var(--sidebar-max-width) auto;
   grid-template-areas:
     "sidebar header header"
     "sidebar children children";
 
   .sidebar {
-    --sidebar-max-width: 270px;
     grid-area: sidebar;
     max-width: var(--sidebar-max-width);
     width: var(--sidebar-max-width);
+    transition: opacity .5s linear;
   }
 
   .header {
@@ -18,10 +19,11 @@
     margin-left: auto;
     display: flex;
     justify-content: space-between;
+    align-items: center;
     margin-block: 1rem;
     padding-inline: 2rem;
   }
-  
+
   & > div:last-child {
     grid-area: children;
     padding-inline: 2rem;

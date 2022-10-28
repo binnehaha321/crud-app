@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Card, Typography, Space, Row, Spin, Col } from "antd";
+import { Card, Typography, Space, Row, Col } from "antd";
 import * as icon from "~/assets/images/Home";
 import request from "~/utils/request";
 import "./index.scss";
@@ -8,7 +8,6 @@ import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 
 function Home() {
-  const [isLoaded, setIsLoaded] = useState(false);
   const [amountStudent, setAmountStudent] = useState(0);
   const [amountMajor, setAmountMajor] = useState(0);
   const [amountPayment, setAmountPayment] = useState(0);
@@ -46,12 +45,10 @@ function Home() {
     });
 
   useEffect(() => {
-    setIsLoaded(false);
     callStudentList();
     callMajorList();
     // callPaymentList();
     callUserList();
-    setIsLoaded(true);
   }, []);
 
   const { Title, Text } = Typography;
@@ -93,36 +90,31 @@ function Home() {
 
   return (
     <>
-      {isLoaded ? (
-        <Row
-          gutter={[8, 8]}
-          justify="space-between"
-          style={{ paddingTop: "1rem" }}
-        >
-          {items.map((item, index) => (
-            <Col>
-              <Link to={item.path} key={index}>
-                <Card
-                  key={index}
-                  hoverable
-                  style={{
-                    width: 240,
-                    background: item.bgColor,
-                  }}
-                >
-                  <Space direction="vertical">
-                    <img src={item.icon} alt={item.label} />
-                    <Text style={{ color: item.color }}>{item.label}</Text>
-                  </Space>
-                  <Title level={4}>{item.amount}</Title>
-                </Card>
-              </Link>
-            </Col>
-          ))}
-        </Row>
-      ) : (
-        <Spin />
-      )}
+      <Row
+        gutter={[8, 8]}
+        justify="space-between"
+        style={{ paddingTop: "1rem" }}
+      >
+        {items.map((item, index) => (
+          <Col key={index}>
+            <Link to={item.path}>
+              <Card
+                hoverable
+                style={{
+                  width: 240,
+                  background: item.bgColor,
+                }}
+              >
+                <Space direction="vertical">
+                  <img src={item.icon} alt={item.label} />
+                  <Text style={{ color: item.color }}>{item.label}</Text>
+                </Space>
+                <Title level={4}>{item.amount}</Title>
+              </Card>
+            </Link>
+          </Col>
+        ))}
+      </Row>
     </>
   );
 }

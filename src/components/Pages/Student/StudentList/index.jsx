@@ -169,7 +169,7 @@ function StudentList() {
       .then((res) => {
         const student = res?.data?.students;
         setCurrentStudentValues({
-          key: student?.id,
+          key: student?.studentId,
           studentId: student?.studentId,
           // avatar: student?.avatar,
           email: student?.email,

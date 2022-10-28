@@ -3,6 +3,7 @@ import authenReducer from "./authenReducer";
 import studentReducer from "./studentReducer";
 import majorReducer from "./majorReducer";
 import userReducer from "./userReducer";
+import paymentReducer from "./paymentReducer";
 
 // const rootReducer = (state, action) => {
 //   switch (action.type) {
@@ -58,4 +59,5 @@ export default combineReducers({
   student: studentReducer,
   major: majorReducer,
   user: userReducer,
+  payment: paymentReducer,
 });

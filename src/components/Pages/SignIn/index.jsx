@@ -34,8 +34,8 @@ function SignIn() {
                 msg: res?.data?.message,
               })
             );
+            navigate("/");
           }
-          navigate("/");
         })
         .catch((err) => {
           dispatch(signInFail(err?.response?.data?.message));

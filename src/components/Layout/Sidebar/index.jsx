@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Menu, Space, Image, Typography } from "antd";
 import Heading from "../Heading";
 import Button from "../Button";
@@ -10,6 +10,7 @@ import { logOut } from "~/store/actions/authenAction";
 
 function Sidebar({ className }) {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const sidebarElements = [
     {
       label: <Link to="/">Home</Link>,
@@ -48,7 +49,13 @@ function Sidebar({ className }) {
     },
   ];
 
-  const { fullName, roleId } = JSON.parse(localStorage.getItem("user_info"));
+  let fullName = "",
+    roleId = "";
+  if (localStorage.getItem("user_info")) {
+    const user = JSON.parse(localStorage?.getItem("user_info"));
+    fullName = user.fullName;
+    roleId = user.roleId;
+  }
 
   return (
     <Space
@@ -59,7 +66,11 @@ function Sidebar({ className }) {
       <Heading level={4} className="heading" />
       <Space direction="vertical" align="center" className="profile">
         <Image src={icon.AVATAR} alt="avatar" className="avatar" />
-        <Typography.Title level={5} style={{ fontWeight: "700" }} className="need-capitalize">
+        <Typography.Title
+          level={5}
+          style={{ fontWeight: "700" }}
+          className="need-capitalize"
+        >
           {fullName}
         </Typography.Title>
         <span className="role">{roleId}</span>
@@ -70,7 +81,10 @@ function Sidebar({ className }) {
         className="menu"
       />
       <Button
-        onClick={() => dispatch(logOut("Log out successfully!"))}
+        onClick={() => {
+          dispatch(logOut("Log out successfully!"));
+          navigate("sign-in");
+        }}
         value="Logout"
         className="logout"
       >

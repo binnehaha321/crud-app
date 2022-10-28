@@ -95,7 +95,10 @@ function AddNewStudent() {
                 <Form.Item label="Major" name="majorId">
                   <Select allowClear showSearch>
                     {majorList?.map((major) => (
-                      <Select.Option key={major?.id} value={major?.majorId}>
+                      <Select.Option
+                        key={major?.majorId}
+                        value={major?.majorId}
+                      >
                         {major?.majorName_EN}
                       </Select.Option>
                     ))}

@@ -4,10 +4,10 @@ import {
   SIGN_IN_FAIL,
   LOG_OUT,
 } from "../constants/authen";
+import * as LS from "~/utils/localStorage";
 
 const initialState = {
   isLoading: false,
-  isLogin: false,
   msg: null,
   flag: false,
   userInfo: null,
@@ -22,15 +22,11 @@ const authenReducer = (state = initialState, action) => {
       };
     }
     case SIGN_IN_SUCCESS: {
-      localStorage.setItem(
-        "user_info",
-        JSON.stringify(action.payload.userInfo)
-      );
-      localStorage.setItem("is_login", true);
+      LS.saveUserInfo(action.payload.userInfo);
+      LS.saveLoginStatus();
       return {
         ...state,
         isLoading: false,
-        isLogin: true,
         msg: action.payload.msg,
         flag: true,
         userInfo: action.payload.userInfo,
@@ -40,18 +36,16 @@ const authenReducer = (state = initialState, action) => {
       return {
         ...state,
         isLoading: false,
-        isLogin: false,
         flag: false,
         msg: action.payload,
       };
     }
     case LOG_OUT: {
-      localStorage.removeItem("user_info");
-      localStorage.removeItem("is_login");
+      LS.removeUserInfo();
+      LS.removeLoginStatus();
       return {
         ...state,
         isLoading: false,
-        isLogin: false,
         msg: action.payload,
         userInfo: null,
       };

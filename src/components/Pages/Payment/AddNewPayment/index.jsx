@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Button,
   Col,
@@ -17,6 +17,11 @@ import { DollarCircleOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import request from "~/utils/request";
 import schedule from "./schedule";
+import {
+  addPayment,
+  addPaymentFail,
+  addPaymentSuccess,
+} from "~/store/actions/paymentAction";
 
 function AddNewPayment() {
   const [form] = Form.useForm();
@@ -24,8 +29,17 @@ function AddNewPayment() {
   const navigate = useNavigate();
   const handleAddPayment = useCallback(
     (values) => {
-      dispatch({ type: "ADD_PAYMENT", payload: values });
-      // navigate("../payments");
+      request
+      .post("payments/add", values)
+      .then((res) => {
+        if (!res) {
+          dispatch(addPayment());
+        } else {
+          dispatch(addPaymentSuccess(res?.data?.message));
+          navigate("../payments");
+          }
+        })
+        .catch((err) => dispatch(addPaymentFail(err?.response?.data?.message)));
     },
     [dispatch, navigate]
   );
@@ -44,12 +58,23 @@ function AddNewPayment() {
     });
   }, []);
 
+  let { msg, flag } = useSelector((state) => state.payment);
+  useEffect(() => {
+    if (msg) {
+      if (flag) {
+        toast.success(msg);
+      } else {
+        toast.error(msg);
+      }
+    }
+  }, [msg, flag]);
+
   return (
     <Col
       className="py-30"
       xs={{ span: 24 }}
       md={{ span: 20 }}
-      lg={{ span: 12 }}
+      lg={{ span: 16 }}
     >
       {" "}
       <Space direction="horizental" size={"middle"}>

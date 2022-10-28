@@ -111,7 +111,7 @@ function MajorList() {
       .then((res) => {
         const major = res?.data?.majors;
         setCurrentMajorValues({
-          key: major?.id,
+          key: major?.majorId,
           majorId: major?.majorId,
           majorName_EN: major?.majorName_EN,
           majorName_VI: major?.majorName_VI,
