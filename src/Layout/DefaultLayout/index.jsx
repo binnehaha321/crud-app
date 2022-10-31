@@ -1,6 +1,5 @@
 import { Col, Row } from "antd";
-import Header from "../Header";
-import Sidebar from "../Sidebar";
+import { Header, Sidebar } from "~/components";
 import "./index.scss";
 
 function DefaultLayout({ children }) {

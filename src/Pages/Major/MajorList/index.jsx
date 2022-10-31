@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Input, Modal, Space, Form, Typography } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
-import { Table, Button } from "~/components/Layout";
+import { Table, Button } from "~/components";
 import * as icon from "~/assets/images/ActionIcons";
 import request from "~/utils/request";
 

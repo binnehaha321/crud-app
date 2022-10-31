@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Table } from "~/components/Layout";
+import { Table } from "~/components";
 import { Tag, Typography } from "antd";
 import moment from "moment";
 import { SORT } from "~/assets/images/ActionIcons";

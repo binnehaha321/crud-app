@@ -14,7 +14,7 @@ import {
 import { ExclamationCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import * as icon from "~/assets/images/ActionIcons";
-import { Table, Button } from "~/components/Layout";
+import { Table, Button } from "~/components";
 import request from "~/utils/request";
 import roles from "../roleList";
 import "./index.scss";

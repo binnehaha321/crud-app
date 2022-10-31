@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Row, Col, Typography, Form, Input, Button } from "antd";
 import { MailOutlined } from "@ant-design/icons";
-import Heading from "~/components/Layout/Heading";
+import Heading from "~/components/Heading";
 import styles from "./index.module.scss";
 import request from "~/utils/request";
 import { toast } from "react-toastify";
