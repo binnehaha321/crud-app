@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { PlusOutlined, UserAddOutlined } from "@ant-design/icons";
@@ -13,38 +13,81 @@ import {
   Space,
   Typography,
   Divider,
+  DatePicker,
 } from "antd";
-import { toast } from "react-toastify";
-import roles from "../roleList.js";
+
 import {
   addUser,
   addUserSuccess,
   addUserFail,
 } from "~/store/actions/userAction";
 import request from "~/utils/request.js";
+import { ADD_USER_FAIL } from "~/utils/message";
+import { toast } from "react-toastify";
 
 function AddNewUser() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const handleAddUser = useCallback(
-    (values) => {
-      request
-        .post("register", values)
-        .then((res) => {
-          if (!res) {
-            dispatch(addUser());
-          } else {
-            dispatch(addUserSuccess(res?.data?.message));
-            navigate("../users");
-          }
-        })
-        .catch((err) => dispatch(addUserFail(err?.response?.data?.message)));
-    },
-    [dispatch, navigate]
-  );
+  const [roles, setRoles] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  // const handleAddUser = useCallback(
+  //   (values) => {
+  //     request
+  //       .post("register", values)
+  //       .then((res) => {
+  //         if (!res) {
+  //           dispatch(addUser());
+  //         } else {
+  //           dispatch(addUserSuccess(res?.data?.message));
+  //           navigate("../users");
+  //         }
+  //       })
+  //       .catch((err) => dispatch(addUserFail(err?.response?.data?.message)));
+  //   },
+  //   [dispatch, navigate]
+  // );
 
-  let { msg, flag } = useSelector((state) => state.major);
+  const handleGetRoles = async () => {
+    try {
+      const res = await request.get("role/all?pageNumber=0");
+      setRoles(res?.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  
+  const handleGetDepartments = async () => {
+    try {
+      const res = await request.get("department/all?pageNumber=0");
+      setDepartments(res?.data?.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleAddUser = async (values) => {
+    // Format date on submit event
+    values.dob = values?.dob?.format("YYYY-MM-DD");
+    try {
+      dispatch(addUser());
+      const res = await request.post("users/add", values);
+      if (!res) {
+        dispatch(addUser());
+      } else {
+        dispatch(addUserSuccess(res?.data?.message));
+        navigate("../users");
+      }
+    } catch (error) {
+      console.log(error);
+      dispatch(addUserFail(ADD_USER_FAIL));
+    }
+  };
+
+  let { msg, flag } = useSelector((state) => state.user);
+
   useEffect(() => {
+    handleGetRoles();
+    handleGetDepartments();
     if (msg) {
       if (flag) {
         toast.success(msg);
@@ -81,64 +124,78 @@ function AddNewUser() {
         <Row className="add-new-user" gutter={[16, 16]}>
           <Col xl={12} lg={18} xs={24}>
             <Row gutter={[8, 8]}>
-              <Col md={8} xs={24}>
-                <Form.Item label="User ID" name="userId">
-                  <Input className="need-uppercase" />
-                </Form.Item>
-              </Col>
-              <Col md={8} xs={24}>
-                <Form.Item label="Role" name="roleId">
-                  <Select allowClear maxTagCount="responsive">
+              <Col md={12} xs={24}>
+                <Form.Item label="Role" name={"role"}>
+                  <Select allowClear maxTagCount="responsive" mode={"multiple"}>
                     {roles?.map((role, index) => (
-                      <Select.Option value={role.value} key={index}>
-                        {role.label}
+                      <Select.Option value={role.roleName} key={index}>
+                        {role.roleName}
                       </Select.Option>
                     ))}
                   </Select>
                 </Form.Item>
               </Col>
-              <Col md={8} xs={24}>
-                <Form.Item label="Gender" name="gender">
-                  <Select allowClear="true">
+              {/* <Col md={6} xs={24}>
+                <Form.Item label="Gender" name={"gender"}>
+                  <Select allowClear>
                     <Select.Option value="Male">Male</Select.Option>
                     <Select.Option value="Female">Female</Select.Option>
                     <Select.Option value="Other">Other</Select.Option>
                   </Select>
                 </Form.Item>
-              </Col>
-            </Row>
-            <Row gutter={[8, 8]}>
+              </Col> */}
               <Col md={12} xs={24}>
-                <Form.Item label="Fullname" name="fullName">
-                  <Input className="need-capitalize" />
-                </Form.Item>
-              </Col>
-              <Col md={12} xs={24}>
-                <Form.Item label="Email" name="email">
-                  <Input type="email" className="need-lowercase" />
+                <Form.Item label="Dob" name={"dob"}>
+                  <DatePicker format="DD-MM-YYYY" />
                 </Form.Item>
               </Col>
             </Row>
             <Row gutter={[8, 8]}>
               <Col md={8} xs={24}>
-                <Form.Item label="Phone Number" name="phoneNumber">
+                <Form.Item label="Fullname" name={"fullName"}>
+                  <Input className="need-capitalize" />
+                </Form.Item>
+              </Col>
+              <Col md={8} xs={24}>
+                <Form.Item label="Email" name={"email"}>
+                  <Input type="email" className="need-lowercase" />
+                </Form.Item>
+              </Col>
+              <Col md={8} xs={24}>
+                <Form.Item label="Department" name={"departmentId"}>
+                  <Select allowClear>
+                    {departments?.map((department, index) => (
+                      <Select.Option
+                        value={department.departmentId}
+                        key={index}
+                      >
+                        {department.departmentName}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter={[8, 8]}>
+              <Col md={8} xs={24}>
+                <Form.Item label="Phone Number" name={"phoneNumber"}>
                   <Input maxLength={10} />
                 </Form.Item>
               </Col>
               <Col md={8} xs={24}>
-                <Form.Item label="Username" name="username">
+                <Form.Item label="Username" name={"username"}>
                   <Input />
                 </Form.Item>
               </Col>
               <Col md={8} xs={24}>
-                <Form.Item label="Password" name="password">
+                <Form.Item label="Password" name={"password"}>
                   <Input.Password />
                 </Form.Item>
               </Col>
             </Row>
           </Col>
           <Col xl={12} lg={18} xs={24}>
-            <Form.Item label="Address" name="address">
+            <Form.Item label="Address" name={"address"}>
               <Input.TextArea
                 maxLength="255"
                 showCount="true"
@@ -146,10 +203,10 @@ function AddNewUser() {
               />
             </Form.Item>
             <Form.Item
+              name={"avatar"}
               hidden // this function is building
               label="Avatar"
               valuePropName="fileList"
-              name="avatar"
               getValueFromEvent={(e) => {
                 if (Array.isArray(e)) {
                   return e;

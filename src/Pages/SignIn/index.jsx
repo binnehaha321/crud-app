@@ -6,13 +6,14 @@ import { MailOutlined } from "@ant-design/icons";
 import Heading from "~/components/Heading";
 import styles from "./index.module.scss";
 import request from "~/utils/request";
-import { toast } from "react-toastify";
+import { SIGN_IN_SUCCESS_MSG } from "~/constants/msg";
 
 import {
   signIn,
   signInSuccess,
   signInFail,
 } from "~/store/actions/authenAction";
+import { toast } from "react-toastify";
 
 function SignIn() {
   const { Text, Title } = Typography;
@@ -25,17 +26,14 @@ function SignIn() {
       request
         .post("login", values)
         .then((res) => {
-          if (!res) {
-            dispatch(signIn());
-          } else {
-            dispatch(
-              signInSuccess({
-                userInfo: res?.data?.user,
-                msg: res?.data?.message,
-              })
-            );
-            navigate("/");
-          }
+          dispatch(signIn());
+          dispatch(
+            signInSuccess({
+              userInfo: res?.data,
+              msg: SIGN_IN_SUCCESS_MSG,
+            })
+          );
+          navigate("/");
         })
         .catch((err) => {
           dispatch(signInFail(err?.response?.data?.message));
@@ -53,9 +51,9 @@ function SignIn() {
         toast.error(msg);
       }
     }
-  }, [msg]);
+  }, [msg, flag]);
 
-  return (
+  return [
     <Row
       type="flex"
       justify="center"
@@ -86,18 +84,18 @@ function SignIn() {
           form={form}
         >
           <Form.Item
-            label="Email"
-            name="email"
+            label="Username"
+            name="username"
             rules={[
               {
                 required: true,
-                message: "Please input your email!",
+                message: "Please input your username!",
               },
             ]}
           >
             <Input
-              type="email"
-              placeholder="Enter your email"
+              type="text"
+              placeholder="Enter your username"
               suffix={<MailOutlined />}
             />
           </Form.Item>
@@ -130,8 +128,8 @@ function SignIn() {
           </Form.Item>
         </Form>
       </Col>
-    </Row>
-  );
+    </Row>,
+  ];
 }
 
 export default SignIn;

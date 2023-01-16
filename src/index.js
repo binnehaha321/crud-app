@@ -13,12 +13,12 @@ import configStore from "./store/configStore";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 const store = configStore();
 root.render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <Provider store={store}>
-        <ToastContainer />
-        <App />
-      </Provider>
-    </BrowserRouter>
-  </React.StrictMode>
+  // <React.StrictMode>
+  <BrowserRouter>
+    <Provider store={store}>
+      <ToastContainer />
+      <App />
+    </Provider>
+  </BrowserRouter>
+  // </React.StrictMode>
 );

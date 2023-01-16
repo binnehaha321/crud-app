@@ -21,6 +21,24 @@
   --border-radius-sm: 4px;
 }
 
+// SCROLLBAR
+/* width */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--btn-primary);
+  border-radius: var(--border-radius-sm) !important;
+}
+
 // INPUT
 input {
   border-radius: var(--border-radius-sm) !important;
@@ -34,6 +52,7 @@ button {
     opacity: var(--opacity);
   }
 }
+
 .ant-btn-primary {
   background-color: var(--btn-primary);
   border-color: var(--btn-primary);
@@ -99,5 +118,5 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .rotate180 {
   transform: rotate(180deg);
-  transition: transform .5s linear;
+  transition: transform 0.5s linear;
 }

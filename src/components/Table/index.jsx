@@ -1,7 +1,17 @@
 import { Divider, Space, Table as TableAnt, Typography } from "antd";
 import "./index.scss";
 
-function Table({ caption, icon, children, columns, dataSource }) {
+function Table({
+  caption,
+  icon,
+  children,
+  columns,
+  dataSource,
+  loading,
+  pageSize,
+  total,
+  onChange,
+}) {
   return (
     <>
       <Space
@@ -23,6 +33,8 @@ function Table({ caption, icon, children, columns, dataSource }) {
         columns={columns}
         dataSource={dataSource}
         scroll={{ x: "fit-content" }}
+        loading={loading}
+        pagination={{ pageSize, total, onChange, showSizeChanger: false }}
       />
     </>
   );

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import {
   Space,
   Image,
@@ -17,10 +18,16 @@ import moment from "moment";
 import { Table, Button } from "~/components";
 import * as icon from "~/assets/images/ActionIcons";
 import request from "~/utils/request";
+import useFetch from "~/hooks/useFetch";
 import "./index.scss";
 
 function StudentList() {
   const formRef = useRef();
+  const [selectedId, setSelectedId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentStudentValues, setCurrentStudentValues] = useState({});
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
   const columns = [
     {
       title: "",
@@ -72,19 +79,14 @@ function StudentList() {
       key: "gender",
     },
     {
-      title: "Phone",
-      dataIndex: "phoneNumber",
-      key: "phoneNumber",
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
     },
     {
-      title: "Enroll No.",
-      dataIndex: "enrollNumber",
-      key: "enrollNumber",
-    },
-    {
-      title: "Date Of Admission",
-      dataIndex: "dateOfAdmission",
-      key: "dateOfAdmission",
+      title: "DOB",
+      dataIndex: "dob",
+      key: "dob",
     },
     {
       title: "",
@@ -107,112 +109,114 @@ function StudentList() {
       studentId: "",
       email: "",
       fullName: "",
-      gender: "",
-      avatar: "",
-      phoneNumber: "",
-      address: "",
-      enrollNumber: "",
-      dateOfAdmission: "",
       majorId: "",
-      classId: "",
+      gender: "",
+      status: "",
+      dob: "",
+      isActive: false,
     },
   ]);
-  const [currentStudentValues, setCurrentStudentValues] = useState({});
 
-  // GET STUDENTS
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [id, setId] = useState(null);
+  // GET AMOUNT OF STUDENT
+  const { data: amountStudent } = useFetch("student/totalStudents");
 
+  // HANDLE STUDENT LIST
   const handleStudentDataList = (students) => {
     let studentData = {};
     return students?.map((student) => {
       studentData = {
-        key: student?.studentId,
-        studentId: student?.studentId,
-        avatar: student?.avatar,
-        email: student?.email,
+        key: student?.fptId,
+        studentId: student?.fptId,
         fullName: student?.fullName,
+        majorId: student?.majorId?.majorCode,
+        email: student?.email,
         gender: student?.gender,
-        phoneNumber: student?.phoneNumber,
-        enrollNumber: student?.enrollNumber,
-        dateOfAdmission: moment(student?.dateOfAdmission).format("YYYY-MM-DD"),
+        status: student?.status,
+        dob: moment(student?.dob + 1).format("DD-MM-YYYY"),
+        isActive: student?.isActive,
       };
       return studentData;
     });
   };
 
-  const handleCallStudentList = () => {
-    request.get("students").then((res) => {
-      const students = res?.data?.students;
+  // GET STUDENT LIST
+  const handleCallStudentList = async (pageNumber = 0) => {
+    setIsLoading(true);
+    try {
+      const res = await request.get(`student/all?pageNumber=${pageNumber}`);
+      const students = res?.data?.data;
       const result = handleStudentDataList(students);
       setData(result);
-    });
+      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+    }
   };
 
-  useEffect(() => {
-    handleCallStudentList();
-  }, []);
+  // GET MAJOR LIST
+  const { data: majorList } = useFetch("major/filter?pageNumber=0&search");
 
   // UPDATE STUDENT
   const [form] = Form.useForm();
 
-  // Get current student's data by id
   useEffect(() => {
+    handleCallStudentList(currentPage);
+    // Get current student's data by id
     if (formRef.current) form.setFieldsValue(currentStudentValues);
-    handleCallMajorList();
   }, [form, currentStudentValues]);
 
-  const handleGetStudentById = (id) => {
-    setId(id);
-    request
-      .get(`students?studentId=${id}`)
-      .then((res) => {
-        const student = res?.data?.students;
-        setCurrentStudentValues({
-          key: student?.studentId,
-          studentId: student?.studentId,
-          // avatar: student?.avatar,
-          email: student?.email,
-          fullName: student?.fullName,
-          gender: student?.gender,
-          phoneNumber: student?.phoneNumber,
-          enrollNumber: student?.enrollNumber,
-          dateOfAdmission: moment(student?.dateOfAdmission),
-          majorId: student?.majorId,
-          classId: student?.classId,
-        });
-        setIsModalOpen(true);
-      })
-      .catch((err) => {
-        console.log(err);
+  const handleGetStudentById = async (id) => {
+    try {
+      const res = await request.get(
+        `student/filter?pageNumber=0&search=fptId:${id}`
+      );
+      const student = res?.data?.data[0];
+      setSelectedId(student?.fptId);
+      setCurrentStudentValues({
+        key: student?.fptId,
+        studentId: student?.fptId,
+        personId: student?.personId,
+        uogId: student?.uogId,
+        fullName: student?.fullName,
+        majorId: student?.majorId?.majorId,
+        email: student?.email,
+        gender: student?.gender,
+        status: student?.status,
+        dob: moment(student?.dob + 1),
+        isActive: student?.isActive,
       });
+      setIsModalOpen(true);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const handleUpdateStudent = (values) => {
-    request
-      .put(`students?studentId=${id}`, values)
-      .then((res) => {
-        const data = res?.data;
-        const students = data?.students;
-        const result = handleStudentDataList(students);
-        setData(result);
-        toast.success(data?.message);
-        setIsModalOpen(false);
-      })
-      .catch((err) => {
-        toast.error(err?.data?.message);
-      });
+  const handleUpdateStudent = async (values) => {
+    setIsLoading(true);
+    try {
+      const res = await request.put(`student/edit/${selectedId}`, values);
+      const data = res?.data;
+      const result = handleCallStudentList(data?.students);
+      setData(result);
+      toast.success(data?.message);
+      setIsModalOpen(false);
+      setIsLoading(false);
+    } catch (error) {
+      toast.error(error?.data?.message);
+      setIsModalOpen(false);
+      setIsLoading(false);
+    }
   };
 
   // DELETE STUDENT
   const handleDelete = (id) => {
     request
-      .delete(`students?studentId=${id}`)
+      .delete(`student/delete/${id}`)
       .then((res) => {
         toast.success(res?.data?.message);
-        const students = res?.data?.students;
-        const result = handleStudentDataList(students);
-        setData(result);
+        const newStudentList = data.filter((student) => student?.key !== id);
+        setData(newStudentList);
       })
       .catch((err) => {
         toast.error(err?.data?.message);
@@ -235,14 +239,6 @@ function StudentList() {
     });
   };
 
-  // GET MAJOR LIST
-  const [majorList, setMajorList] = useState([]);
-  const handleCallMajorList = () => {
-    request.get("majors").then((res) => {
-      setMajorList(res?.data?.majors);
-    });
-  };
-
   return (
     <>
       <Table
@@ -250,6 +246,14 @@ function StudentList() {
         icon={icon.SORT}
         columns={columns}
         dataSource={data}
+        loading={isLoading}
+        pageSize={15}
+        total={amountStudent}
+        onChange={(pageNumber) => {
+          --pageNumber;
+          setCurrentPage(pageNumber);
+          handleCallStudentList(pageNumber);
+        }}
       >
         <Link to="./add" className="ant-btn ant-btn-primary">
           ADD NEW STUDENT
@@ -283,17 +287,11 @@ function StudentList() {
             <Form.Item label="Student ID" name="studentId">
               <Input />
             </Form.Item>
-            <Form.Item label="Major" name="majorId">
-              <Select allowClear>
-                {majorList.map((major) => (
-                  <Select.Option key={major.majorId} value={major.majorId}>
-                    {major.majorName_EN}
-                  </Select.Option>
-                ))}
-              </Select>
+            <Form.Item label="Person ID" name="personId">
+              <Input />
             </Form.Item>
-            <Form.Item label="Enroll Number" name="enrollNumber">
-              <Input type="number" />
+            <Form.Item label="UOG ID" name="uogId">
+              <Input />
             </Form.Item>
           </Space>
           <Space style={{ display: "flex" }}>
@@ -305,8 +303,14 @@ function StudentList() {
             </Form.Item>
           </Space>
           <Space style={{ display: "flex" }}>
-            <Form.Item label="Phone Number" name="phoneNumber">
-              <Input maxLength={10} />
+            <Form.Item label="Major" name="majorId">
+              <Select allowClear>
+                {majorList?.map((major) => (
+                  <Select.Option key={major?.majorId} value={major?.majorId}>
+                    {major?.majorCode}
+                  </Select.Option>
+                ))}
+              </Select>
             </Form.Item>
             <Form.Item label="Gender" name="gender">
               <Select allowClear>
@@ -315,11 +319,11 @@ function StudentList() {
                 <Select.Option value="Other">Other</Select.Option>
               </Select>
             </Form.Item>
-            <Form.Item label="Date Of Admission" name="dateOfAdmission">
-              <DatePicker format={"YYYY-MM-DD"} />
+            <Form.Item label="DOB" name="dob">
+              <DatePicker format={"DD-MM-YYYY"} />
             </Form.Item>
           </Space>
-          <Form.Item label="Avatar" valuePropName="fileList" name="avatar">
+          {/* <Form.Item label="Avatar" valuePropName="fileList" name="avatar">
             <Upload action="/upload.do" listType="picture-card">
               <div>
                 <PlusOutlined />
@@ -332,7 +336,7 @@ function StudentList() {
                 </div>
               </div>
             </Upload>
-          </Form.Item>
+          </Form.Item> */}
         </Form>
       </Modal>
     </>

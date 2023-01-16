@@ -10,14 +10,17 @@ import {
   Image,
   Typography,
   Tag,
+  DatePicker,
 } from "antd";
 import { ExclamationCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import * as icon from "~/assets/images/ActionIcons";
 import { Table, Button } from "~/components";
 import request from "~/utils/request";
-import roles from "../roleList";
 import "./index.scss";
+import { ROLE_ADMIN, ROLE_USER } from "~/constants/role";
+import { UPDATE_USER_FAIL } from "~/utils/message";
+import moment from "moment";
 
 function UserList() {
   const formRef = useRef();
@@ -35,15 +38,6 @@ function UserList() {
           width={65}
           height={55}
         />
-      ),
-    },
-    {
-      title: "User ID",
-      dataIndex: "userId",
-      key: "userId",
-      fixed: "left",
-      render: (userId) => (
-        <Typography.Text className="need-uppercase">{userId}</Typography.Text>
       ),
     },
     {
@@ -66,48 +60,48 @@ function UserList() {
       key: "username",
     },
     {
-      title: "Gender",
-      dataIndex: "gender",
-      key: "gender",
-    },
-    {
       title: "Phone",
       dataIndex: "phoneNumber",
       key: "phoneNumber",
     },
     {
       title: "Role",
-      dataIndex: "roleId",
-      key: "roleId",
-      render: (roleId) => (
-        <Tag
-          color={
-            roleId === "ADMIN"
-              ? "volcano"
-              : roleId === "USER"
-              ? "blue"
-              : "green"
-          }
-        >
-          {roleId}
-        </Tag>
-      ),
+      dataIndex: "roles",
+      key: "roles",
+      width: 250,
+      render: (roles) => {
+        return roles.map((role, index) => (
+          <Tag
+            key={index}
+            color={
+              role.roleName === ROLE_ADMIN
+                ? "volcano"
+                : role.roleName === ROLE_USER
+                ? "blue"
+                : "green"
+            }
+          >
+            {role.roleName}
+          </Tag>
+        ));
+      },
     },
     {
       title: "",
       key: "action",
-      render: (id) => (
+      render: (student) => (
         <Space size="middle">
-          <Button onClick={() => handleGetUserById(id.key)}>
+          <Button onClick={() => handleGetUserById(student.username)}>
             <img src={icon.EDIT} alt="edit" />
           </Button>
-          <Button onClick={() => showDeleteConfirm(id.key)}>
+          <Button onClick={() => showDeleteConfirm(student.key)}>
             <img src={icon.DELETE} alt="delete" />
           </Button>
         </Space>
       ),
     },
   ];
+  const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState([
     {
       key: "",
@@ -116,18 +110,19 @@ function UserList() {
       email: "",
       fullName: "",
       username: "",
-      gender: "",
       phoneNumber: "",
-      roleId: "",
+      roles: [],
     },
   ]);
+
   const [currentUserValues, setCurrentUserValues] = useState({});
 
   // GET USERS
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [id, setId] = useState(null);
+  const [username, setUsername] = useState("");
+  const [roles, setRoles] = useState([]);
 
-  const handleUserDataList = (users) => {
+  const handleUserDataList = (users = []) => {
     let userData = {};
     return users?.map((user) => {
       userData = {
@@ -136,20 +131,26 @@ function UserList() {
         avatar: user?.avatar,
         email: user?.email,
         username: user?.username,
-        gender: user?.gender,
+        fullName: user?.fullName,
         phoneNumber: user?.phoneNumber,
-        roleId: user?.roleId,
+        roles: user?.roles,
       };
       return userData;
     });
   };
 
-  const handleCallUserList = () => {
-    request.get("users").then((res) => {
-      const users = res?.data?.users;
+  const handleCallUserList = async () => {
+    try {
+      setIsLoading(true);
+      const res = await request.get("users/all?pageNumber=0");
+      const users = res?.data?.data;
       const result = handleUserDataList(users);
       setData(result);
-    });
+      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -164,24 +165,25 @@ function UserList() {
     if (formRef.current) form.setFieldsValue(currentUserValues);
   }, [form, currentUserValues]);
 
-  const handleGetUserById = (id) => {
-    setId(id);
+  const handleGetUserById = (username) => {
+    setUsername(username);
     request
-      .get(`users?userId=${id}`)
-      .then((res) => {
-        const user = res?.data?.users;
+      .get(`users/filter?pageNumber=0&search=username:${username}`)
+      .then(async (res) => {
+        const user = res?.data?.data[0];
         setCurrentUserValues({
           key: user?.userId,
-          userId: user?.userId,
+          dob: moment(user?.dob),
           // avatar: user?.avatar,
           email: user?.email,
           fullName: user?.fullName,
+          departmentId: user?.departmentId?.departmentName,
           username: user?.username,
-          gender: user?.gender,
           address: user?.address,
           phoneNumber: user?.phoneNumber,
-          roleId: user?.roleId,
+          roles: user?.roles,
         });
+        await handleGetRoles();
         setIsModalOpen(true);
       })
       .catch((err) => {
@@ -189,9 +191,19 @@ function UserList() {
       });
   };
 
+  // get roles
+  const handleGetRoles = async () => {
+    try {
+      const res = await request.get("role/all?pageNumber=0");
+      setRoles(res?.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleUpdateUser = (values) => {
     request
-      .put(`users?userId=${id}`, values)
+      .put(`users/edit/${username}`, values)
       .then((res) => {
         const data = res?.data;
         const users = data?.users;
@@ -201,14 +213,14 @@ function UserList() {
         setIsModalOpen(false);
       })
       .catch((err) => {
-        toast.error(err?.data?.message);
+        toast.error(UPDATE_USER_FAIL);
       });
   };
 
   // DELETE USER
   const handleDelete = (id) => {
     request
-      .delete(`users?userId=${id}`)
+      .delete(`users/delete/${id}`)
       .then((res) => {
         toast.success(res?.data?.message);
         const users = res?.data?.users;
@@ -218,6 +230,7 @@ function UserList() {
       .catch((err) => {
         toast.error(err?.data?.message);
       });
+    // su dung redux please
   };
 
   // Confirm modal
@@ -243,11 +256,13 @@ function UserList() {
         icon={icon.SORT}
         columns={columns}
         dataSource={data}
+        loading={isLoading}
       >
         <Link to="./add" className="ant-btn ant-btn-primary">
           ADD NEW USER
         </Link>
       </Table>
+
       <Modal
         title="UPDATE A USER"
         open={isModalOpen}
@@ -272,24 +287,20 @@ function UserList() {
           className="update-user"
         >
           <Space style={{ display: "flex" }}>
-            <Form.Item label="User ID" name="userId">
-              <Input />
-            </Form.Item>
-            <Form.Item label="Role" name="roleId">
-              <Select allowClear>
+            <Form.Item label="Role" name="role">
+              <Select allowClear maxTagCount="responsive" mode={"multiple"}>
                 {roles?.map((role, index) => (
-                  <Select.Option value={role.value} key={index}>
-                    {role.label}
+                  <Select.Option value={role.roleName} key={index}>
+                    {role.roleName}
                   </Select.Option>
                 ))}
               </Select>
             </Form.Item>
-            <Form.Item label="Gender" name="gender">
-              <Select allowClear>
-                <Select.Option value="Male">Male</Select.Option>
-                <Select.Option value="Female">Female</Select.Option>
-                <Select.Option value="Other">Other</Select.Option>
-              </Select>
+            <Form.Item label="Dob" name={"dob"}>
+              <DatePicker format="DD-MM-YYYY" />
+            </Form.Item>
+            <Form.Item label="Department" name="departmentId">
+              <Input className="need-capitalize" />
             </Form.Item>
           </Space>
           <Space style={{ display: "flex" }}>

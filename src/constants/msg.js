@@ -1,0 +1,1 @@
+export const SIGN_IN_SUCCESS_MSG = "You are logged in!";

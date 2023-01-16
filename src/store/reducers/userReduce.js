@@ -1,14 +1,14 @@
 import {
-  ADD_STUDENT,
-  ADD_STUDENT_SUCCESS,
-  ADD_STUDENT_FAIL,
-  UPDATE_STUDENT,
-  UPDATE_STUDENT_SUCCESS,
-  UPDATE_STUDENT_FAIL,
-  DELETE_STUDENT,
-  DELETE_STUDENT_SUCCESS,
-  DELETE_STUDENT_FAIL,
-} from "../constants/student";
+  ADD_USER,
+  ADD_USER_SUCCESS,
+  ADD_USER_FAIL,
+  UPDATE_USER,
+  UPDATE_USER_SUCCESS,
+  UPDATE_USER_FAIL,
+  DELETE_USER,
+  DELETE_USER_SUCCESS,
+  DELETE_USER_FAIL,
+} from "../constants/user";
 
 const initialState = {
   isLoading: false,
@@ -16,15 +16,16 @@ const initialState = {
   flag: false,
 };
 
-const studentReducer = (state = initialState, action) => {
+const userReducer = (state = initialState, action) => {
   switch (action.type) {
-    case ADD_STUDENT: {
+    case ADD_USER: {
       return {
         ...state,
         isLoading: true,
+        msg: "",
       };
     }
-    case ADD_STUDENT_SUCCESS: {
+    case ADD_USER_SUCCESS: {
       return {
         ...state,
         isLoading: false,
@@ -32,7 +33,7 @@ const studentReducer = (state = initialState, action) => {
         flag: true,
       };
     }
-    case ADD_STUDENT_FAIL: {
+    case ADD_USER_FAIL: {
       return {
         ...state,
         isLoading: false,
@@ -40,13 +41,14 @@ const studentReducer = (state = initialState, action) => {
         flag: false,
       };
     }
-    case UPDATE_STUDENT: {
+    case UPDATE_USER: {
       return {
         ...state,
         isLoading: true,
+        msg: "",
       };
     }
-    case UPDATE_STUDENT_SUCCESS: {
+    case UPDATE_USER_SUCCESS: {
       return {
         ...state,
         isLoading: false,
@@ -54,7 +56,7 @@ const studentReducer = (state = initialState, action) => {
         flag: true,
       };
     }
-    case UPDATE_STUDENT_FAIL: {
+    case UPDATE_USER_FAIL: {
       return {
         ...state,
         isLoading: false,
@@ -62,24 +64,27 @@ const studentReducer = (state = initialState, action) => {
         flag: false,
       };
     }
-    case DELETE_STUDENT: {
+    case DELETE_USER: {
       return {
         ...state,
         isLoading: true,
+        msg: "",
       };
     }
-    case DELETE_STUDENT_SUCCESS: {
+    case DELETE_USER_SUCCESS: {
       return {
         ...state,
         isLoading: false,
         msg: action.payload,
+        flag: true,
       };
     }
-    case DELETE_STUDENT_FAIL: {
+    case DELETE_USER_FAIL: {
       return {
         ...state,
         isLoading: false,
         msg: action.payload,
+        flag: false,
       };
     }
     default:
@@ -87,4 +92,4 @@ const studentReducer = (state = initialState, action) => {
   }
 };
 
-export default studentReducer;
+export default userReducer;

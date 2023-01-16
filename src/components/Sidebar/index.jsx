@@ -1,60 +1,98 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; 
+import { useDispatch } from "react-redux";
 import { Menu, Space, Image, Typography } from "antd";
+import {
+  AimOutlined,
+  AppstoreOutlined,
+  BarsOutlined,
+  CompassOutlined,
+  DashboardOutlined,
+  DatabaseOutlined,
+  ExpandOutlined,
+  ExperimentOutlined,
+  HomeOutlined,
+  IdcardOutlined,
+  LoginOutlined,
+  ReadOutlined,
+  TeamOutlined,
+  TrophyOutlined,
+  UnorderedListOutlined,
+  UserOutlined,
+  WarningOutlined,
+} from "@ant-design/icons";
 import Heading from "../Heading";
 import Button from "../Button";
 import * as icon from "~/assets/images/Sidebar";
+import { logOut, logOutSuccess } from "~/store/actions/authenAction";
+import { cookies } from "~/utils/cookies";
 import "./index.scss";
-import { UserOutlined } from "@ant-design/icons";
-import { useDispatch } from "react-redux";
-import { logOut } from "~/store/actions/authenAction";
 
 function Sidebar({ className }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  function getItem(label, key, icon, children, type) {
+    return {
+      key,
+      icon,
+      children,
+      label,
+      type,
+    };
+  }
+
   const sidebarElements = [
-    {
-      label: <Link to="/">Home</Link>,
-      key: "home",
-      icon: <img src={icon.HOME} alt="home" />,
-    },
-    {
-      label: <Link to="/users">Users</Link>,
-      key: "user",
-      icon: <UserOutlined />,
-    },
-    {
-      label: <Link to="/majors">Majors</Link>,
-      key: "majors",
-      icon: <img src={icon.MAJORS} alt="majors" />,
-    },
-    {
-      label: <Link to="/students">Students</Link>,
-      key: "students",
-      icon: <img src={icon.STUDENTS} alt="students" />,
-    },
-    {
-      label: <Link to="/payments">Payments</Link>,
-      key: "payments",
-      icon: <img src={icon.PAYMENT} alt="payments" />,
-    },
-    {
-      label: <Link to="/report">Report</Link>,
-      key: "report",
-      icon: <img src={icon.REPORT} alt="report" />,
-    },
-    {
-      label: <Link to="/settings">Settings</Link>,
-      key: "settings",
-      icon: <img src={icon.SETTINGS} alt="settings" />,
-    },
+    getItem(<Link to="/">Home</Link>, null, <HomeOutlined />),
+    getItem("Facuty", "sub1", <ExpandOutlined />, [
+      getItem(<Link to={"/users"}>Users</Link>, "user1", <UserOutlined />),
+      getItem(
+        <Link to={"/departments"}>Departments</Link>,
+        "user2",
+        <TeamOutlined />
+      ),
+      getItem(<Link to={"/roles"}>Roles</Link>, "user3", <AimOutlined />),
+    ]),
+    getItem("Education", "sub2", <ExperimentOutlined />, [
+      getItem(<Link to={"/terms"}>Terms</Link>, "edu1", <DashboardOutlined />),
+      getItem(<Link to={"/majors"}>Majors</Link>, "edu2", <BarsOutlined />),
+      getItem(
+        <Link to={"/programs"}>Programs</Link>,
+        "edu3",
+        <DatabaseOutlined />
+      ),
+      getItem(<Link to={"/subjects"}>Subjects</Link>, "edu4", <ReadOutlined />),
+      getItem(<Link to={"/class"}>Class</Link>, "edu5", <CompassOutlined />),
+    ]),
+    getItem("Students", "sub3", <AppstoreOutlined />, [
+      getItem(
+        <Link to={"/students"}>List</Link>,
+        "stu1",
+        <UnorderedListOutlined />
+      ),
+      getItem(
+        <Link to={"/honour-students"}>Honour</Link>,
+        "stu4",
+        <TrophyOutlined />
+      ),
+      getItem(
+        <Link to={"/ojt-students"}>OJT</Link>,
+        "stu2",
+        <IdcardOutlined />
+      ),
+      getItem(
+        <Link to={"/fail-subjects"}>Fail</Link>,
+        "stu3",
+        <WarningOutlined />
+      ),
+    ]),
   ];
 
   let fullName = "",
     roleId = "";
-  if (localStorage.getItem("user_info")) {
-    const user = JSON.parse(localStorage?.getItem("user_info"));
-    fullName = user.fullName;
-    roleId = user.roleId;
+  if (cookies.get("user_info")) {
+    const user = cookies.get("user_info");
+    fullName = user?.data?.fullName;
+    roleId = user?.data?.roles?.map((role) => role);
   }
 
   return (
@@ -73,7 +111,9 @@ function Sidebar({ className }) {
         >
           {fullName}
         </Typography.Title>
-        <span className="role">{roleId}</span>
+        <Space direction={"vertical"} align={"center"} className="role">
+          {roleId}
+        </Space>
       </Space>
       <Menu
         items={sidebarElements}
@@ -82,13 +122,14 @@ function Sidebar({ className }) {
       />
       <Button
         onClick={() => {
-          dispatch(logOut("Log out successfully!"));
-          navigate("sign-in");
+          dispatch(logOut());
+          dispatch(logOutSuccess("Log out successfully!"));
+          navigate("/sign-in");
         }}
         value="Logout"
         className="logout"
       >
-        <img src={icon.LOGOUT} alt="logout" />
+        <LoginOutlined />
       </Button>
     </Space>
   );

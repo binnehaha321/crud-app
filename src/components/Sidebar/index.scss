@@ -1,6 +1,7 @@
 .fixed-sidebar {
   background-color: var(--bg-secondary) !important;
   padding: 1rem;
+  overflow: auto;
 
   position: fixed;
   top: 0;
@@ -30,17 +31,12 @@
   }
 
   .ant-space-item {
-    &:nth-child(3) {
-      margin-top: 2rem;
-    }
     &:last-child {
       margin-top: auto;
     }
   }
 
   .ant-menu-item {
-    padding-inline: 3.5rem;
-
     img,
     svg {
       width: 18px;
@@ -66,7 +62,7 @@
       background-color: var(--btn-danger);
     }
 
-    img {
+    svg {
       margin-left: 1.5rem;
     }
   }

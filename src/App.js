@@ -4,11 +4,11 @@ import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { Spin } from "antd";
 import { publicRoutes, privateRoutes } from "~/routes";
 import DefaultLayout from "./Layout/DefaultLayout";
-import "~/utils/handleSidebar";
+import { cookies } from "./utils/cookies";
 
 function App() {
   let { isLoading } = useSelector((state) => state.authen);
-  let isAuthen = localStorage.getItem("is_login");
+  let isAuthen = cookies.get("is_login");
   const navigate = useNavigate();
   const location = useLocation();
 

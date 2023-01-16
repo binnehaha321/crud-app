@@ -1,18 +1,21 @@
 import { useEffect, useState } from "react";
-import { Card, Typography, Space, Row, Col } from "antd";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Card, Typography, Space, Row, Col, Spin } from "antd";
 import * as icon from "~/assets/images/Home";
 import request from "~/utils/request";
-import "./index.scss";
-import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { Link } from "react-router-dom";
+import "./index.scss";
 
 function Home() {
-  const [amountStudent, setAmountStudent] = useState(0);
-  const [amountMajor, setAmountMajor] = useState(0);
-  const [amountPayment, setAmountPayment] = useState(0);
-  const [amountUser, setAmountUser] = useState(0);
   let { msg } = useSelector((state) => state.authen);
+  const [isLoading, setIsLoading] = useState(false);
+  const [amount, setAmount] = useState({
+    student: 0,
+    major: 0,
+    user: 0,
+    payment: 0,
+  });
 
   useEffect(() => {
     if (msg) {
@@ -21,16 +24,26 @@ function Home() {
   }, [msg]);
 
   // STUDENTS
-  const callStudentList = () =>
-    request.get("students").then((res) => {
-      setAmountStudent(res?.data?.students?.length);
-    });
+  const callStudentList = async () => {
+    setIsLoading(true);
+    try {
+      const res = await request.get("student/totalStudents");
+      setAmount((props) => ({
+        ...props,
+        student: res?.data,
+      }));
+      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+    }
+  };
 
   // MAJORS
-  const callMajorList = () =>
-    request.get("majors").then((res) => {
-      setAmountMajor(res?.data?.majors?.length);
-    });
+  // const callMajorList = () =>
+  //   request.get("majors").then((res) => {
+  //     setAmountMajor(res?.data?.majors?.length);
+  //   });
 
   // PAYMENTS
   // const callPaymentList = () =>
@@ -39,16 +52,16 @@ function Home() {
   //   });
 
   // USERS
-  const callUserList = () =>
-    request.get("users").then((res) => {
-      setAmountUser(res?.data?.users?.length);
-    });
+  // const callUserList = () =>
+  //   request.get("users").then((res) => {
+  //     setAmountUser(res?.data?.users?.length);
+  //   });
 
   useEffect(() => {
     callStudentList();
-    callMajorList();
+    // callMajorList();
     // callPaymentList();
-    callUserList();
+    // callUserList();
   }, []);
 
   const { Title, Text } = Typography;
@@ -58,7 +71,7 @@ function Home() {
       label: "Students",
       path: "students",
       icon: icon.STUDENTS,
-      amount: amountStudent,
+      amount: amount.student,
       bgColor: "#F0F9FF",
       color: "#000",
     },
@@ -66,7 +79,7 @@ function Home() {
       label: "Majors",
       path: "majors",
       icon: icon.MAJORS,
-      amount: amountMajor,
+      amount: amount.major,
       bgColor: "#FEF6FB",
       color: "#000",
     },
@@ -82,7 +95,7 @@ function Home() {
       label: "User",
       path: "users",
       icon: icon.USERS,
-      amount: amountUser,
+      amount: amount.user,
       bgColor: "linear-gradient(110.42deg, #FEAF00 18.27%, #F8D442 91.84%)",
       color: "#FFF",
     },
@@ -90,31 +103,35 @@ function Home() {
 
   return (
     <>
-      <Row
-        gutter={[8, 8]}
-        justify="space-between"
-        style={{ paddingTop: "1rem" }}
-      >
-        {items.map((item, index) => (
-          <Col key={index}>
-            <Link to={item.path}>
-              <Card
-                hoverable
-                style={{
-                  width: 240,
-                  background: item.bgColor,
-                }}
-              >
-                <Space direction="vertical">
-                  <img src={item.icon} alt={item.label} />
-                  <Text style={{ color: item.color }}>{item.label}</Text>
-                </Space>
-                <Title level={4}>{item.amount}</Title>
-              </Card>
-            </Link>
-          </Col>
-        ))}
-      </Row>
+      {isLoading ? (
+        <Spin />
+      ) : (
+        <Row
+          gutter={[8, 8]}
+          justify="space-between"
+          style={{ paddingTop: "1rem" }}
+        >
+          {items.map((item, index) => (
+            <Col key={index}>
+              <Link to={item.path}>
+                <Card
+                  hoverable
+                  style={{
+                    width: 240,
+                    background: item.bgColor,
+                  }}
+                >
+                  <Space direction="vertical">
+                    <img src={item.icon} alt={item.label} />
+                    <Text style={{ color: item.color }}>{item.label}</Text>
+                  </Space>
+                  <Title level={4}>{item.amount}</Title>
+                </Card>
+              </Link>
+            </Col>
+          ))}
+        </Row>
+      )}
     </>
   );
 }

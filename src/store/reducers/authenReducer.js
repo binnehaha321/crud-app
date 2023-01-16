@@ -3,8 +3,10 @@ import {
   SIGN_IN_SUCCESS,
   SIGN_IN_FAIL,
   LOG_OUT,
+  LOG_OUT_SUCCESS,
+  LOG_OUT_FAIL,
 } from "../constants/authen";
-import * as LS from "~/utils/localStorage";
+import * as CK from "~/utils/cookies";
 
 const initialState = {
   isLoading: false,
@@ -22,8 +24,8 @@ const authenReducer = (state = initialState, action) => {
       };
     }
     case SIGN_IN_SUCCESS: {
-      LS.saveUserInfo(action.payload.userInfo);
-      LS.saveLoginStatus();
+      CK.saveUserInfo(action.payload.userInfo);
+      CK.saveLoginStatus();
       return {
         ...state,
         isLoading: false,
@@ -41,13 +43,27 @@ const authenReducer = (state = initialState, action) => {
       };
     }
     case LOG_OUT: {
-      LS.removeUserInfo();
-      LS.removeLoginStatus();
+      return {
+        ...state,
+        isLoading: true,
+        msg: "",
+      };
+    }
+    case LOG_OUT_SUCCESS: {
+      CK.removeUserInfo();
+      CK.removeLoginStatus();
       return {
         ...state,
         isLoading: false,
         msg: action.payload,
         userInfo: null,
+      };
+    }
+    case LOG_OUT_FAIL: {
+      return {
+        ...state,
+        isLoading: true,
+        msg: action.payload,
       };
     }
     default:

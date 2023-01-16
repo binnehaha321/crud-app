@@ -10,18 +10,20 @@
     grid-area: sidebar;
     max-width: var(--sidebar-max-width);
     width: var(--sidebar-max-width);
-    transition: opacity .5s linear;
+    transition: opacity 0.5s linear;
   }
 
   .header {
     grid-area: header;
     width: 100%;
-    margin-left: auto;
+    background-color: #fff;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-block: 1rem;
-    padding-inline: 2rem;
+    padding: 1rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 3;
   }
 
   & > div:last-child {
