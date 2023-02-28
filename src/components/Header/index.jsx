@@ -5,7 +5,7 @@ function Header({ className }) {
   return (
     <div className={`wrapper ${className}`}>
       <div className="left">
-        <img src={COLLAPSE} alt="collapse-menu" id="collapse-menu" />
+        {/* <img src={COLLAPSE} alt="collapse-menu" id="collapse-menu" /> */}
       </div>
       <div className="right">
         <div className="search">

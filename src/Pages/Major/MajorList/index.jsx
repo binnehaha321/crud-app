@@ -13,6 +13,7 @@ function MajorList() {
   const [id, setId] = useState(null);
   const [form] = Form.useForm();
   const [currentMajorValues, setCurrentMajorValues] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
   const columns = [
     {
       title: "Major ID",
@@ -21,6 +22,12 @@ function MajorList() {
       render: (majorId) => (
         <Typography.Text className="need-uppercase">{majorId}</Typography.Text>
       ),
+    },
+    {
+      title: "Major Code",
+      dataIndex: "majorCode",
+      key: "majorCode",
+      render: (majorCode) => <Typography.Text>{majorCode}</Typography.Text>,
     },
     {
       title: "Major Name (EN)",
@@ -43,11 +50,6 @@ function MajorList() {
       ),
     },
     {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
-    },
-    {
       title: "",
       key: "action",
       render: (id) => (
@@ -66,9 +68,9 @@ function MajorList() {
     {
       key: 0,
       majorId: "",
+      majorCode: "",
       majorName_EN: "",
       majorName_VI: "",
-      description: "",
     },
   ]);
 
@@ -79,20 +81,28 @@ function MajorList() {
       majorData = {
         key: major?.majorId,
         majorId: major?.majorId,
-        majorName_EN: major?.majorName_EN,
-        majorName_VI: major?.majorName_VI,
-        description: major?.description,
+        majorCode: major?.majorCode,
+        majorName_EN: major?.ename,
+        majorName_VI: major?.vname,
       };
       return majorData;
     });
   };
 
-  const handleCallMajorList = () => {
-    request.get("majors").then((res) => {
-      const majors = res?.data?.majors;
+  const handleCallMajorList = async (pageNumber = 0) => {
+    setIsLoading(true);
+    try {
+      const res = await request.get(
+        `major/filter?pageNumber=${pageNumber}&search`
+      );
+      const majors = res?.data;
       const result = handleMajorDataList(majors);
       setData(result);
-    });
+      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -178,6 +188,7 @@ function MajorList() {
         icon={icon.SORT}
         columns={columns}
         dataSource={data}
+        loading={isLoading}
       >
         <Link to="./add" className="ant-btn ant-btn-primary">
           ADD NEW MAJOR

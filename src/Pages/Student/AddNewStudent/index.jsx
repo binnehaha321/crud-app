@@ -15,7 +15,7 @@ import {
   Divider,
   DatePicker,
 } from "antd";
-import request from "~/utils/request";
+import request, { post } from "~/utils/request";
 import {
   addStudent,
   addStudentSuccess,
@@ -36,35 +36,22 @@ function AddNewStudent() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // const handleAddStudent = useCallback(
-  //   (values) => {
-  //     request
-  //       .post("students/add", values)
-  //       .then((res) => {
-  //         if (!res) {
-  //           dispatch(addStudent());
-  //         } else {
-  //           dispatch(addStudentSuccess(res?.data?.message));
-  //           navigate("../students");
-  //         }
-  //       })
-  //       .catch((err) => {
-  //         dispatch(addStudentFail(err?.response?.data?.message));
-  //       });
-  //   },
-  //   [dispatch, navigate]
-  // );
-
   const handleAddStudent = async (values) => {
     try {
       dispatch(addStudent());
       const res = await request.post("student/add", values);
+      console.log(res);
       dispatch(addStudentSuccess(res?.data?.message));
-      navigate("../students");
+      // navigate("../students");
     } catch (error) {
       dispatch(addStudentFail(error?.response?.data?.message));
     }
   };
+
+  // const handleAddStudent = async (values) => {
+  //   const response = await post("student/add", values);
+  //   console.log(response)
+  // }
 
   let { msg, flag } = useSelector((state) => state.student);
   useEffect(() => {
@@ -131,7 +118,6 @@ function AddNewStudent() {
               <Col xs={24} md={8}>
                 <Form.Item label="Major" name="majorId">
                   <Select allowClear>
-                    {/* <Select.Option value="Male">Male</Select.Option> */}
                     {majorList?.map((major) => {
                       return (
                         <Select.Option

@@ -1,8 +1,5 @@
 import SignIn from "~/Pages/SignIn";
 import Home from "~/Pages/Home";
-import Payment from "~/Pages/Payment/PaymentList";
-import AddNewPayment from "~/Pages/Payment/AddNewPayment";
-import PaymentDetail from "~/Pages/Payment/PaymentDetail";
 import StudentList from "~/Pages/Student/StudentList";
 import AddNewStudent from "~/Pages/Student/AddNewStudent";
 import UserList from "~/Pages/User/UserList";
@@ -12,6 +9,11 @@ import AddNewMajor from "~/Pages/Major/AddNewMajor";
 import ResetPassword from "~/Pages/ResetPassword";
 import ConfirmPassword from "~/Pages/ConfirmPassword";
 import NotFound from "~/Pages/NotFound";
+import HonourList from "~/Pages/Student/Honour";
+import SubjectList from "~/Pages/Subject/SubjectList";
+import ClassList from "~/Pages/Class/ClassList";
+import AddNewClass from "~/Pages/Class/AddNewClass";
+import RoleList from "~/Pages/Roles/RoleList";
 
 const publicRoutes = [
   { path: "sign-in", component: <SignIn /> },
@@ -20,15 +22,19 @@ const publicRoutes = [
 ];
 const privateRoutes = [
   { path: "/", component: <Home /> },
-  { path: "payments", component: <Payment /> },
-  { path: "payments/add", component: <AddNewPayment /> },
-  { path: "payments/:id", component: <PaymentDetail /> },
   { path: "students", component: <StudentList /> },
+  { path: "students/honour", component: <HonourList /> },
+  // { path: "students/ojt", component: <StudentList /> },
   { path: "students/add", component: <AddNewStudent /> },
   { path: "users", component: <UserList /> },
   { path: "users/add", component: <AddNewUser /> },
   { path: "majors", component: <MajorList /> },
   { path: "majors/add", component: <AddNewMajor /> },
+  { path: "subjects", component: <SubjectList /> },
+  { path: "class", component: <ClassList /> },
+  { path: "class/add", component: <AddNewClass /> },
+  { path: "roles", component: <RoleList /> },
+  // { path: "roles/add", component: <AddNewRole /> },
   { path: "*", component: <NotFound /> },
 ];
 

@@ -146,7 +146,7 @@ function AddNewUser() {
               </Col> */}
               <Col md={12} xs={24}>
                 <Form.Item label="Dob" name={"dob"}>
-                  <DatePicker format="DD-MM-YYYY" />
+                  <DatePicker format={"DD-MM-YYYY"} />
                 </Form.Item>
               </Col>
             </Row>

@@ -4,9 +4,13 @@ import { ToastContainer } from "react-toastify";
 import { Heading } from "~/components";
 import styles from "./index.module.scss";
 import { MailOutlined } from "@ant-design/icons";
+import request from "~/utils/request";
 
 function ResetPassword() {
-  const handleSubmit = (values) => {};
+  const handleSubmit = async (values) => {
+    const res = await request.post("forgot_password", values);
+    console.log(res)
+  };
   return (
     <Row
       type="flex"

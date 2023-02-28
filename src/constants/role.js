@@ -1,4 +1,4 @@
-export const ROLE_ADMIN = "ROLE_ADMIN";
-export const ROLE_USER = "ROLE_USER";
-export const ROLE_STAFF = "ROLE_STAFF";
-export const ROLE_TEACHER = "ROLE_TEACHER";
+export const ADMIN = "ROLE_ADMIN";
+export const USER = "ROLE_USER";
+export const STAFF = "ROLE_STAFF";
+export const TEACHER = "ROLE_TEACHER";

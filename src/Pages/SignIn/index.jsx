@@ -1,7 +1,7 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Row, Col, Typography, Form, Input, Button } from "antd";
+import { Row, Col, Typography, Form, Input, Button, Skeleton } from "antd";
 import { MailOutlined } from "@ant-design/icons";
 import Heading from "~/components/Heading";
 import styles from "./index.module.scss";
@@ -17,12 +17,14 @@ import { toast } from "react-toastify";
 
 function SignIn() {
   const { Text, Title } = Typography;
+  const [isLoading, setIsLoading] = useState(false);
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const handleSignIn = useCallback(
     (values) => {
+      setIsLoading(true);
       request
         .post("login", values)
         .then((res) => {
@@ -33,6 +35,7 @@ function SignIn() {
               msg: SIGN_IN_SUCCESS_MSG,
             })
           );
+          setIsLoading(false);
           navigate("/");
         })
         .catch((err) => {
@@ -52,6 +55,8 @@ function SignIn() {
       }
     }
   }, [msg, flag]);
+
+  if (isLoading) return <Skeleton />;
 
   return [
     <Row

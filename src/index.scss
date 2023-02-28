@@ -6,6 +6,19 @@
   font-family: "Montserrat", sans-serif;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+a,
+span,
+p,
+input {
+  font-family: "Montserrat", sans-serif !important;
+}
+
 // Variables
 :root {
   --bg-primary: linear-gradient(71.17deg, #feaf00 19.35%, #f8d442 90.12%);

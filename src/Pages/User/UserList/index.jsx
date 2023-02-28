@@ -11,6 +11,7 @@ import {
   Typography,
   Tag,
   DatePicker,
+  Button as Btn,
 } from "antd";
 import { ExclamationCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
@@ -18,7 +19,7 @@ import * as icon from "~/assets/images/ActionIcons";
 import { Table, Button } from "~/components";
 import request from "~/utils/request";
 import "./index.scss";
-import { ROLE_ADMIN, ROLE_USER } from "~/constants/role";
+import { ADMIN, USER } from "~/constants/role";
 import { UPDATE_USER_FAIL } from "~/utils/message";
 import moment from "moment";
 
@@ -74,9 +75,9 @@ function UserList() {
           <Tag
             key={index}
             color={
-              role.roleName === ROLE_ADMIN
+              role.roleName === ADMIN
                 ? "volcano"
-                : role.roleName === ROLE_USER
+                : role.roleName === USER
                 ? "blue"
                 : "green"
             }
@@ -258,8 +259,8 @@ function UserList() {
         dataSource={data}
         loading={isLoading}
       >
-        <Link to="./add" className="ant-btn ant-btn-primary">
-          ADD NEW USER
+        <Link to="./add">
+          <Btn type={"primary"}>ADD NEW USER</Btn>
         </Link>
       </Table>
 

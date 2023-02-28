@@ -70,7 +70,7 @@ function Sidebar({ className }) {
         <UnorderedListOutlined />
       ),
       getItem(
-        <Link to={"/honour-students"}>Honour</Link>,
+        <Link to={"../students/honour"}>Honour</Link>,
         "stu4",
         <TrophyOutlined />
       ),

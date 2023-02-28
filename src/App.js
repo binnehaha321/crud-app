@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
-import { Spin } from "antd";
+import { Spin } from "antd"; 
 import { publicRoutes, privateRoutes } from "~/routes";
 import DefaultLayout from "./Layout/DefaultLayout";
 import { cookies } from "./utils/cookies";

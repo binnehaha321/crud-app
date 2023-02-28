@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
 import {
   Space,
   Image,
@@ -11,15 +10,22 @@ import {
   DatePicker,
   Form,
   Typography,
+  Popover,
+  Button,
 } from "antd";
-import { ExclamationCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  ExclamationCircleOutlined,
+  UploadOutlined,
+  UserAddOutlined,
+} from "@ant-design/icons";
 import { toast } from "react-toastify";
 import moment from "moment";
-import { Table, Button } from "~/components";
+import { Table } from "~/components";
 import * as icon from "~/assets/images/ActionIcons";
 import request from "~/utils/request";
 import useFetch from "~/hooks/useFetch";
 import "./index.scss";
+import UploadCSV from "~/components/UploadCSV/UploadCSV";
 
 function StudentList() {
   const formRef = useRef();
@@ -149,8 +155,8 @@ function StudentList() {
       setData(result);
       setIsLoading(false);
     } catch (error) {
-      console.log(error);
       setIsLoading(false);
+      throw new Error(error);
     }
   };
 
@@ -255,9 +261,21 @@ function StudentList() {
           handleCallStudentList(pageNumber);
         }}
       >
-        <Link to="./add" className="ant-btn ant-btn-primary">
-          ADD NEW STUDENT
-        </Link>
+        <Popover
+          content={
+            <Space direction="vertical">
+              <Link to="../students/add">
+                <Button icon={<UserAddOutlined />} type={"text"}>
+                  ADD NEW STUDENT
+                </Button>
+              </Link>
+              <UploadCSV />
+            </Space>
+          }
+          trigger="click"
+        >
+          <Button>ADD NEW STUDENT</Button>
+        </Popover>
       </Table>
       <Modal
         title="UPDATE A STUDENT"
@@ -285,7 +303,7 @@ function StudentList() {
         >
           <Space style={{ display: "flex" }}>
             <Form.Item label="Student ID" name="studentId">
-              <Input />
+              <Input className="need-uppercase" />
             </Form.Item>
             <Form.Item label="Person ID" name="personId">
               <Input />
@@ -296,7 +314,7 @@ function StudentList() {
           </Space>
           <Space style={{ display: "flex" }}>
             <Form.Item label="Fullname" name="fullName">
-              <Input />
+              <Input className="need-capitalize" />
             </Form.Item>
             <Form.Item label="Email" name="email">
               <Input type="email" />
