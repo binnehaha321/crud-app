@@ -11,6 +11,7 @@ function Table({
   pageSize,
   total,
   onChange,
+  onRow,
 }) {
   return (
     <>
@@ -30,6 +31,7 @@ function Table({
       </Space>
       <Divider style={{ margin: "0" }} />
       <TableAnt
+        onRow={onRow}
         columns={columns}
         dataSource={dataSource}
         scroll={{ x: "fit-content" }}

@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom"; 
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { Menu, Space, Image, Typography } from "antd";
 import {
@@ -65,7 +65,7 @@ function Sidebar({ className }) {
     ]),
     getItem("Students", "sub3", <AppstoreOutlined />, [
       getItem(
-        <Link to={"/students"}>List</Link>,
+        <Link to={"/students"}>Student List</Link>,
         "stu1",
         <UnorderedListOutlined />
       ),
@@ -75,12 +75,12 @@ function Sidebar({ className }) {
         <TrophyOutlined />
       ),
       getItem(
-        <Link to={"/ojt-students"}>OJT</Link>,
+        <Link to={"../students/ojt"}>OJT</Link>,
         "stu2",
         <IdcardOutlined />
       ),
       getItem(
-        <Link to={"/fail-subjects"}>Fail</Link>,
+        <Link to={"../students/fail-subject"}>Fail</Link>,
         "stu3",
         <WarningOutlined />
       ),

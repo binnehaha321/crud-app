@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import {
   Space,
   Image,
-  Upload,
   Input,
   Select,
   Modal,
@@ -11,21 +10,18 @@ import {
   Form,
   Typography,
   Popover,
-  Button,
+  Button as Btn,
 } from "antd";
-import {
-  ExclamationCircleOutlined,
-  UploadOutlined,
-  UserAddOutlined,
-} from "@ant-design/icons";
+import { ExclamationCircleOutlined, UserAddOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import moment from "moment";
-import { Table } from "~/components";
+import { Table, Button } from "~/components";
 import * as icon from "~/assets/images/ActionIcons";
 import request from "~/utils/request";
 import useFetch from "~/hooks/useFetch";
 import "./index.scss";
 import UploadCSV from "~/components/UploadCSV/UploadCSV";
+import StudentDetail from "~/components/StudentDetail";
 
 function StudentList() {
   const formRef = useRef();
@@ -123,6 +119,9 @@ function StudentList() {
     },
   ]);
 
+  const [isOpen, setIsOpen] = useState(false);
+  const [detailStd, setDetailStd] = useState({});
+
   // GET AMOUNT OF STUDENT
   const { data: amountStudent } = useFetch("student/totalStudents");
 
@@ -138,7 +137,8 @@ function StudentList() {
         email: student?.email,
         gender: student?.gender,
         status: student?.status,
-        dob: moment(student?.dob + 1).format("DD-MM-YYYY"),
+        // dob: moment(student?.dob + 1).format("YYYY-MM-DD"),
+        dob: student?.dob,
         isActive: student?.isActive,
       };
       return studentData;
@@ -245,6 +245,13 @@ function StudentList() {
     });
   };
 
+  // Detail student
+  const handleOpenDetailStudent = (record) => {
+    setIsOpen(true);
+    console.log(record);
+    setDetailStd(record);
+  };
+
   return (
     <>
       <Table
@@ -260,21 +267,28 @@ function StudentList() {
           setCurrentPage(pageNumber);
           handleCallStudentList(pageNumber);
         }}
+        onRow={(record) => {
+          return {
+            onClick: () => {
+              handleOpenDetailStudent(record);
+            },
+          };
+        }}
       >
         <Popover
           content={
             <Space direction="vertical">
               <Link to="../students/add">
-                <Button icon={<UserAddOutlined />} type={"text"}>
+                <Btn icon={<UserAddOutlined />} type={"primary"}>
                   ADD NEW STUDENT
-                </Button>
+                </Btn>
               </Link>
               <UploadCSV />
             </Space>
           }
           trigger="click"
         >
-          <Button>ADD NEW STUDENT</Button>
+          <Btn>ADD NEW STUDENT</Btn>
         </Popover>
       </Table>
       <Modal
@@ -341,22 +355,19 @@ function StudentList() {
               <DatePicker format={"DD-MM-YYYY"} />
             </Form.Item>
           </Space>
-          {/* <Form.Item label="Avatar" valuePropName="fileList" name="avatar">
-            <Upload action="/upload.do" listType="picture-card">
-              <div>
-                <PlusOutlined />
-                <div
-                  style={{
-                    marginTop: 8,
-                  }}
-                >
-                  Upload
-                </div>
-              </div>
-            </Upload>
-          </Form.Item> */}
         </Form>
       </Modal>
+      <StudentDetail
+        open={isOpen}
+        onOk={() => setIsOpen(false)}
+        title={detailStd?.fullName}
+        studentId={detailStd?.studentId}
+        email={detailStd?.email}
+        gender={detailStd?.gender}
+        majorId={detailStd?.majorId}
+        dob={detailStd?.dob}
+        isActive={detailStd?.isActive}
+      />
     </>
   );
 }
