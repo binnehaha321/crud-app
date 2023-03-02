@@ -2,7 +2,11 @@ import axios from "axios";
 import { cookies } from "./cookies";
 
 const request = axios.create({
+<<<<<<< HEAD
   baseURL: "https://webapp-backend-379318.as.r.appspot.com/",
+=======
+  baseURL: "http://webapp-backend-379318.as.r.appspot.com/",
+>>>>>>> 8a9a4bb66364ac4e1bd30f3a1a3c2f8d898c05e9
   headers: {
     "Content-Type": "application/json",
   },
