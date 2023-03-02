@@ -12,15 +12,19 @@ const UploadCSV = () => {
   const handleUploadCSV = () => {
     setIsUploading(true);
     axios
-      .post("http://localhost:8080/student/insert/file", formData, {
-        responseType: "blob",
-        headers: {
-          authorization: `Bearer ${
-            cookies ? JSON.parse(cookies.cookies.user_info).data.token : null
-          }`,
-          "Content-Type": "multipart/form-data",
-        },
-      })
+      .post(
+        "https://webapp-backend-379318.as.r.appspot.com/student/insert/file",
+        formData,
+        {
+          responseType: "blob",
+          headers: {
+            authorization: `Bearer ${
+              cookies ? JSON.parse(cookies.cookies.user_info).data.token : null
+            }`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
       .then((res) => {
         const blob = new Blob([res?.data], {
           type: "text/csv; charset=UTF-8",
@@ -41,8 +45,8 @@ const UploadCSV = () => {
   };
 
   return (
-		<Upload
-			name="file"
+    <Upload
+      name="file"
       maxCount={1}
       customRequest={handleUploadCSV}
       accept=".csv, .xls, .xlsx"
