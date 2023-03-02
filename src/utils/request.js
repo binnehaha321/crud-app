@@ -2,7 +2,7 @@ import axios from "axios";
 import { cookies } from "./cookies";
 
 const request = axios.create({
-  baseURL: "http://localhost:8080/",
+  baseURL: "http://webapp-backend-379318.as.r.appspot.com/",
   headers: {
     "Content-Type": "application/json",
   },
