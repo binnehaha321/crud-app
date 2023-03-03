@@ -35,12 +35,12 @@ function HonourList() {
       ),
     },
     {
-      title: "Student ID",
-      dataIndex: "studentId",
-      key: "studentId",
-      render: (studentId) => (
+      title: "FPT ID",
+      dataIndex: "fptId",
+      key: "fptId",
+      render: (fptId) => (
         <Typography.Text className="need-uppercase">
-          {studentId}
+          {fptId}
         </Typography.Text>
       ),
     },
@@ -84,7 +84,7 @@ function HonourList() {
   const [data, setData] = useState([
     {
       key: "",
-      studentId: "",
+      fptId: "",
       email: "",
       fullName: "",
       majorId: "",

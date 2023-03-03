@@ -1,18 +1,28 @@
-import { Divider, Space, Table as TableAnt, Typography } from "antd";
+import { Button, Divider, Space, Table as TableAnt, Typography } from "antd";
 import "./index.scss";
+import { FilterOutlined } from "@ant-design/icons";
 
 function Table({
   caption,
-  icon,
   children,
   columns,
   dataSource,
   loading,
-  pageSize,
-  total,
+  totalPages,
+  currentPage,
   onChange,
   onRow,
+  onOpenFilter,
 }) {
+  const paginationConfig = {
+    pageSize: 15,
+    current: currentPage,
+    total: totalPages,
+    showSizeChanger: false,
+    onChange: onChange,
+    hideOnSinglePage: true,
+  };
+
   return (
     <>
       <Space
@@ -25,7 +35,13 @@ function Table({
           <Typography.Title level={3}>{caption}</Typography.Title>
         </Space>
         <Space direction="horizental" className="gap-2">
-          <img src={icon} alt={icon} />
+          <Button
+            onClick={onOpenFilter}
+            type={"text"}
+            style={{ color: "#feaf00" }}
+          >
+            <FilterOutlined style={{ fontSize: "20px" }} />
+          </Button>
           {children}
         </Space>
       </Space>
@@ -36,7 +52,8 @@ function Table({
         dataSource={dataSource}
         scroll={{ x: "fit-content" }}
         loading={loading}
-        pagination={{ pageSize, total, onChange, showSizeChanger: false }}
+        pagination={paginationConfig}
+        // pagination={{ pageSize, total, onChange, showSizeChanger: false }}
       />
     </>
   );

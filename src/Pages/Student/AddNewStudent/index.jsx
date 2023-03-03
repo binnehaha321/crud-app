@@ -1,38 +1,28 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { useDispatch, useSelector } from "react-redux";
-import { PlusOutlined, UserAddOutlined } from "@ant-design/icons";
+import { useDispatch } from "react-redux";
+import { UserAddOutlined } from "@ant-design/icons";
 import {
   Col,
   Row,
   Form,
   Input,
   Button,
-  Select,
-  Upload,
   Space,
   Typography,
   Divider,
   DatePicker,
 } from "antd";
-import request, { post } from "~/utils/request";
+import request from "~/utils/request";
 import {
   addStudent,
   addStudentSuccess,
   addStudentFail,
 } from "~/store/actions/studentAction";
-import { toast } from "react-toastify";
+import moment from "moment";
+import GenderSelect from "~/components/GenderSelect/GenderSelect";
+import MajorList from "~/components/MajorList/MajorList";
 
 function AddNewStudent() {
-  const [majorList, setMajorList] = useState([]);
-
-  // GET MAJOR LIST
-  useEffect(() => {
-    request
-      .get("major/filter?pageNumber=0&search")
-      .then((res) => setMajorList(res?.data));
-  }, []);
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -40,29 +30,12 @@ function AddNewStudent() {
     try {
       dispatch(addStudent());
       const res = await request.post("student/add", values);
-      console.log(res);
       dispatch(addStudentSuccess(res?.data?.message));
-      // navigate("../students");
+      navigate("../students");
     } catch (error) {
       dispatch(addStudentFail(error?.response?.data?.message));
     }
   };
-
-  // const handleAddStudent = async (values) => {
-  //   const response = await post("student/add", values);
-  //   console.log(response)
-  // }
-
-  let { msg, flag } = useSelector((state) => state.student);
-  useEffect(() => {
-    if (msg) {
-      if (flag) {
-        toast.success(msg);
-      } else {
-        toast.error(msg);
-      }
-    }
-  }, [msg, flag]);
 
   return (
     <Col className="py-30">
@@ -115,54 +88,19 @@ function AddNewStudent() {
               </Col>
             </Row>
             <Row gutter={[8, 8]}>
-              <Col xs={24} md={8}>
-                <Form.Item label="Major" name="majorId">
-                  <Select allowClear>
-                    {majorList?.map((major) => {
-                      return (
-                        <Select.Option
-                          key={major?.majorId}
-                          value={major?.majorId}
-                        >
-                          {major?.majorCode}
-                        </Select.Option>
-                      );
-                    })}
-                  </Select>
-                </Form.Item>
+              <Col xs={24} md={6}>
+                <MajorList />
               </Col>
-              <Col xs={24} md={8}>
-                <Form.Item label="Gender" name="gender">
-                  <Select allowClear>
-                    <Select.Option value="Male">Male</Select.Option>
-                    <Select.Option value="Female">Female</Select.Option>
-                    <Select.Option value="Other">Other</Select.Option>
-                  </Select>
-                </Form.Item>
+              <Col xs={24} md={6}>
+                <GenderSelect />
               </Col>
-              <Col xs={24} md={8}>
+              <Col xs={24} md={6}>
                 <Form.Item label="DOB" name="dob">
-                  <DatePicker format={"DD-MM-YYYY"} />
+                  <DatePicker format={"DD-MM-YYYY"} style={{ width: "100%" }} />
                 </Form.Item>
               </Col>
             </Row>
           </Col>
-          {/* <Col xs={24} lg={8}>
-            <Form.Item label="Avatar" valuePropName="fileList" name="avatar">
-              <Upload action="/upload.do" listType="picture-card">
-                <div>
-                  <PlusOutlined />
-                  <div
-                    style={{
-                      marginTop: 8,
-                    }}
-                  >
-                    Upload
-                  </div>
-                </div>
-              </Upload>
-            </Form.Item>
-          </Col> */}
           <Col xs={{ span: 24 }}>
             <Form.Item>
               <Button type="primary" htmlType="submit">

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Row, Col, Typography, Form, Input, Button, Skeleton } from "antd";
+import { Row, Col, Typography, Form, Input, Button } from "antd";
 import { MailOutlined } from "@ant-design/icons";
 import Heading from "~/components/Heading";
 import styles from "./index.module.scss";
@@ -14,6 +14,7 @@ import {
   signInFail,
 } from "~/store/actions/authenAction";
 import { toast } from "react-toastify";
+import Loading from "~/components/Loading/Loading";
 
 function SignIn() {
   const { Text, Title } = Typography;
@@ -39,6 +40,7 @@ function SignIn() {
           navigate("/");
         })
         .catch((err) => {
+          setIsLoading(false);
           dispatch(signInFail(err?.response?.data?.message));
         });
     },
@@ -56,7 +58,7 @@ function SignIn() {
     }
   }, [msg, flag]);
 
-  if (isLoading) return <Skeleton />;
+  if (isLoading) return <Loading />;
 
   return [
     <Row

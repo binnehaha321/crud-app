@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { Button, Upload, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { cookies } from "~/utils/cookies";
 import { saveAs } from "file-saver";
+import { toast } from "react-toastify";
 
 const UploadCSV = () => {
   const [formData] = useState(new FormData());
@@ -38,6 +39,10 @@ const UploadCSV = () => {
       });
   };
 
+  useEffect(() => {
+    if (!isUploading) return () => toast.success("Uploaded successfully!");
+  }, [isUploading]);
+
   const handleFileChange = (e) => {
     if (e.file) {
       formData.append("file", e.file.originFileObj);
@@ -45,7 +50,7 @@ const UploadCSV = () => {
   };
 
   return (
-    <Upload
+    <Upload.Dragger
       name="file"
       maxCount={1}
       customRequest={handleUploadCSV}
@@ -53,7 +58,7 @@ const UploadCSV = () => {
       onChange={handleFileChange}
     >
       <Button icon={<UploadOutlined />}>Upload File</Button>
-    </Upload>
+    </Upload.Dragger>
   );
 };
 

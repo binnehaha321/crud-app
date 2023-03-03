@@ -9,9 +9,9 @@ const StudentDetail = (props) => {
       cancelButtonProps={{ style: { display: "none" } }}
       closable={false}
     >
-      <Descriptions title={title}>
+      <Descriptions title={title} column={[24, 24]} bordered>
         <Descriptions.Item label={"Student ID"} span={3}>
-          {info.studentId}
+          {info.fptId}
         </Descriptions.Item>
         <Descriptions.Item label={"Major"} span={3}>
           {info.majorId}
@@ -24,6 +24,9 @@ const StudentDetail = (props) => {
         </Descriptions.Item>
         <Descriptions.Item label={"Birthday"} span={3}>
           {info.dob}
+        </Descriptions.Item>
+        <Descriptions.Item label={"Status"} span={3}>
+          {info.status}
         </Descriptions.Item>
         <Descriptions.Item label={"Active"} span={3}>
           {info.isActive?.toString()}

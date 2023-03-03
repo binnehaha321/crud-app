@@ -5,7 +5,7 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import { Table, Button } from "~/components";
 import * as icon from "~/assets/images/ActionIcons";
-import request from "~/utils/request";
+import request, { get } from "~/utils/request";
 
 function MajorList() {
   const formRef = useRef();
@@ -92,10 +92,7 @@ function MajorList() {
   const handleCallMajorList = async (pageNumber = 0) => {
     setIsLoading(true);
     try {
-      const res = await request.get(
-        `major/filter?pageNumber=${pageNumber}&search`
-      );
-      const majors = res?.data;
+      const majors = await get(`major/filter?pageNumber=${pageNumber}&search`);
       const result = handleMajorDataList(majors);
       setData(result);
       setIsLoading(false);
