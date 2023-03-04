@@ -15,7 +15,7 @@ const ClassList = () => {
     },
   ]);
   const getMajorList = async () => {
-    const res = await request.get("major/filter?pageNumber=0&search");
+    const res = await request.get("major/filter?pageNumber=1&search");
     const majorCode = res?.data?.map((major) => {
       return {
         key: major?.majorId,

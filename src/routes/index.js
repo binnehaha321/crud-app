@@ -19,6 +19,7 @@ import TermList from "~/Pages/Term/TermList";
 import OJTList from "~/Pages/Student/OJT";
 import FailSubjectList from "~/Pages/Student/FailSubject";
 import DepartmentList from "~/Pages/Department/DepartmentList";
+import AddNewDepartment from "~/Pages/Department/AddNewDepartment";
 
 const publicRoutes = [
   { path: "sign-in", component: <SignIn /> },
@@ -32,6 +33,7 @@ const privateRoutes = [
   { path: "students/ojt", component: <OJTList /> },
   { path: "students/fail-subject", component: <FailSubjectList /> },
   { path: "departments", component: <DepartmentList /> },
+  { path: "departments/add", component: <AddNewDepartment /> },
   { path: "students/add", component: <AddNewStudent /> },
   { path: "users", component: <UserList /> },
   { path: "users/add", component: <AddNewUser /> },

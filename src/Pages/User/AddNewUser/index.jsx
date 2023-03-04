@@ -15,6 +15,7 @@ import {
   Divider,
   DatePicker,
 } from "antd";
+import { toast } from "react-toastify";
 
 import {
   addUser,
@@ -23,47 +24,41 @@ import {
 } from "~/store/actions/userAction";
 import request from "~/utils/request.js";
 import { ADD_USER_FAIL } from "~/utils/message";
-import { toast } from "react-toastify";
+import DepartmentSelect from "~/components/DepartmentSelect/DepartmentSelect";
 
 function AddNewUser() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  // get role list
   const [roles, setRoles] = useState([]);
-  const [departments, setDepartments] = useState([]);
-  // const handleAddUser = useCallback(
-  //   (values) => {
-  //     request
-  //       .post("register", values)
-  //       .then((res) => {
-  //         if (!res) {
-  //           dispatch(addUser());
-  //         } else {
-  //           dispatch(addUserSuccess(res?.data?.message));
-  //           navigate("../users");
-  //         }
-  //       })
-  //       .catch((err) => dispatch(addUserFail(err?.response?.data?.message)));
-  //   },
-  //   [dispatch, navigate]
-  // );
 
   const handleGetRoles = async () => {
     try {
-      const res = await request.get("role/all?pageNumber=0");
+      const res = await request.get("role/all?pageNumber=1");
       setRoles(res?.data);
     } catch (error) {
       console.log(error);
     }
   };
-  
+
+  // get department list
+  const [departments, setDepartments] = useState([]);
+
   const handleGetDepartments = async () => {
     try {
-      const res = await request.get("department/all?pageNumber=0");
+      const res = await request.get("department/all?pageNumber=1");
       setDepartments(res?.data?.data);
     } catch (error) {
       console.log(error);
     }
   };
+
+  // run func
+  useEffect(() => {
+    handleGetDepartments();
+    handleGetRoles();
+  }, []);
 
   const handleAddUser = async (values) => {
     // Format date on submit event
@@ -83,11 +78,11 @@ function AddNewUser() {
     }
   };
 
+
+  // run toast
   let { msg, flag } = useSelector((state) => state.user);
 
   useEffect(() => {
-    handleGetRoles();
-    handleGetDepartments();
     if (msg) {
       if (flag) {
         toast.success(msg);
@@ -135,15 +130,6 @@ function AddNewUser() {
                   </Select>
                 </Form.Item>
               </Col>
-              {/* <Col md={6} xs={24}>
-                <Form.Item label="Gender" name={"gender"}>
-                  <Select allowClear>
-                    <Select.Option value="Male">Male</Select.Option>
-                    <Select.Option value="Female">Female</Select.Option>
-                    <Select.Option value="Other">Other</Select.Option>
-                  </Select>
-                </Form.Item>
-              </Col> */}
               <Col md={12} xs={24}>
                 <Form.Item label="Dob" name={"dob"}>
                   <DatePicker format={"DD-MM-YYYY"} />
@@ -162,18 +148,7 @@ function AddNewUser() {
                 </Form.Item>
               </Col>
               <Col md={8} xs={24}>
-                <Form.Item label="Department" name={"departmentId"}>
-                  <Select allowClear>
-                    {departments?.map((department, index) => (
-                      <Select.Option
-                        value={department.departmentId}
-                        key={index}
-                      >
-                        {department.departmentName}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </Form.Item>
+                <DepartmentSelect departments={departments} />
               </Col>
             </Row>
             <Row gutter={[8, 8]}>

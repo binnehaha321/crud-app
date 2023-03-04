@@ -21,7 +21,7 @@ const RoleList = () => {
 
   const getRoleList = async () => {
     setLoading(true);
-    const res = await request.get("role/all?pageNumber=0");
+    const res = await request.get("role/all?pageNumber=1");
     const role = res?.data?.map((role) => {
       return {
         key: role?.roleId,

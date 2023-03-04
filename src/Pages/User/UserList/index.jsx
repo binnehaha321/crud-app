@@ -15,13 +15,14 @@ import {
 } from "antd";
 import { ExclamationCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
+import moment from "moment";
 import * as icon from "~/assets/images/ActionIcons";
 import { Table, Button } from "~/components";
 import request from "~/utils/request";
-import "./index.scss";
 import { ADMIN, USER } from "~/constants/role";
 import { UPDATE_USER_FAIL } from "~/utils/message";
-import moment from "moment";
+import DepartmentSelect from "~/components/DepartmentSelect/DepartmentSelect";
+import "./index.scss";
 
 function UserList() {
   const formRef = useRef();
@@ -92,7 +93,7 @@ function UserList() {
       key: "action",
       render: (student) => (
         <Space size="middle">
-          <Button onClick={() => handleGetUserById(student.username)}>
+          <Button onClick={() => handleGetUserUpdate(student.username)}>
             <img src={icon.EDIT} alt="edit" />
           </Button>
           <Button onClick={() => showDeleteConfirm(student.key)}>
@@ -121,7 +122,6 @@ function UserList() {
   // GET USERS
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [username, setUsername] = useState("");
-  const [roles, setRoles] = useState([]);
 
   const handleUserDataList = (users = []) => {
     let userData = {};
@@ -143,7 +143,7 @@ function UserList() {
   const handleCallUserList = async () => {
     try {
       setIsLoading(true);
-      const res = await request.get("users/all?pageNumber=0");
+      const res = await request.get("users/all?pageNumber=1");
       const users = res?.data?.data;
       const result = handleUserDataList(users);
       setData(result);
@@ -163,75 +163,95 @@ function UserList() {
 
   // Get current user's data by id
   useEffect(() => {
-    if (formRef.current) form.setFieldsValue(currentUserValues);
+    if (formRef.current) {
+      form.setFieldsValue(currentUserValues);
+    }
   }, [form, currentUserValues]);
 
-  const handleGetUserById = (username) => {
+  // get user to update
+  const handleGetUserUpdate = async (username) => {
     setUsername(username);
-    request
-      .get(`users/filter?pageNumber=0&search=username:${username}`)
-      .then(async (res) => {
-        const user = res?.data?.data[0];
-        setCurrentUserValues({
-          key: user?.userId,
-          dob: moment(user?.dob),
-          // avatar: user?.avatar,
-          email: user?.email,
-          fullName: user?.fullName,
-          departmentId: user?.departmentId?.departmentName,
-          username: user?.username,
-          address: user?.address,
-          phoneNumber: user?.phoneNumber,
-          roles: user?.roles,
-        });
-        await handleGetRoles();
-        setIsModalOpen(true);
-      })
-      .catch((err) => {
-        console.log(err);
+    try {
+      const res = await request.get(
+        `users/filter?pageNumber=1&search=username:${username}`
+      );
+      const user = res?.data?.data[0];
+      setCurrentUserValues({
+        key: user?.userId,
+        dob: moment(user?.dob),
+        // avatar: user?.avatar,
+        email: user?.email,
+        fullName: user?.fullName,
+        departmentId: user?.departmentId?.departmentName,
+        username: user?.username,
+        address: user?.address,
+        phoneNumber: user?.phoneNumber,
+        roles: user?.roles,
       });
+      await handleGetRoles();
+      await handleGetDepartments();
+      setIsModalOpen(true);
+    } catch (error) {
+      throw new Error(error);
+    }
   };
 
-  // get roles
+  // get role list
+  const [roles, setRoles] = useState([]);
+
   const handleGetRoles = async () => {
     try {
-      const res = await request.get("role/all?pageNumber=0");
+      const res = await request.get("role/all?pageNumber=1");
       setRoles(res?.data);
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleUpdateUser = (values) => {
-    request
-      .put(`users/edit/${username}`, values)
-      .then((res) => {
-        const data = res?.data;
-        const users = data?.users;
-        const result = handleUserDataList(users);
-        setData(result);
-        toast.success(data?.message);
-        setIsModalOpen(false);
-      })
-      .catch((err) => {
-        toast.error(UPDATE_USER_FAIL);
-      });
+  // get department list
+  const [departments, setDepartments] = useState([]);
+
+  const handleGetDepartments = async () => {
+    try {
+      const res = await request.get("department/all?pageNumber=1");
+      setDepartments(res?.data?.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // handle update user
+  const handleUpdateUser = async (values) => {
+    setIsLoading(true);
+    try {
+      const res = await request.put(`users/edit/${username}`, values);
+      const data = await res?.data;
+      const users = await data?.users;
+      const result = handleUserDataList(users);
+      setData(result);
+      toast.success(await data?.message);
+      setIsModalOpen(false);
+      setIsLoading(false);
+    } catch (error) {
+      toast.error(UPDATE_USER_FAIL);
+      setIsModalOpen(false);
+      setIsLoading(false);
+      throw new Error(error);
+    }
   };
 
   // DELETE USER
-  const handleDelete = (id) => {
-    request
-      .delete(`users/delete/${id}`)
-      .then((res) => {
-        toast.success(res?.data?.message);
-        const users = res?.data?.users;
-        const result = handleUserDataList(users);
-        setData(result);
-      })
-      .catch((err) => {
-        toast.error(err?.data?.message);
-      });
-    // su dung redux please
+  const handleDelete = async (id) => {
+    setIsLoading(true);
+    try {
+      const res = await request.delete(`users/delete/${id}`);
+      toast.success(await res?.data?.message);
+      setData(data.filter((d) => d.userId !== id));
+      setIsLoading(false);
+    } catch (error) {
+      toast.error(error?.data?.message);
+      setIsLoading(false);
+    }
   };
 
   // Confirm modal
@@ -263,7 +283,6 @@ function UserList() {
           <Btn type={"primary"}>ADD NEW USER</Btn>
         </Link>
       </Table>
-
       <Modal
         title="UPDATE A USER"
         open={isModalOpen}
@@ -288,7 +307,7 @@ function UserList() {
           className="update-user"
         >
           <Space style={{ display: "flex" }}>
-            <Form.Item label="Role" name="role">
+            <Form.Item label="Role" name="roles">
               <Select allowClear maxTagCount="responsive" mode={"multiple"}>
                 {roles?.map((role, index) => (
                   <Select.Option value={role.roleName} key={index}>
@@ -300,9 +319,7 @@ function UserList() {
             <Form.Item label="Dob" name={"dob"}>
               <DatePicker format="DD-MM-YYYY" />
             </Form.Item>
-            <Form.Item label="Department" name="departmentId">
-              <Input className="need-capitalize" />
-            </Form.Item>
+            <DepartmentSelect departments={departments} />
           </Space>
           <Space style={{ display: "flex" }}>
             <Form.Item label="Fullname" name="fullName">

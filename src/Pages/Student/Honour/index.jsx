@@ -1,22 +1,11 @@
 import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import {
-  Form,
-  Input,
-  Select,
-  Upload,
-  Space,
-  Modal,
-  Image,
-  Typography,
-  Tag,
-  DatePicker,
-} from "antd";
+import { Form, Select, Modal, Image, Typography } from "antd";
 import { ExclamationCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
-import * as icon from "~/assets/images/ActionIcons";
 import { Table, Button } from "~/components";
 import request from "~/utils/request";
+import useFetch from "~/hooks/useFetch";
 
 function HonourList() {
   const columns = [
@@ -39,9 +28,7 @@ function HonourList() {
       dataIndex: "fptId",
       key: "fptId",
       render: (fptId) => (
-        <Typography.Text className="need-uppercase">
-          {fptId}
-        </Typography.Text>
+        <Typography.Text className="need-uppercase">{fptId}</Typography.Text>
       ),
     },
     {
@@ -94,27 +81,129 @@ function HonourList() {
       isActive: false,
     },
   ]);
+  const [isOpenModal, setIsOpenModal] = useState(false);
 
-  const getHonourList = async () => {
-    setIsLoading(true);
-    const res = await request("student/get/honorList/2/SP22/2");
-    setData(res?.data);
-    setIsLoading(false);
+  // GET PROGRAM LIST
+  const { data: programList } = useFetch("program/all?pageNumber=1");
+  // GET MAJOR LIST
+  const { data: termList } = useFetch("term/filter?pageNumber=1&search");
+  // GET MAJOR LIST
+  const { data: majorList } = useFetch("major/filter?pageNumber=1&search");
+
+  const getHonourList = async (values) => {
+    if (values) {
+      const { programId, termCode, majorId } = values;
+      setIsLoading(true);
+      try {
+        const res = await request(
+          `student/get/honorList/${programId}/${termCode}/${majorId}`
+        );
+        console.log(res?.data?.data);
+        setIsLoading(false);
+      } catch (error) {
+        setIsLoading(false);
+        throw new Error(error);
+      }
+    }
   };
 
   useEffect(() => {
     getHonourList();
   }, []);
 
+  // handle close modal
+  const [form] = Form.useForm();
+  const handleCloseModal = () => {
+    setIsOpenModal(false);
+    form.resetFields();
+  };
+
   return (
     <>
+      <Modal
+        open={isOpenModal}
+        onCancel={handleCloseModal}
+        title="FILTER HONOURS"
+        forceRender
+        onOk={() => {
+          form.submit();
+          // setIsOpenModal(false);
+          // form.resetFields();
+        }}
+      >
+        <Form
+          layout={"vertical"}
+          form={form}
+          onFinish={getHonourList}
+          onKeyPress={(e) => {
+            if (e.key === "Enter") form.submit();
+          }}
+        >
+          <Form.Item
+            label="Program"
+            name={"programId"}
+            rules={[
+              {
+                required: true,
+                message: "Please select program!",
+              },
+            ]}
+          >
+            <Select allowClear>
+              {programList?.data?.map((item) => (
+                <Select.Option key={item.programId} value={item.programId}>
+                  {item.programName}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            label="Term"
+            name={"termCode"}
+            rules={[
+              {
+                required: true,
+                message: "Please select term!",
+              },
+            ]}
+          >
+            <Select allowClear>
+              {termList?.data?.map((item) => (
+                <Select.Option key={item.termCode} value={item.termCode}>
+                  {item.termName}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            label="Major"
+            name={"majorId"}
+            rules={[
+              {
+                required: true,
+                message: "Please select major!",
+              },
+            ]}
+          >
+            <Select allowClear>
+              {majorList?.data?.map((item) => (
+                <Select.Option key={item.majorId} value={item.majorId}>
+                  {item.majorCode}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+        </Form>
+      </Modal>
       <Table
-        caption="User List"
-        icon={icon.SORT}
+        caption="Honours List"
         columns={columns}
         dataSource={data}
         loading={isLoading}
-      ></Table>
+        onOpenFilter={() => setIsOpenModal(true)}
+      />
     </>
   );
 }

@@ -19,11 +19,12 @@ import moment from "moment";
 import { Table, Button } from "~/components";
 import * as icon from "~/assets/images/ActionIcons";
 import request, { get } from "~/utils/request";
-import useFetch from "~/hooks/useFetch";
 import UploadCSV from "~/components/UploadCSV/UploadCSV";
 import StudentDetail from "~/components/StudentDetail";
 import "./index.scss";
 import FilterSearch from "~/components/FilterSearch/FilterSearch";
+import { handleStudentDataList } from "~/utils/handleList";
+import MajorList from "~/components/MajorList/MajorList";
 
 function StudentList() {
   const formRef = useRef();
@@ -130,30 +131,8 @@ function StudentList() {
   const [isOpen, setIsOpen] = useState(false);
   const [detailStd, setDetailStd] = useState({});
 
-  // GET AMOUNT OF STUDENT
-  const { data: amountStudent } = useFetch("student/totalStudents");
-
-  // HANDLE STUDENT LIST
-  const handleStudentDataList = (students) => {
-    let studentData = {};
-    return students?.map((student) => {
-      studentData = {
-        key: student?.fptId,
-        fptId: student?.fptId,
-        fullName: student?.fullName,
-        majorId: student?.majorId?.majorCode,
-        email: student?.email,
-        gender: student?.gender,
-        status: student?.status,
-        dob: moment(student?.dob).format("DD-MM-YYYY"),
-        isActive: student?.isActive,
-      };
-      return studentData;
-    });
-  };
-
   // GET STUDENT LIST
-  const handleCallStudentList = async (pageNumber = 0) => {
+  const handleCallStudentList = async (pageNumber = 1) => {
     setIsLoading(true);
     try {
       const res = await get(`student/all?pageNumber=${pageNumber}`);
@@ -169,7 +148,14 @@ function StudentList() {
   };
 
   // GET MAJOR LIST
-  const { data: majorList } = useFetch("major/filter?pageNumber=0&search");
+  const [majorList, setMajorList] = useState([]);
+  const handleGetMajorList = async () => {
+    const res = await request.get("major/filter?pageNumber=1&search");
+    setMajorList(res?.data?.data);
+  };
+  useEffect(() => {
+    handleGetMajorList();
+  }, []);
 
   // UPDATE STUDENT
   const [form] = Form.useForm();
@@ -187,7 +173,7 @@ function StudentList() {
     e.stopPropagation();
     setSelectedId(id);
     try {
-      const res = await get(`student/filter?pageNumber=0&search=fptId:${id}`);
+      const res = await get(`student/filter?pageNumber=1&search=fptId:${id}`);
       const student = res?.data[0];
       setCurrentStudentValues({
         key: student?.fptId,
@@ -224,17 +210,16 @@ function StudentList() {
   };
 
   // DELETE STUDENT
-  const handleDelete = (id) => {
-    request
-      .delete(`student/delete/${id}`)
-      .then((res) => {
-        toast.success(res?.data?.message);
-        const newStudentList = data.filter((student) => student?.key !== id);
-        setData(newStudentList);
-      })
-      .catch((err) => {
-        toast.error(err?.data?.message);
-      });
+  const handleDelete = async (id) => {
+    try {
+      const res = await request.delete(`student/delete/${id}`);
+      toast.success(await res?.data?.message);
+      const newStudentList = data.filter((student) => student?.key !== id);
+      setData(newStudentList);
+    } catch (error) {
+      toast.error(error?.data?.message);
+      setIsLoading(false);
+    }
   };
 
   // Confirm modal
@@ -276,7 +261,7 @@ function StudentList() {
       }
     }
     setIsLoading(true);
-    const res = await get(`student/filter?pageNumber=0&search=${query}`);
+    const res = await get(`student/filter?pageNumber=1&search=${query}`);
     setData(res?.data);
     setTotalPages(res?.pageNumber * 15);
     handleCloseFilter();
@@ -368,15 +353,7 @@ function StudentList() {
             </Form.Item>
           </Space>
           <Space style={{ display: "flex" }}>
-            <Form.Item label="Major" name="majorId">
-              <Select allowClear>
-                {majorList?.map((major) => (
-                  <Select.Option key={major?.majorId} value={major?.majorId}>
-                    {major?.majorCode}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
+            <MajorList majors={majorList} />
             <Form.Item label="Gender" name="gender">
               <Select allowClear>
                 <Select.Option value="Male">Male</Select.Option>

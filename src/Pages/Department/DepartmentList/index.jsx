@@ -1,71 +1,48 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import {
-  Space,
-  Image,
-  Upload,
-  Input,
-  Select,
-  Modal,
-  DatePicker,
-  Form,
-  Typography,
-  Button as Btn,
-} from "antd";
+import { Form, Input, Space, Modal, Button as Btn } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
-import moment from "moment";
-import { Table, Button } from "~/components";
 import * as icon from "~/assets/images/ActionIcons";
-import request from "~/utils/request";
-import useFetch from "~/hooks/useFetch";
-// import "./index.scss";
+import { Table, Button } from "~/components";
+import request, { get } from "~/utils/request";
+import { UPDATE_DEPARTMENT_FAIL } from "~/utils/message";
+import { handleDepartmentDataList } from "~/utils/handleList";
 
 function DepartmentList() {
   const formRef = useRef();
-  const [selectedId, setSelectedId] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [currentSubjectValues, setCurrentSubjectValues] = useState({});
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0);
   const columns = [
     {
       title: "Department ID",
       dataIndex: "departmentId",
       key: "departmentId",
-      render: (departmentId) => (
-        <Typography.Text>{departmentId}</Typography.Text>
-      ),
     },
     {
-      title: "Department Name",
+      title: "Department",
       dataIndex: "departmentName",
       key: "departmentName",
-      render: (departmentName) => (
-        <Typography.Text>{departmentName}</Typography.Text>
-      ),
     },
     {
       title: "Description",
       dataIndex: "description",
       key: "description",
-      render: (description) => <Typography.Text>{description}</Typography.Text>,
     },
     {
       title: "",
       key: "action",
       render: (id) => (
         <Space size="middle">
-          <Button onClick={() => handleGetSubjectById(id.key)}>
+          <Button onClick={() => handleGetDepartmentUpdate(id.key)}>
             <img src={icon.EDIT} alt="edit" />
           </Button>
-          <Button onClick={() => showDeleteConfirm(id.key)}>
+          <Button onClick={(e) => showDeleteConfirm(e, id.key)}>
             <img src={icon.DELETE} alt="delete" />
           </Button>
         </Space>
       ),
     },
   ];
+  const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState([
     {
       key: "",
@@ -75,112 +52,102 @@ function DepartmentList() {
     },
   ]);
 
-  // GET AMOUNT OF SUBJECT
-  //   const { data: amountSubject } = useFetch("subject/totalSubjects");
+  const [currentDepartmentValues, setCurrentDepartmentValues] = useState({});
 
-  // HANDLE SUBJECT LIST
-  const handleDepartmentDataList = (departments) => {
-    let departmentData = {};
-    return departments?.map((department) => {
-      departmentData = {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState();
+
+  const handleCallDepartmentList = async () => {
+    setIsLoading(true);
+    try {
+      const res = await request.get("department/all?pageNumber=1");
+      const departments = await res?.data?.data;
+      const result = handleDepartmentDataList(await departments);
+      setData(result);
+      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    handleCallDepartmentList();
+  }, []);
+
+  // UPDATE DEPARTMENT
+  const [form] = Form.useForm();
+
+  // Reset fields after submit
+  useEffect(() => {
+    if (formRef.current) form.setFieldsValue(currentDepartmentValues);
+  }, [form, currentDepartmentValues]);
+
+  // get department by id to update
+  const handleGetDepartmentUpdate = async (id) => {
+    setSelectedId(id);
+    setIsLoading(true);
+    try {
+      const res = await get(`department/${id}`);
+      const department = await res?.data;
+      setCurrentDepartmentValues({
         key: department?.departmentId,
         departmentId: department?.departmentId,
         departmentName: department?.departmentName,
         description: department?.description,
-      };
-      return departmentData;
-    });
-  };
-
-  // GET SUBJECT LIST
-  const handleCallDepartmentList = async (pageNumber = 0) => {
-    setIsLoading(true);
-    try {
-      const res = await request.get(`department/all?pageNumber=${pageNumber}`);
-      const subjects = res?.data?.data;
-      const result = handleDepartmentDataList(subjects);
-      setData(result);
-      setIsLoading(false);
-    } catch (error) {
-      console.log(error);
-      setIsLoading(false);
-    }
-  };
-
-  // UPDATE STUDENT
-  const [form] = Form.useForm();
-
-  useEffect(() => {
-    handleCallDepartmentList(currentPage);
-    // Get current subject's data by id
-    if (formRef.current) form.setFieldsValue(currentSubjectValues);
-  }, [form, currentSubjectValues]);
-
-  const handleGetSubjectById = async (id) => {
-    try {
-      const res = await request.get(
-        `subject/filter?pageNumber=0&search=subjectCode:*${id}`
-      );
-      const subject = res?.data?.data[0];
-      setSelectedId(subject?.subjectCode);
-      setCurrentSubjectValues({
-        key: subject?.subjectCode,
-        subjectCode: subject?.subjectCode,
-        subjectName: subject?.subjectName,
-        description: subject?.description,
-        replaceWith: subject?.replaceWith,
       });
       setIsModalOpen(true);
+      setIsLoading(false);
     } catch (error) {
       console.log(error);
+      setIsLoading(false);
     }
   };
 
-  const handleUpdateSubject = async (values) => {
+  // handle update department
+  const handleUpdateDepartment = async (values) => {
     setIsLoading(true);
     try {
-      const res = await request.put(`subject/edit/${selectedId}`, values);
-      const data = res?.data;
-      console.log(data);
-      const result = handleCallDepartmentList(data?.students);
-      setData(result);
-      toast.success(data?.message);
+      const res = await request.put(`department/edit/${selectedId}`, values);
+      const data = await res?.data;
+      console.log(await data);
+      toast.success(await data?.message);
       setIsModalOpen(false);
       setIsLoading(false);
     } catch (error) {
-      toast.error(error?.data?.message);
+      toast.error(UPDATE_DEPARTMENT_FAIL);
       setIsModalOpen(false);
       setIsLoading(false);
     }
   };
 
-  // DELETE STUDENT
+  // DELETE USER
   const handleDelete = (id) => {
-    //     request
-    //       .delete(`student/delete/${id}`)
-    //       .then((res) => {
-    //         toast.success(res?.data?.message);
-    //         const newStudentList = data.filter((student) => student?.key !== id);
-    //         setData(newStudentList);
-    //       })
-    //       .catch((err) => {
-    //         toast.error(err?.data?.message);
-    //       });
+    request
+      .delete(`users/delete/${id}`)
+      .then((res) => {
+        toast.success(res?.data?.message);
+        setData(data.filter((d) => d.userId !== id));
+      })
+      .catch((err) => {
+        toast.error(err?.data?.message);
+      });
   };
 
   // Confirm modal
   const showDeleteConfirm = (id) => {
-    //     Modal.confirm({
-    //       title: "Are you sure delete this student?",
-    //       icon: <ExclamationCircleOutlined />,
-    //       content: "Click No to cancel.",
-    //       okText: "Yes",
-    //       okType: "danger",
-    //       cancelText: "No",
-    //       onOk() {
-    //         handleDelete(id);
-    //       },
-    //     });
+    Modal.confirm({
+      title: "Are you sure delete this student?",
+      icon: <ExclamationCircleOutlined />,
+      content: "Click No to cancel.",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+
+      onOk() {
+        handleDelete(id);
+      },
+    });
   };
 
   return (
@@ -191,28 +158,14 @@ function DepartmentList() {
         columns={columns}
         dataSource={data}
         loading={isLoading}
-        pageSize={15}
-        onRow={(record) => {
-          return {
-            onClick: () => {
-              console.log(record);
-            },
-          };
-        }}
-        // total={amountStudent}
-        onChange={(pageNumber) => {
-          --pageNumber;
-          setCurrentPage(pageNumber);
-          handleCallDepartmentList(pageNumber);
-        }}
       >
-        <Link to="../term/add" className="ant-btn ant-btn-primary">
-          <Btn>ADD NEW TERM</Btn>
+        <Link to="./add">
+          <Btn type={"primary"}>ADD NEW DEPARTMENT</Btn>
         </Link>
       </Table>
+
       <Modal
-        title="UPDATE A SUBJECT"
-        forceRender
+        title="UPDATE A USER"
         open={isModalOpen}
         onOk={form.submit}
         onCancel={() => setIsModalOpen(false)}
@@ -230,40 +183,23 @@ function DepartmentList() {
           }}
           layout="vertical"
           form={form}
-          onFinish={handleUpdateSubject}
-          initialValues={currentSubjectValues}
-          className="update-subject"
+          onFinish={handleUpdateDepartment}
+          initialValues={currentDepartmentValues}
+          className="update-user"
         >
           <Space style={{ display: "flex" }}>
-            <Form.Item label="Subject Code" name="subjectCode">
-              <Input />
+            <Form.Item label="Department ID" name={"departmentId"}>
+              <Input readOnly />
             </Form.Item>
-            <Form.Item label="Subject Name" name="subjectName">
+            <Form.Item label="Department" name={"departmentName"}>
               <Input />
             </Form.Item>
           </Space>
           <Space style={{ display: "flex" }}>
             <Form.Item label="Description" name="description">
-              <Input />
-            </Form.Item>
-            <Form.Item label="Replace With" name="replaceWith">
-              <Input />
+              <Input.TextArea />
             </Form.Item>
           </Space>
-          {/* <Form.Item label="Avatar" valuePropName="fileList" name="avatar">
-            <Upload action="/upload.do" listType="picture-card">
-              <div>
-                <PlusOutlined />
-                <div
-                  style={{
-                    marginTop: 8,
-                  }}
-                >
-                  Upload
-                </div>
-              </div>
-            </Upload>
-          </Form.Item> */}
         </Form>
       </Modal>
     </>

@@ -122,7 +122,7 @@ function SubjectList() {
   const handleGetSubjectById = async (id) => {
     try {
       const res = await request.get(
-        `subject/filter?pageNumber=0&search=subjectCode:*${id}`
+        `subject/filter?pageNumber=1&search=subjectCode:*${id}`
       );
       const subject = res?.data?.data[0];
       setSelectedId(subject?.subjectCode);
