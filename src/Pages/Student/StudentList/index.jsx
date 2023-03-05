@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import {
   Space,
   Image,
@@ -13,7 +14,11 @@ import {
   Button as Btn,
   Tooltip,
 } from "antd";
-import { ExclamationCircleOutlined, UserAddOutlined } from "@ant-design/icons";
+import {
+  ExclamationCircleOutlined,
+  PlusOutlined,
+  UserAddOutlined,
+} from "@ant-design/icons";
 import { toast } from "react-toastify";
 import moment from "moment";
 import { Table, Button } from "~/components";
@@ -21,10 +26,10 @@ import * as icon from "~/assets/images/ActionIcons";
 import request, { get } from "~/utils/request";
 import UploadCSV from "~/components/UploadCSV/UploadCSV";
 import StudentDetail from "~/components/StudentDetail";
-import "./index.scss";
 import FilterSearch from "~/components/FilterSearch/FilterSearch";
 import { handleStudentDataList } from "~/utils/handleList";
 import MajorList from "~/components/MajorList/MajorList";
+import "./index.scss";
 
 function StudentList() {
   const formRef = useRef();
@@ -100,7 +105,16 @@ function StudentList() {
       key: "dob",
     },
     {
-      title: "",
+      title: (
+        <UploadCSV
+          url={
+            "https://webapp-backend-379318.as.r.appspot.com/student/insert/score/file"
+          }
+          file={"scores"}
+          type={"dashed"}
+          danger
+        />
+      ),
       key: "action",
       render: (id) => (
         <Space size="middle">
@@ -110,6 +124,11 @@ function StudentList() {
           <Button onClick={(e) => showDeleteConfirm(e, id.key)}>
             <img src={icon.DELETE} alt="delete" />
           </Button>
+          <Link to={`/students/score/${id.key}`}>
+            <Btn type={"primary"} icon={<PlusOutlined />} danger>
+              Add score
+            </Btn>
+          </Link>
         </Space>
       ),
     },
@@ -130,6 +149,12 @@ function StudentList() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [detailStd, setDetailStd] = useState({});
+
+  // toast score
+  const { msg, flag } = useSelector((state) => state.score);
+  useEffect(() => {
+    if (flag) toast.success(msg);
+  }, [msg, flag]);
 
   // GET STUDENT LIST
   const handleCallStudentList = async (pageNumber = 1) => {
@@ -301,7 +326,10 @@ function StudentList() {
                   ADD NEW STUDENT
                 </Btn>
               </Link>
-              <UploadCSV />
+              <UploadCSV
+                url="https://webapp-backend-379318.as.r.appspot.com/student/insert/file"
+                file={"students"}
+              />
             </Space>
           }
           trigger="click"
@@ -309,6 +337,7 @@ function StudentList() {
           <Btn>ADD NEW STUDENT</Btn>
         </Popover>
       </Table>
+      {/* Update student */}
       <Modal
         title="UPDATE A STUDENT"
         forceRender

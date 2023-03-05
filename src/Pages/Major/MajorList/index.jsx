@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Input, Modal, Space, Form, Typography } from "antd";
+import { Input, Modal, Space, Form, Typography, Button as Btn } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import { Table, Button } from "~/components";
 import * as icon from "~/assets/images/ActionIcons";
 import request, { get } from "~/utils/request";
+import { useSelector } from "react-redux";
 
 function MajorList() {
   const formRef = useRef();
@@ -31,22 +32,18 @@ function MajorList() {
     },
     {
       title: "Major Name (EN)",
-      dataIndex: "majorName_EN",
-      key: "majorName_EN",
-      render: (majorName_EN) => (
-        <Typography.Text className="need-capitalize">
-          {majorName_EN}
-        </Typography.Text>
+      dataIndex: "eName",
+      key: "eName",
+      render: (eName) => (
+        <Typography.Text className="need-capitalize">{eName}</Typography.Text>
       ),
     },
     {
       title: "Major Name (VI)",
-      dataIndex: "majorName_VI",
-      key: "majorName_VI",
-      render: (majorName_VI) => (
-        <Typography.Text className="need-capitalize">
-          {majorName_VI}
-        </Typography.Text>
+      dataIndex: "vName",
+      key: "vName",
+      render: (vName) => (
+        <Typography.Text className="need-capitalize">{vName}</Typography.Text>
       ),
     },
     {
@@ -69,8 +66,8 @@ function MajorList() {
       key: 0,
       majorId: "",
       majorCode: "",
-      majorName_EN: "",
-      majorName_VI: "",
+      eName: "",
+      vName: "",
     },
   ]);
 
@@ -82,17 +79,17 @@ function MajorList() {
         key: major?.majorId,
         majorId: major?.majorId,
         majorCode: major?.majorCode,
-        majorName_EN: major?.ename,
-        majorName_VI: major?.vname,
+        eName: major?.ename,
+        vName: major?.vname,
       };
       return majorData;
     });
   };
 
-  const handleCallMajorList = async (pageNumber = 0) => {
+  const handleCallMajorList = async () => {
     setIsLoading(true);
     try {
-      const majors = await get(`major/filter?pageNumber=${pageNumber}&search`);
+      const { data: majors } = await get(`major/all?pageNumber=1`);
       const result = handleMajorDataList(majors);
       setData(result);
       setIsLoading(false);
@@ -120,8 +117,8 @@ function MajorList() {
         setCurrentMajorValues({
           key: major?.majorId,
           majorId: major?.majorId,
-          majorName_EN: major?.majorName_EN,
-          majorName_VI: major?.majorName_VI,
+          eName: major?.eName,
+          vName: major?.vName,
           description: major?.description,
         });
         setIsModalOpen(true);
@@ -137,6 +134,7 @@ function MajorList() {
       .then((res) => {
         const data = res?.data;
         const majors = data?.majors;
+        console.log(data);
         const result = handleMajorDataList(majors);
         setData(result);
         toast.success(data?.message);
@@ -178,17 +176,28 @@ function MajorList() {
     });
   };
 
+  // popup add success
+  let { msg, flag } = useSelector((state) => state.major);
+  useEffect(() => {
+    if (msg) {
+      if (flag) {
+        toast.success(msg);
+      } else {
+        toast.error(msg);
+      }
+    }
+  }, [msg, flag]);
+
   return (
     <>
       <Table
         caption="Major List"
-        icon={icon.SORT}
         columns={columns}
         dataSource={data}
         loading={isLoading}
       >
-        <Link to="./add" className="ant-btn ant-btn-primary">
-          ADD NEW MAJOR
+        <Link to="./add">
+          <Btn type="primary">ADD NEW MAJOR</Btn>
         </Link>
       </Table>
       <Modal
@@ -218,10 +227,10 @@ function MajorList() {
           <Form.Item label="Major ID" name="majorId">
             <Input className="need-uppercase" />
           </Form.Item>
-          <Form.Item label="Major Name (EN)" name="majorName_EN">
+          <Form.Item label="Major Name (EN)" name="eName">
             <Input className="need-capitalize" />
           </Form.Item>
-          <Form.Item label="Major Name (VI)" name="majorName_VI">
+          <Form.Item label="Major Name (VI)" name="vName">
             <Input className="need-capitalize" />
           </Form.Item>
           <Form.Item label="Description" name="description">

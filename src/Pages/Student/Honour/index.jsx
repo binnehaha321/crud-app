@@ -1,11 +1,9 @@
-import { useEffect, useState, useRef } from "react";
-import { Link } from "react-router-dom";
-import { Form, Select, Modal, Image, Typography } from "antd";
-import { ExclamationCircleOutlined, PlusOutlined } from "@ant-design/icons";
-import { toast } from "react-toastify";
-import { Table, Button } from "~/components";
-import request from "~/utils/request";
+import { useEffect, useState } from "react";
+import { Form, Select, Modal, Image, Typography, Divider, Card } from "antd";
+import { Table } from "~/components";
+import request, { get } from "~/utils/request";
 import useFetch from "~/hooks/useFetch";
+import StudentScore from "~/components/StudentScore";
 
 function HonourList() {
   const columns = [
@@ -42,29 +40,37 @@ function HonourList() {
       ),
     },
     {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
-      render: (email) => (
-        <a className="need-lowercase" href={`mailto:${email}`}>
-          {email}
-        </a>
+      title: "Major",
+      dataIndex: "majorName",
+      key: "majorName",
+    },
+    {
+      title: "Subject",
+      dataIndex: "subjectCode",
+      key: "subjectCode",
+    },
+    {
+      title: "Term",
+      dataIndex: "termCode",
+      key: "termCode",
+    },
+    {
+      title: "Studied",
+      dataIndex: "numberSubjectStudiedInTheTerm",
+      key: "numberSubjectStudiedInTheTerm",
+    },
+    {
+      title: "Mark",
+      dataIndex: "mark",
+      key: "mark",
+    },
+    {
+      title: "Avg Score",
+      dataIndex: "averageScore",
+      key: "averageScore",
+      render: (score) => (
+        <Typography.Text>{Number(score).toFixed(1)}</Typography.Text>
       ),
-    },
-    {
-      title: "Gender",
-      dataIndex: "gender",
-      key: "gender",
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-    },
-    {
-      title: "DOB",
-      dataIndex: "dob",
-      key: "dob",
     },
   ];
   const [isLoading, setIsLoading] = useState(false);
@@ -72,13 +78,13 @@ function HonourList() {
     {
       key: "",
       fptId: "",
-      email: "",
       fullName: "",
-      majorId: "",
-      gender: "",
-      status: "",
-      dob: "",
-      isActive: false,
+      majorName: "",
+      subjectCode: "",
+      termCode: "",
+      mark: "",
+      numberSubjectStudiedInTheTerm: "",
+      averageScore: "",
     },
   ]);
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -86,10 +92,30 @@ function HonourList() {
   // GET PROGRAM LIST
   const { data: programList } = useFetch("program/all?pageNumber=1");
   // GET MAJOR LIST
-  const { data: termList } = useFetch("term/filter?pageNumber=1&search");
+  const { data: termList } = useFetch("term/all?pageNumber=1");
   // GET MAJOR LIST
-  const { data: majorList } = useFetch("major/filter?pageNumber=1&search");
+  const { data: majorList } = useFetch("major/all?pageNumber=1");
 
+  // format honour list data to table
+  const formatHonourList = (list = []) => {
+    let data = {};
+    data = list.map((item, index) => {
+      return {
+        key: index,
+        fptId: item?.fptId,
+        fullName: item?.fullName,
+        majorName: item?.majorName,
+        subjectCode: item?.subjectCode,
+        termCode: item?.termCode,
+        mark: item?.mark,
+        numberSubjectStudiedInTheTerm: item?.numberSubjectStudiedInTheTerm,
+        averageScore: item?.averageScore,
+      };
+    });
+    return data;
+  };
+
+  // get honour list
   const getHonourList = async (values) => {
     if (values) {
       const { programId, termCode, majorId } = values;
@@ -98,24 +124,66 @@ function HonourList() {
         const res = await request(
           `student/get/honorList/${programId}/${termCode}/${majorId}`
         );
-        console.log(res?.data?.data);
+        const data = formatHonourList(await res?.data?.data);
+        setData(data);
+        handleCloseModal();
         setIsLoading(false);
       } catch (error) {
         setIsLoading(false);
         throw new Error(error);
       }
-    }
+    } else return;
   };
 
   useEffect(() => {
     getHonourList();
-  }, []);
+  }, [programList, termList, majorList]);
 
   // handle close modal
   const [form] = Form.useForm();
   const handleCloseModal = () => {
     setIsOpenModal(false);
-    form.resetFields();
+  };
+
+  // get student score by id
+  const [isOpenStudentScore, setIsOpenStudentScore] = useState(false);
+  const [studentScoreData, setStudentScoreData] = useState([]);
+  const [modalTitle, setModalTitle] = useState("");
+  const [subjectTab, setSubjectTab] = useState([
+    {
+      key: "",
+      tab: "",
+    },
+  ]);
+
+  // get score
+  const handleGetStudentScore = async (id) => {
+    if (id) {
+      setIsOpenStudentScore(true);
+      try {
+        const res = await get(`student/get/score/${id}`);
+        const tabs = formatTab(await res?.data);
+        setSubjectTab(tabs);
+        setStudentScoreData(await res?.data);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  // format tab
+  const formatTab = (list = []) => {
+    return list.map((item) => {
+      const res = {
+        key: item?.studentSubjectId?.subjectCode?.subjectCode,
+        tab: item?.studentSubjectId?.subjectCode?.subjectCode,
+      };
+      return res;
+    });
+  };
+  const [activeTabKey, setActiveTabKey] = useState(subjectTab[0]?.key);
+  const onTabChange = (key) => {
+    setActiveTabKey(key);
   };
 
   return (
@@ -125,11 +193,7 @@ function HonourList() {
         onCancel={handleCloseModal}
         title="FILTER HONOURS"
         forceRender
-        onOk={() => {
-          form.submit();
-          // setIsOpenModal(false);
-          // form.resetFields();
-        }}
+        onOk={() => form.submit()}
       >
         <Form
           layout={"vertical"}
@@ -203,7 +267,49 @@ function HonourList() {
         dataSource={data}
         loading={isLoading}
         onOpenFilter={() => setIsOpenModal(true)}
+        onRow={(record) => {
+          return {
+            onDoubleClick: () => {
+              handleGetStudentScore(record?.fptId);
+              setModalTitle(
+                `${record?.fullName} (${record?.fptId}) - ${record?.majorName}`
+              );
+            },
+          };
+        }}
       />
+
+      {/* Student score by id */}
+      <Modal
+        open={isOpenStudentScore}
+        onOk={() => setIsOpenStudentScore(false)}
+        cancelButtonProps={{ style: { display: "none" } }}
+        closable={false}
+        title={modalTitle}
+      >
+        <Divider />
+        <Card
+          style={{
+            width: "100%",
+          }}
+          title="Card title"
+          tabList={subjectTab}
+          activeTabKey={activeTabKey}
+          onTabChange={onTabChange}
+        >
+          {studentScoreData.map((data, index) => (
+            <StudentScore
+              key={index}
+              program={data?.studentSubjectId.programId.programName}
+              term={data?.studentSubjectId.termCode.termName}
+              subject={data?.studentSubjectId.subjectCode.subjectName}
+              mark={data?.mark}
+              status={data?.status}
+              tabList={subjectTab}
+            />
+          ))}
+        </Card>
+      </Modal>
     </>
   );
 }

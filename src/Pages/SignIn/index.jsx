@@ -103,7 +103,7 @@ function SignIn() {
             <Input
               type="text"
               placeholder="Enter your username"
-              suffix={<MailOutlined />}
+              suffix={<MailOutlined key={"username"} />}
             />
           </Form.Item>
 

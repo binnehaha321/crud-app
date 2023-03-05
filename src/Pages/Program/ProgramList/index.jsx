@@ -1,212 +1,259 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import {
+  Card,
+  Divider,
+  Skeleton,
   Space,
-  Image,
-  Upload,
-  Input,
-  Select,
-  Modal,
-  Form,
   Typography,
   Button as Btn,
+  Modal,
+  Form,
+  Input,
 } from "antd";
-import { ExclamationCircleOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  ExclamationCircleOutlined,
+  SettingOutlined,
+} from "@ant-design/icons";
+import request, { get, post } from "~/utils/request";
+import Meta from "antd/lib/card/Meta";
+import { ENGLISH, BTEC } from "~/constants/program";
 import { toast } from "react-toastify";
-import { Table, Button } from "~/components";
-import * as icon from "~/assets/images/ActionIcons";
-import request from "~/utils/request";
-import useFetch from "~/hooks/useFetch";
+import AddNewCardItem from "~/components/AddNewCardItem/AddNewCardItem";
 
-function ProgramList() {
-  const formRef = useRef();
-  const [selectedId, setSelectedId] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [currentProgramValues, setCurrentProgramValues] = useState({});
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0);
-  const columns = [
+const ProgramList = () => {
+  const [loading, setLoading] = useState(false);
+  const [isOpenModal, setIsOpenModal] = useState(false);
+  const [programs, setPrograms] = useState([
     {
-      title: "Program ID",
-      dataIndex: "programId",
-      key: "programId",
-      render: (programId) => <Typography.Text>{programId}</Typography.Text>,
-    },
-    {
-      title: "Program Name",
-      dataIndex: "programName",
-      key: "programName",
-      render: (programName) => <Typography.Text>{programName}</Typography.Text>,
-    },
-    {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
-      render: (description) => <Typography.Text>{description}</Typography.Text>,
-    },
-    {
-      title: "",
-      key: "action",
-      render: (id) => (
-        <Space size="middle">
-          <Button onClick={() => handleGetProgramById(id.key)}>
-            <img src={icon.EDIT} alt="edit" />
-          </Button>
-          <Button onClick={() => showDeleteConfirm(id.key)}>
-            <img src={icon.DELETE} alt="delete" />
-          </Button>
-        </Space>
-      ),
-    },
-  ];
-  const [data, setData] = useState([
-    {
-      key: "",
-      programId: "",
+      key: 0,
+      programId: 0,
       programName: "",
       description: "",
     },
   ]);
 
-  // HANDLE SUBJECT LIST
-  const handleProgramDataList = (programs) => {
-    let programData = {};
-    return programs?.map((program) => {
-      programData = {
-        key: program?.programId,
-        programId: program?.programId,
-        programName: program?.programName,
-        description: program?.description,
-      };
-      return programData;
-    });
-  };
-
-  // GET SUBJECT LIST
-  const handleCallProgramList = async (pageNumber = 0) => {
-    setIsLoading(true);
+  const getProgramList = async () => {
+    setLoading(true);
     try {
-      const res = await request.get(`program/all?pageNumber=${pageNumber}`);
-      const programs = res?.data?.data;
-      const result = handleProgramDataList(programs);
-      setData(result);
-      setIsLoading(false);
+      const res = await request.get("program/all?pageNumber=1");
+      const data = await res?.data?.data?.map((program) => {
+        return {
+          key: program?.programId,
+          programId: program?.programId,
+          programName: program?.programName,
+          description: program?.description,
+        };
+      });
+      setPrograms(data);
+      setLoading(false);
     } catch (error) {
       console.log(error);
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  // UPDATE STUDENT
-  const [form] = Form.useForm();
-
   useEffect(() => {
-    handleCallProgramList(currentPage);
+    getProgramList();
   }, []);
 
-  useEffect(() => {
-    // Get current subject's data by id
-    if (formRef.current) form.setFieldsValue(currentProgramValues);
-  }, [form, currentProgramValues]);
+  // handle close modal
+  const [formAddProgram] = Form.useForm();
+  const handleCloseModal = () => {
+    setIsOpenModal(false);
+    formAddProgram.resetFields();
+  };
 
-  const handleGetProgramById = async (id) => {
+  // handle add a new program
+  const handleAddProgram = async (values) => {
+    if (values) {
+      if (!values.description) values.description = "No description...";
+      try {
+        const res = await post("program/add", values);
+        setPrograms([
+          ...programs,
+          {
+            key: res?.data?.roleId,
+            programId: res?.data?.programId,
+            programName: res?.data?.programName,
+            description: res?.data?.description,
+          },
+        ]);
+
+        toast.success(await res?.message);
+        handleCloseModal();
+      } catch (error) {
+        console.log(error?.response?.data?.message);
+        toast.error(await error?.response?.data?.message);
+        throw new Error(error);
+      }
+    }
+  };
+
+  // handle delete a program
+  const handleDelete = async (id) => {
+    setLoading(true);
     try {
-      const res = await request.get(`program/${id}`);
-      const program = res?.data?.data;
-      setSelectedId(program?.programId);
-      setCurrentProgramValues({
-        key: program?.programId,
-        programId: program?.programId,
-        programName: program?.programName,
-        description: program?.description,
-      });
-      setIsModalOpen(true);
+      const res = await request.delete(`program/delete/${id}`);
+      toast.success(await res?.data?.message);
+      const newProgramList = programs.filter((program) => program?.key !== id);
+      setPrograms(newProgramList);
+      setLoading(false);
     } catch (error) {
       console.log(error);
-    }
-  };
-
-  const handleUpdateSubject = async (values) => {
-    setIsLoading(true);
-    try {
-      const res = await request.put(`subject/edit/${selectedId}`, values);
-      const data = res?.data;
-      console.log(data);
-      const result = handleCallProgramList(data?.students);
-      setData(result);
-      toast.success(data?.message);
-      setIsModalOpen(false);
-      setIsLoading(false);
-    } catch (error) {
       toast.error(error?.data?.message);
-      setIsModalOpen(false);
-      setIsLoading(false);
+      setLoading(false);
     }
-  };
-
-  // DELETE STUDENT
-  const handleDelete = (id) => {
-    //     request
-    //       .delete(`student/delete/${id}`)
-    //       .then((res) => {
-    //         toast.success(res?.data?.message);
-    //         const newStudentList = data.filter((student) => student?.key !== id);
-    //         setData(newStudentList);
-    //       })
-    //       .catch((err) => {
-    //         toast.error(err?.data?.message);
-    //       });
   };
 
   // Confirm modal
   const showDeleteConfirm = (id) => {
-    //     Modal.confirm({
-    //       title: "Are you sure delete this student?",
-    //       icon: <ExclamationCircleOutlined />,
-    //       content: "Click No to cancel.",
-    //       okText: "Yes",
-    //       okType: "danger",
-    //       cancelText: "No",
-    //       onOk() {
-    //         handleDelete(id);
-    //       },
-    //     });
+    Modal.confirm({
+      title: "Are you sure delete this program?",
+      icon: <ExclamationCircleOutlined />,
+      content: "Click No to cancel.",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+
+      onOk() {
+        handleDelete(id);
+      },
+    });
+  };
+
+  // update program
+  const [isOpenUpdateProgram, setIsOpenUpdateProgram] = useState(false);
+  const [formUpdate] = Form.useForm();
+  const formUpdateRef = useRef();
+  const [currentProgramValues, setCurrentProgramValues] = useState({});
+  const [selectedId, setSelectedId] = useState(null);
+
+  // Get current program's data by id
+  const handleGetProgramUpdate = async (id) => {
+    setIsOpenUpdateProgram(true);
+    setSelectedId(id);
+    try {
+      const res = await get(`program/${id}`);
+      const program = res?.data;
+      setCurrentProgramValues({
+        key: program?.programId,
+        programId: program?.programId,
+        program: program?.programName,
+        description: program?.description,
+      });
+      setIsOpenUpdateProgram(true);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    // set values to current program's fields
+    if (formUpdateRef.current) formUpdate.setFieldsValue(currentProgramValues);
+  }, [formUpdate, currentProgramValues]);
+
+  // handle update program
+  const handleUpdateProgram = async (values) => {
+    setLoading(true);
+    try {
+      const res = await request.put(`program/edit/${selectedId}`, values);
+      const data = await res?.data;
+
+      const index = programs.findIndex((item) => item.key === selectedId);
+
+      setPrograms([
+        ...programs.slice(0, index),
+        {
+          ...programs[index],
+          key: currentProgramValues.programId,
+          programId: values.programId || currentProgramValues.programId,
+          program: values.programName || currentProgramValues.programName,
+          description: values.description || currentProgramValues.description,
+        },
+        ...programs.slice(index + 1),
+      ]);
+
+      toast.success(data?.message);
+      setIsOpenUpdateProgram(false);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      toast.error(error?.data?.message);
+      setIsOpenUpdateProgram(false);
+      setLoading(false);
+    }
   };
 
   return (
     <>
-      <Table
-        caption="Program List"
-        icon={icon.SORT}
-        columns={columns}
-        dataSource={data}
-        loading={isLoading}
-        pageSize={15}
-        // total={amountStudent}
-        onChange={(pageNumber) => {
-          --pageNumber;
-          setCurrentPage(pageNumber);
-          handleCallProgramList(pageNumber);
-        }}
-      >
-        <Link to="../subject/add" className="ant-btn ant-btn-primary">
-          <Btn>ADD NEW SUBJECT</Btn>
-        </Link>
-      </Table>
+      <Space style={{ width: "100%", justifyContent: "space-between" }}>
+        <Typography.Title level={3} style={{ marginBlock: "1rem" }}>
+          Program List
+        </Typography.Title>
+        <Btn type={"primary"} onClick={() => setIsOpenModal(true)}>
+          ADD NEW PROGRAM
+        </Btn>
+      </Space>
+      <Divider style={{ margin: "0" }} />
+      <Space wrap>
+        {programs?.map((program) => (
+          <Card
+            loading={loading}
+            key={program.programId}
+            style={{
+              width: 300,
+              height: "100%",
+              marginTop: 16,
+              backgroundColor:
+                program.programName === ENGLISH
+                  ? "#fff2e8"
+                  : program.programName === BTEC
+                  ? "#e6f7ff"
+                  : "#eee",
+            }}
+            actions={[
+              <SettingOutlined key="setting" />,
+              <EditOutlined
+                key="edit"
+                onClick={() => handleGetProgramUpdate(program.programId)}
+              />,
+              <DeleteOutlined
+                key="delete"
+                onClick={() => showDeleteConfirm(program.programId)}
+              />,
+            ]}
+          >
+            <Skeleton loading={loading} active>
+              <Meta
+                title={program.programName}
+                description={program.description}
+              />
+            </Skeleton>
+          </Card>
+        ))}
+      </Space>
+      {/* add */}
+      <AddNewCardItem
+        open={isOpenModal}
+        onCancel={handleCloseModal}
+        onFinish={handleAddProgram}
+        name={"program"}
+        form={formAddProgram}
+      />
+      {/* update */}
       <Modal
-        title="UPDATE A SUBJECT"
+        title="UPDATE A PROGRAM"
         forceRender
-        open={isModalOpen}
-        onOk={() => {
-          form.submit();
-          setIsModalOpen(false);
-        }}
-        onCancel={() => setIsModalOpen(false)}
+        open={isOpenUpdateProgram}
+        onOk={formUpdate.submit}
+        onCancel={() => setIsOpenUpdateProgram(false)}
       >
         <Form
-          ref={formRef}
+          ref={formUpdateRef}
           onKeyPress={(e) => {
-            if (e.key === "Enter") form.submit();
+            if (e.key === "Enter") formUpdate.submit();
           }}
           labelCol={{
             span: 24,
@@ -215,42 +262,31 @@ function ProgramList() {
             span: 24,
           }}
           layout="vertical"
-          form={form}
-          onFinish={handleUpdateSubject}
+          form={formUpdate}
+          onFinish={handleUpdateProgram}
           initialValues={currentProgramValues}
-          className="update-subject"
+          className="update-student"
         >
-          <Space style={{ display: "flex" }}>
-            <Form.Item label="Program ID" name="programId">
-              <Input readOnly />
-            </Form.Item>
-            <Form.Item label="Program Name" name="programName">
+          <Space style={{ display: "flex" }} direction="vertical">
+            <Form.Item
+              label="Program"
+              name="program"
+              rules={[
+                {
+                  required: true,
+                  message: "Please input a program name!",
+                },
+              ]}
+            >
               <Input />
             </Form.Item>
-          </Space>
-          <Space style={{ display: "flex" }}>
             <Form.Item label="Description" name="description">
-              <Input />
+              <Input.TextArea />
             </Form.Item>
           </Space>
-          {/* <Form.Item label="Avatar" valuePropName="fileList" name="avatar">
-            <Upload action="/upload.do" listType="picture-card">
-              <div>
-                <PlusOutlined />
-                <div
-                  style={{
-                    marginTop: 8,
-                  }}
-                >
-                  Upload
-                </div>
-              </div>
-            </Upload>
-          </Form.Item> */}
         </Form>
       </Modal>
     </>
   );
-}
-
+};
 export default ProgramList;

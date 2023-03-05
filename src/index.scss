@@ -15,7 +15,8 @@ h6,
 a,
 span,
 p,
-input {
+input,
+textarea {
   font-family: "Montserrat", sans-serif !important;
 }
 
@@ -105,6 +106,12 @@ button {
 .ant-table-cell {
   width: 150px;
   white-space: nowrap;
+}
+
+.ant-picker,
+.ant-input-number,
+.ant-upload {
+  width: 100%;
 }
 
 // Organize

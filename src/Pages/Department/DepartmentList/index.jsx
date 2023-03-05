@@ -109,9 +109,26 @@ function DepartmentList() {
     setIsLoading(true);
     try {
       const res = await request.put(`department/edit/${selectedId}`, values);
-      const data = await res?.data;
-      console.log(await data);
-      toast.success(await data?.message);
+      const result = await res?.data;
+
+      const index = data.findIndex((item) => item.key === selectedId);
+
+      setData([
+        ...data.slice(0, index),
+        {
+          ...data[index],
+          key: currentDepartmentValues.key,
+          departmentId:
+            values.departmentId || currentDepartmentValues.departmentId,
+          departmentName:
+            values.departmentName || currentDepartmentValues.departmentName,
+          description:
+            values.description || currentDepartmentValues.description,
+        },
+        ...data.slice(index + 1),
+      ]);
+
+      toast.success(await result?.message);
       setIsModalOpen(false);
       setIsLoading(false);
     } catch (error) {
@@ -154,7 +171,6 @@ function DepartmentList() {
     <>
       <Table
         caption="Department List"
-        icon={icon.SORT}
         columns={columns}
         dataSource={data}
         loading={isLoading}

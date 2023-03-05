@@ -1,5 +1,4 @@
-import { useEffect, useState, useRef } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import {
   Form,
   Input,
@@ -12,10 +11,7 @@ import {
   Tag,
   DatePicker,
 } from "antd";
-import { ExclamationCircleOutlined, PlusOutlined } from "@ant-design/icons";
-import { toast } from "react-toastify";
-import * as icon from "~/assets/images/ActionIcons";
-import { Table, Button } from "~/components";
+import { Table } from "~/components";
 import request from "~/utils/request";
 
 function OJTList() {
@@ -39,9 +35,7 @@ function OJTList() {
       dataIndex: "fptId",
       key: "fptId",
       render: (fptId) => (
-        <Typography.Text className="need-uppercase">
-          {fptId}
-        </Typography.Text>
+        <Typography.Text className="need-uppercase">{fptId}</Typography.Text>
       ),
     },
     {
@@ -55,29 +49,24 @@ function OJTList() {
       ),
     },
     {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
-      render: (email) => (
-        <a className="need-lowercase" href={`mailto:${email}`}>
-          {email}
-        </a>
-      ),
+      title: "Major",
+      dataIndex: "majorName",
+      key: "majorName",
     },
     {
-      title: "Gender",
-      dataIndex: "gender",
-      key: "gender",
+      title: "No. of Terms",
+      dataIndex: "numberOfTerms",
+      key: "numberOfTerms",
     },
     {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
+      title: "BTEC passed",
+      dataIndex: "btecPassed",
+      key: "btecPassed",
     },
     {
-      title: "DOB",
-      dataIndex: "dob",
-      key: "dob",
+      title: "BTEC studied",
+      dataIndex: "btecStudied",
+      key: "btecStudied",
     },
   ];
   const [isLoading, setIsLoading] = useState(false);
@@ -85,9 +74,14 @@ function OJTList() {
 
   const getOJTList = async () => {
     setIsLoading(true);
-    const res = await request("student/get/studentJoinOJT");
-    setData(res?.data?.data);
-    setIsLoading(false);
+    try {
+      const res = await request("student/get/studentJoinOJT");
+      setData(res?.data?.data);
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      throw new Error(error);
+    }
   };
 
   useEffect(() => {
@@ -98,7 +92,6 @@ function OJTList() {
     <>
       <Table
         caption="OJT List"
-        icon={icon.SORT}
         columns={columns}
         dataSource={data}
         loading={isLoading}

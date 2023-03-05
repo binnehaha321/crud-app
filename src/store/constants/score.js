@@ -1,0 +1,2 @@
+export const ADD_SCORE_SUCCESS = "ADD_SCORE_SUCCESS";
+export const ADD_SCORE_FAIL = "ADD_SCORE_FAIL";

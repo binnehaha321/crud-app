@@ -101,7 +101,7 @@ function AddNewStudent() {
               </Col>
             </Row>
           </Col>
-          <Col xs={{ span: 24 }}>
+          <Col xs={24}>
             <Form.Item>
               <Button type="primary" htmlType="submit">
                 Add Student

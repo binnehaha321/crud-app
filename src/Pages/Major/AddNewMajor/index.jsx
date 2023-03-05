@@ -1,18 +1,10 @@
-import { useCallback, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Button,
-  Col,
-  Divider,
-  Input,
-  Space,
-  Typography,
-  Form,
-} from "antd";
+import { Button, Col, Divider, Input, Space, Typography, Form } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
-import request from "~/utils/request";
+import { post } from "~/utils/request";
 import {
   addMajor,
   addMajorSuccess,
@@ -22,35 +14,18 @@ import {
 function AddNewMajor() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const handleAddMajor = useCallback(
-    (values) => {
-      request
-        .post("majors/add", values)
-        .then((res) => {
-          if (!res) {
-            dispatch(addMajor());
-          } else {
-            dispatch(addMajorSuccess(res?.data?.message));
-          }
-          navigate("../majors");
-        })
-        .catch((err) => {
-          dispatch(addMajorFail(err?.response?.data?.message));
-        });
-    },
-    [dispatch, navigate]
-  );
 
-  let { msg, flag } = useSelector((state) => state.major);
-  useEffect(() => {
-    if (msg) {
-      if (flag) {
-        toast.success(msg);
-      } else {
-        toast.error(msg);
-      }
+  // handle add major
+  const handleAddMajor = async (values) => {
+    try {
+      const res = await post("major/add", values);
+      dispatch(addMajorSuccess(await res?.message));
+      navigate("../majors");
+    } catch (error) {
+      dispatch(addMajorFail(await error?.response?.data?.message));
+      throw new Error(error);
     }
-  }, [msg, flag]);
+  };
 
   return (
     <Col
@@ -78,21 +53,14 @@ function AddNewMajor() {
         layout="vertical"
         onFinish={handleAddMajor}
       >
-        <Form.Item label="Major ID" name="majorId">
+        <Form.Item label="Major Code" name="majorCode">
           <Input className="need-uppercase" />
         </Form.Item>
-        <Form.Item label="Major Name (EN)" name="majorName_EN">
+        <Form.Item label="Major (EN)" name="vietnameseName">
           <Input className="need-capitalize" />
         </Form.Item>
-        <Form.Item label="Major Name (VI)" name="majorName_VI">
+        <Form.Item label="Major (VI)" name="englishName">
           <Input className="need-capitalize" />
-        </Form.Item>
-        <Form.Item label="Description" name="description">
-          <Input.TextArea
-            maxLength="255"
-            showCount="true"
-            autoSize={{ minRows: 5 }}
-          />
         </Form.Item>
         <Form.Item align="center">
           <Button type="primary" htmlType="submit">

@@ -1,21 +1,6 @@
-import { useEffect, useState, useRef } from "react";
-import { Link } from "react-router-dom";
-import {
-  Form,
-  Input,
-  Select,
-  Upload,
-  Space,
-  Modal,
-  Image,
-  Typography,
-  Tag,
-  DatePicker,
-} from "antd";
-import { ExclamationCircleOutlined, PlusOutlined } from "@ant-design/icons";
-import { toast } from "react-toastify";
-import * as icon from "~/assets/images/ActionIcons";
-import { Table, Button } from "~/components";
+import { useEffect, useState } from "react";
+import { Image, Typography } from "antd";
+import { Table } from "~/components";
 import request from "~/utils/request";
 
 function FailSubjectList() {
@@ -39,9 +24,7 @@ function FailSubjectList() {
       dataIndex: "fptId",
       key: "fptId",
       render: (fptId) => (
-        <Typography.Text className="need-uppercase">
-          {fptId}
-        </Typography.Text>
+        <Typography.Text className="need-uppercase">{fptId}</Typography.Text>
       ),
     },
     {
@@ -55,29 +38,29 @@ function FailSubjectList() {
       ),
     },
     {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
-      render: (email) => (
-        <a className="need-lowercase" href={`mailto:${email}`}>
-          {email}
-        </a>
-      ),
+      title: "Major",
+      dataIndex: "majorName",
+      key: "majorName",
     },
     {
-      title: "Gender",
-      dataIndex: "gender",
-      key: "gender",
+      title: "Subject",
+      dataIndex: "subjectCode",
+      key: "subjectCode",
     },
     {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
+      title: "Term",
+      dataIndex: "termCode",
+      key: "termCode",
     },
     {
-      title: "DOB",
-      dataIndex: "dob",
-      key: "dob",
+      title: "Program",
+      dataIndex: "programName",
+      key: "programName",
+    },
+    {
+      title: "Mark",
+      dataIndex: "mark",
+      key: "mark",
     },
   ];
   const [isLoading, setIsLoading] = useState(false);
@@ -85,9 +68,14 @@ function FailSubjectList() {
 
   const getFailSubjectList = async () => {
     setIsLoading(true);
-    const res = await request("student/get/getFailSubjectList");
-    setData(res?.data?.data);
-    setIsLoading(false);
+    try {
+      const res = await request("student/get/getFailSubjectList");
+      setData(res?.data?.data);
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      throw new Error(error);
+    }
   };
 
   useEffect(() => {
@@ -95,15 +83,12 @@ function FailSubjectList() {
   }, []);
 
   return (
-    <>
-      <Table
-        caption="Fail Subjects List"
-        icon={icon.SORT}
-        columns={columns}
-        dataSource={data}
-        loading={isLoading}
-      ></Table>
-    </>
+    <Table
+      caption="Fail Subjects List"
+      columns={columns}
+      dataSource={data}
+      loading={isLoading}
+    />
   );
 }
 
