@@ -268,17 +268,8 @@ const ProgramList = () => {
           className="update-student"
         >
           <Space style={{ display: "flex" }} direction="vertical">
-            <Form.Item
-              label="Program"
-              name="program"
-              rules={[
-                {
-                  required: true,
-                  message: "Please input a program name!",
-                },
-              ]}
-            >
-              <Input />
+            <Form.Item label="Program" name="program">
+              <Input readOnly />
             </Form.Item>
             <Form.Item label="Description" name="description">
               <Input.TextArea />

@@ -6,6 +6,7 @@ import paymentReducer from "./paymentReducer";
 import userReducer from "./userReduce";
 import paginationReducer from "./paginationReducer";
 import scoreReducer from "./scoreReducer";
+import subjectReducer from "./subjectReducer";
 
 export default combineReducers({
   authen: authenReducer,
@@ -15,4 +16,5 @@ export default combineReducers({
   payment: paymentReducer,
   pagination: paginationReducer,
   score: scoreReducer,
+  subject: subjectReducer,
 });

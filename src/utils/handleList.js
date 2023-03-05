@@ -32,3 +32,70 @@ export const handleStudentDataList = (students) => {
     return studentData;
   });
 };
+
+// major
+export const handleMajorDataList = (majors) => {
+  let majorData = {};
+  return majors?.map((major) => {
+    majorData = {
+      key: major?.majorId,
+      majorId: major?.majorId,
+      majorCode: major?.majorCode,
+      ename: major?.ename,
+      vname: major?.vname,
+    };
+    return majorData;
+  });
+};
+
+// honour
+export const formatHonourList = (list = []) => {
+  let data = {};
+  data = list.map((item, index) => {
+    return {
+      key: index,
+      fptId: item?.fptId,
+      fullName: item?.fullName,
+      majorName: item?.majorName,
+      subjectCode: item?.subjectCode,
+      termCode: item?.termCode,
+      mark: item?.mark,
+      numberSubjectStudiedInTheTerm: item?.numberSubjectStudiedInTheTerm,
+      averageScore: item?.averageScore,
+    };
+  });
+  return data;
+};
+
+// subject
+export const handleSubjectDataList = (subjects) => {
+  let subjectData = {};
+  return subjects?.map((subject) => {
+    subjectData = {
+      key: subject?.subjectCode,
+      subjectCode: subject?.subjectCode,
+      subjectName: subject?.subjectName,
+      description: subject?.description,
+      replaceWith: subject?.replaceWith,
+    };
+    return subjectData;
+  });
+};
+
+// user
+export const handleUserDataList = (users) => {
+  let userData = {};
+  return users?.map((user) => {
+    userData = {
+      key: user?.userId,
+      userId: user?.userId,
+      avatar: user?.avatar,
+      email: user?.email,
+      username: user?.username,
+      fullName: user?.fullName,
+      phoneNumber: user?.phoneNumber,
+      roles: user?.roles,
+    };
+    return userData;
+  });
+};

@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import {
   Space,
-  Image,
   Input,
   Select,
   Modal,
@@ -41,20 +40,6 @@ function StudentList() {
   const [totalPages, setTotalPages] = useState(0);
   const [selectedId, setSelectedId] = useState("");
   const columns = [
-    {
-      title: "",
-      dataIndex: "avatar",
-      key: "avatar",
-      // render: (img) => <Image src={img} width={65} height={55} />,
-      render: () => (
-        <Image
-          src="https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=573"
-          alt="avatar"
-          width={65}
-          height={55}
-        />
-      ),
-    },
     {
       title: "FPT ID",
       dataIndex: "fptId",
@@ -419,9 +404,6 @@ function StudentList() {
         onCancel={handleCloseFilter}
         form={formFilter}
         onFinish={handleFilterSearch}
-        onKeyPress={(e) => {
-          if (e.key === "Enter") formFilter.submit();
-        }}
       />
     </>
   );

@@ -1,15 +1,9 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Button, Col, Divider, Input, Space, Typography, Form } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
-import { toast } from "react-toastify";
 import { post } from "~/utils/request";
-import {
-  addMajor,
-  addMajorSuccess,
-  addMajorFail,
-} from "~/store/actions/majorAction";
+import { addMajorSuccess, addMajorFail } from "~/store/actions/majorAction";
 
 function AddNewMajor() {
   const dispatch = useDispatch();

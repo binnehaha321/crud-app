@@ -37,8 +37,7 @@ const TermList = () => {
   const getTermList = async () => {
     setLoading(true);
     try {
-        const res = await request.get("term/all?pageNumber=1");
-        console.log(res.data.data);
+      const res = await request.get("term/all?pageNumber=1");
       const data = await res?.data?.data?.map((term) => {
         return {
           key: term?.termCode,

@@ -7,7 +7,6 @@ import {
   Upload,
   Space,
   Modal,
-  Image,
   Typography,
   Tag,
   DatePicker,
@@ -23,25 +22,11 @@ import { ADMIN, USER } from "~/constants/role";
 import { UPDATE_USER_FAIL } from "~/utils/message";
 import DepartmentSelect from "~/components/DepartmentSelect/DepartmentSelect";
 import "./index.scss";
+import { handleUserDataList } from "~/utils/handleList";
 
 function UserList() {
   const formRef = useRef();
   const columns = [
-    {
-      title: "",
-      dataIndex: "avatar",
-      key: "avatar",
-      fixed: "left",
-      // render: (img) => <Image src={img} width={65} height={55} />,
-      render: () => (
-        <Image
-          src="https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=573"
-          alt="avatar"
-          width={65}
-          height={55}
-        />
-      ),
-    },
     {
       title: "Email",
       dataIndex: "email",
@@ -118,34 +103,16 @@ function UserList() {
   ]);
 
   const [currentUserValues, setCurrentUserValues] = useState({});
-
-  // GET USERS
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [username, setUsername] = useState("");
 
-  const handleUserDataList = (users = []) => {
-    let userData = {};
-    return users?.map((user) => {
-      userData = {
-        key: user?.userId,
-        userId: user?.userId,
-        avatar: user?.avatar,
-        email: user?.email,
-        username: user?.username,
-        fullName: user?.fullName,
-        phoneNumber: user?.phoneNumber,
-        roles: user?.roles,
-      };
-      return userData;
-    });
-  };
-
+  // get user list
   const handleCallUserList = async () => {
     try {
       setIsLoading(true);
       const res = await request.get("users/all?pageNumber=1");
-      const users = res?.data?.data;
-      const result = handleUserDataList(users);
+      const users = await res?.data?.data;
+      const result = handleUserDataList(await users);
       setData(result);
       setIsLoading(false);
     } catch (error) {
@@ -179,7 +146,6 @@ function UserList() {
       setCurrentUserValues({
         key: user?.userId,
         dob: moment(user?.dob),
-        // avatar: user?.avatar,
         email: user?.email,
         fullName: user?.fullName,
         departmentId: user?.departmentId?.departmentName,

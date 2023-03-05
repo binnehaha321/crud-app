@@ -12,7 +12,6 @@ import NotFound from "~/Pages/NotFound";
 import HonourList from "~/Pages/Student/Honour";
 import SubjectList from "~/Pages/Subject/SubjectList";
 import ClassList from "~/Pages/Class/ClassList";
-import AddNewClass from "~/Pages/Class/AddNewClass";
 import RoleList from "~/Pages/Roles/RoleList";
 import ProgramList from "~/Pages/Program/ProgramList";
 import TermList from "~/Pages/Term/TermList";
@@ -21,6 +20,8 @@ import FailSubjectList from "~/Pages/Student/FailSubject";
 import DepartmentList from "~/Pages/Department/DepartmentList";
 import AddNewDepartment from "~/Pages/Department/AddNewDepartment";
 import StudentScore from "~/Pages/Student/Score/Score";
+import AddNewSubject from "~/Pages/Subject/AddNewSubject";
+import AssignStudentClass from "~/Pages/Class/AssignStudentClass";
 
 const publicRoutes = [
   { path: "sign-in", component: <SignIn /> },
@@ -42,10 +43,10 @@ const privateRoutes = [
   { path: "majors", component: <MajorList /> },
   { path: "majors/add", component: <AddNewMajor /> },
   { path: "subjects", component: <SubjectList /> },
+  { path: "subjects/add", component: <AddNewSubject /> },
   { path: "class", component: <ClassList /> },
-  { path: "class/add", component: <AddNewClass /> },
+  { path: "class/add", component: <AssignStudentClass /> },
   { path: "roles", component: <RoleList /> },
-  // { path: "roles/add", component: <AddNewRole /> },
   { path: "programs", component: <ProgramList /> },
   { path: "terms", component: <TermList /> },
   { path: "*", component: <NotFound /> },

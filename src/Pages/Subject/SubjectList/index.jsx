@@ -1,56 +1,47 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  Space,
-  Image,
-  Upload,
-  Input,
-  Select,
-  Modal,
-  DatePicker,
-  Form,
-  Typography,
-} from "antd";
+import { useSelector } from "react-redux";
+import { Input, Modal, Space, Form, Typography, Button as Btn } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
-import moment from "moment";
 import { Table, Button } from "~/components";
 import * as icon from "~/assets/images/ActionIcons";
-import request from "~/utils/request";
-import useFetch from "~/hooks/useFetch";
-// import "./index.scss";
+import request, { get } from "~/utils/request";
+import { handleSubjectDataList } from "~/utils/handleList";
+import SearchSubject from "~/components/SearchSubject";
 
 function SubjectList() {
   const formRef = useRef();
-  const [selectedId, setSelectedId] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [currentSubjectValues, setCurrentSubjectValues] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0);
+  const [selectedId, setSelectedId] = useState(null);
+  const [form] = Form.useForm();
+  const [currentSubjectValues, setCurrentSubjectValues] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
   const columns = [
     {
       title: "Subject Code",
       dataIndex: "subjectCode",
       key: "subjectCode",
-      render: (subjectCode) => <Typography.Text>{subjectCode}</Typography.Text>,
+      render: (subjectCode) => (
+        <Typography.Text className="need-uppercase">
+          {subjectCode}
+        </Typography.Text>
+      ),
     },
     {
-      title: "Subject Name",
+      title: "Subject",
       dataIndex: "subjectName",
       key: "subjectName",
-      render: (subjectName) => <Typography.Text>{subjectName}</Typography.Text>,
     },
     {
       title: "Description",
       dataIndex: "description",
       key: "description",
-      render: (description) => <Typography.Text>{description}</Typography.Text>,
     },
     {
-      title: "Replace With",
+      title: "Replaced",
       dataIndex: "replaceWith",
       key: "replaceWith",
-      render: (replaceWith) => <Typography.Text>{replaceWith}</Typography.Text>,
     },
     {
       title: "",
@@ -67,42 +58,18 @@ function SubjectList() {
       ),
     },
   ];
-  const [data, setData] = useState([
-    {
-      key: "",
-      subjectCode: "",
-      subjectName: "",
-      description: "",
-      replaceWith: "",
-    },
-  ]);
+  const [data, setData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
 
-  // GET AMOUNT OF SUBJECT
-  //   const { data: amountSubject } = useFetch("subject/totalSubjects");
-
-  // HANDLE SUBJECT LIST
-  const handleSubjectDataList = (subjects) => {
-    let subjectData = {};
-    return subjects?.map((subject) => {
-      subjectData = {
-        key: subject?.subjectCode,
-        subjectCode: subject?.subjectCode,
-        subjectName: subject?.subjectName,
-        description: subject?.description,
-        replaceWith: subject?.replaceWith,
-      };
-      return subjectData;
-    });
-  };
-
-  // GET SUBJECT LIST
-  const handleCallSubjectList = async (pageNumber = 0) => {
+  // get subject list
+  const handleGetSubjectList = async (pageNumber) => {
     setIsLoading(true);
     try {
-      const res = await request.get(`subject/all?pageNumber=${pageNumber}`);
-      const subjects = res?.data?.data;
-      const result = handleSubjectDataList(subjects);
+      const res = await get(`subject/all?pageNumber=${pageNumber}`);
+      const result = handleSubjectDataList(await res?.data);
       setData(result);
+      setTotalPages((await res?.pageNumber) * 15);
       setIsLoading(false);
     } catch (error) {
       console.log(error);
@@ -110,100 +77,176 @@ function SubjectList() {
     }
   };
 
-  // UPDATE STUDENT
-  const [form] = Form.useForm();
-
   useEffect(() => {
-    handleCallSubjectList(currentPage);
-    // Get current subject's data by id
+    handleGetSubjectList(currentPage);
+  }, [currentPage]);
+
+  // Get current subject's data by id
+  useEffect(() => {
     if (formRef.current) form.setFieldsValue(currentSubjectValues);
   }, [form, currentSubjectValues]);
 
   const handleGetSubjectById = async (id) => {
+    setSelectedId(id);
+    setIsLoading(true);
     try {
-      const res = await request.get(
-        `subject/filter?pageNumber=1&search=subjectCode:*${id}`
+      const { data: res } = await get(
+        `subject/filter?pageNumber=1&search=subjectCode:${id}`
       );
-      const subject = res?.data?.data[0];
-      setSelectedId(subject?.subjectCode);
+      const _sub = await res[0];
       setCurrentSubjectValues({
-        key: subject?.subjectCode,
-        subjectCode: subject?.subjectCode,
-        subjectName: subject?.subjectName,
-        description: subject?.description,
-        replaceWith: subject?.replaceWith,
+        key: _sub?.subjectCode,
+        subjectCode: _sub?.subjectCode,
+        subjectName: _sub?.subjectName,
+        description: _sub?.description,
+        replaceWith: _sub?.replaceWith,
       });
       setIsModalOpen(true);
+      setIsLoading(false);
     } catch (error) {
-      console.log(error);
+      setIsLoading(false);
+      throw new Error(error);
     }
   };
 
+  // handle update subject
   const handleUpdateSubject = async (values) => {
     setIsLoading(true);
     try {
       const res = await request.put(`subject/edit/${selectedId}`, values);
-      const data = res?.data;
-      console.log(data);
-      const result = handleCallSubjectList(data?.students);
+      const data = await res?.data;
+      const result = handleSubjectDataList(data?.data);
       setData(result);
       toast.success(data?.message);
-      setIsModalOpen(false);
+      handleCloseUpdateModal();
       setIsLoading(false);
     } catch (error) {
-      toast.error(error?.data?.message);
-      setIsModalOpen(false);
+      handleCloseUpdateModal();
       setIsLoading(false);
     }
   };
 
-  // DELETE STUDENT
-  const handleDelete = (id) => {
-    //     request
-    //       .delete(`student/delete/${id}`)
-    //       .then((res) => {
-    //         toast.success(res?.data?.message);
-    //         const newStudentList = data.filter((student) => student?.key !== id);
-    //         setData(newStudentList);
-    //       })
-    //       .catch((err) => {
-    //         toast.error(err?.data?.message);
-    //       });
+  // handle close modal update
+  const handleCloseUpdateModal = () => {
+    setIsModalOpen(false);
+    form.resetFields();
+  };
+
+  // DELETE SUBJECT
+  const handleDelete = async (id) => {
+    try {
+      const res = await request.delete(`subject/delete/${id}`);
+      toast.success(res?.data?.message);
+      const newData = data.filter((d) => d.subjectCode !== id);
+      const result = handleSubjectDataList(newData);
+      setData(result);
+    } catch (error) {
+      toast.error(error?.data?.message);
+      throw new Error(error);
+    }
   };
 
   // Confirm modal
   const showDeleteConfirm = (id) => {
-    //     Modal.confirm({
-    //       title: "Are you sure delete this student?",
-    //       icon: <ExclamationCircleOutlined />,
-    //       content: "Click No to cancel.",
-    //       okText: "Yes",
-    //       okType: "danger",
-    //       cancelText: "No",
-    //       onOk() {
-    //         handleDelete(id);
-    //       },
-    //     });
+    Modal.confirm({
+      title: "Are you sure delete this subject?",
+      icon: <ExclamationCircleOutlined />,
+      content: "Click No to cancel.",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+
+      onOk() {
+        handleDelete(id);
+      },
+    });
+  };
+
+  // popup add success
+  let { msg, flag } = useSelector((state) => state.subject);
+  useEffect(() => {
+    if (msg) {
+      if (flag) {
+        toast.success(msg);
+      } else {
+        toast.error(msg);
+      }
+    }
+  }, [msg, flag]);
+
+  // filter search
+  const [isOpenFilter, setIsOpenFilter] = useState(false);
+  const [formFilter] = Form.useForm();
+
+  const handleCloseFilter = () => {
+    setIsOpenFilter(false);
+    formFilter.resetFields();
+  };
+
+  const handleFilter = async (values) => {
+    const _subCode = values?.subjectCode;
+    const _subName = values?.subjectName;
+    if (values) {
+      try {
+        if (
+          typeof _subCode !== "undefined" &&
+          typeof _subName === "undefined"
+        ) {
+          setIsLoading(true);
+          const res = await get(
+            `subject/filter?pageNumber=1&search=subjectCode:${_subCode}`
+          );
+          const result = handleSubjectDataList(await res?.data);
+          setData(result);
+        } else if (
+          typeof _subCode === "undefined" &&
+          typeof _subName !== "undefined"
+        ) {
+          setIsLoading(true);
+          const res = await get(
+            `subject/filter?pageNumber=1&search=subjectName:${_subName}`
+          );
+          const result = handleSubjectDataList(await res?.data);
+          setData(result);
+        } else if (
+          typeof _subCode !== "undefined" &&
+          typeof _subName !== "undefined"
+        ) {
+          setIsLoading(true);
+          const res = await get(
+            `subject/filter?pageNumber=1&search=subjectCode:${_subCode}&subjectName:${_subName}`
+          );
+          const result = handleSubjectDataList(await res?.data);
+          setData(result);
+        } else {
+          return;
+        }
+        handleCloseFilter();
+        setIsLoading(false);
+      } catch (error) {
+        handleCloseFilter();
+        setIsLoading(false);
+      }
+    } else return;
   };
 
   return (
     <>
       <Table
         caption="Subject List"
-        icon={icon.SORT}
         columns={columns}
         dataSource={data}
         loading={isLoading}
-        pageSize={15}
-        // total={amountStudent}
+        currentPage={currentPage}
+        totalPages={totalPages}
         onChange={(pageNumber) => {
-          --pageNumber;
           setCurrentPage(pageNumber);
-          handleCallSubjectList(pageNumber);
+          handleGetSubjectList(pageNumber);
         }}
+        onOpenFilter={() => setIsOpenFilter(true)}
       >
-        <Link to="../subject/add" className="ant-btn ant-btn-primary">
-          ADD NEW SUBJECT
+        <Link to="./add">
+          <Btn type="primary">ADD NEW SUBJECT</Btn>
         </Link>
       </Table>
       <Modal
@@ -230,38 +273,27 @@ function SubjectList() {
           initialValues={currentSubjectValues}
           className="update-subject"
         >
-          <Space style={{ display: "flex" }}>
-            <Form.Item label="Subject Code" name="subjectCode">
-              <Input />
-            </Form.Item>
-            <Form.Item label="Subject Name" name="subjectName">
-              <Input />
-            </Form.Item>
-          </Space>
-          <Space style={{ display: "flex" }}>
-            <Form.Item label="Description" name="description">
-              <Input />
-            </Form.Item>
-            <Form.Item label="Replace With" name="replaceWith">
-              <Input />
-            </Form.Item>
-          </Space>
-          {/* <Form.Item label="Avatar" valuePropName="fileList" name="avatar">
-            <Upload action="/upload.do" listType="picture-card">
-              <div>
-                <PlusOutlined />
-                <div
-                  style={{
-                    marginTop: 8,
-                  }}
-                >
-                  Upload
-                </div>
-              </div>
-            </Upload>
-          </Form.Item> */}
+          <Form.Item label="Subject Code" name="subjectCode">
+            <Input readOnly />
+          </Form.Item>
+          <Form.Item label="Subject" name="subjectName">
+            <Input className="need-uppercase" />
+          </Form.Item>
+          <Form.Item label="Description" name="description">
+            <Input.TextArea />
+          </Form.Item>
+          <Form.Item label="Replaced" name="replaceWith">
+            <Input />
+          </Form.Item>
         </Form>
       </Modal>
+      <SearchSubject
+        form={formFilter}
+        open={isOpenFilter}
+        onOk={formFilter.submit}
+        onFinish={handleFilter}
+        onCancel={handleCloseFilter}
+      />
     </>
   );
 }

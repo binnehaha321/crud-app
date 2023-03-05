@@ -1,26 +1,13 @@
 import { useEffect, useState } from "react";
-import { Form, Select, Modal, Image, Typography, Divider, Card } from "antd";
+import { Form, Select, Modal, Typography, Divider, Card } from "antd";
 import { Table } from "~/components";
 import request, { get } from "~/utils/request";
 import useFetch from "~/hooks/useFetch";
+import { formatHonourList } from "~/utils/handleList";
 import StudentScore from "~/components/StudentScore";
 
 function HonourList() {
   const columns = [
-    {
-      title: "",
-      dataIndex: "avatar",
-      key: "avatar",
-      // render: (img) => <Image src={img} width={65} height={55} />,
-      render: () => (
-        <Image
-          src="https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=573"
-          alt="avatar"
-          width={65}
-          height={55}
-        />
-      ),
-    },
     {
       title: "FPT ID",
       dataIndex: "fptId",
@@ -69,24 +56,12 @@ function HonourList() {
       dataIndex: "averageScore",
       key: "averageScore",
       render: (score) => (
-        <Typography.Text>{Number(score).toFixed(1)}</Typography.Text>
+        <Typography.Text>{score && Number(score).toFixed(1)}</Typography.Text>
       ),
     },
   ];
   const [isLoading, setIsLoading] = useState(false);
-  const [data, setData] = useState([
-    {
-      key: "",
-      fptId: "",
-      fullName: "",
-      majorName: "",
-      subjectCode: "",
-      termCode: "",
-      mark: "",
-      numberSubjectStudiedInTheTerm: "",
-      averageScore: "",
-    },
-  ]);
+  const [data, setData] = useState([]);
   const [isOpenModal, setIsOpenModal] = useState(false);
 
   // GET PROGRAM LIST
@@ -96,30 +71,11 @@ function HonourList() {
   // GET MAJOR LIST
   const { data: majorList } = useFetch("major/all?pageNumber=1");
 
-  // format honour list data to table
-  const formatHonourList = (list = []) => {
-    let data = {};
-    data = list.map((item, index) => {
-      return {
-        key: index,
-        fptId: item?.fptId,
-        fullName: item?.fullName,
-        majorName: item?.majorName,
-        subjectCode: item?.subjectCode,
-        termCode: item?.termCode,
-        mark: item?.mark,
-        numberSubjectStudiedInTheTerm: item?.numberSubjectStudiedInTheTerm,
-        averageScore: item?.averageScore,
-      };
-    });
-    return data;
-  };
-
   // get honour list
   const getHonourList = async (values) => {
+    setIsLoading(true);
     if (values) {
       const { programId, termCode, majorId } = values;
-      setIsLoading(true);
       try {
         const res = await request(
           `student/get/honorList/${programId}/${termCode}/${majorId}`
@@ -132,12 +88,15 @@ function HonourList() {
         setIsLoading(false);
         throw new Error(error);
       }
-    } else return;
+    } else {
+      setIsLoading(false);
+      return;
+    }
   };
 
   useEffect(() => {
     getHonourList();
-  }, [programList, termList, majorList]);
+  }, []);
 
   // handle close modal
   const [form] = Form.useForm();

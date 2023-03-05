@@ -4,7 +4,7 @@ import GenderSelect from "../GenderSelect/GenderSelect";
 import MajorList from "../MajorList/MajorList";
 
 const FilterSearch = (props) => {
-  const { onFinish, open, onOk, onCancel, form, onKeyPress } = props;
+  const { onFinish, open, onOk, onCancel, form } = props;
 
   return (
     <Modal open={open} onOk={onOk} onCancel={onCancel} okText="Search" title="Filter student">
@@ -12,7 +12,6 @@ const FilterSearch = (props) => {
         onFinish={onFinish}
         layout="vertical"
         form={form}
-        onKeyPress={onKeyPress}
       >
         <Row gutter={24}>
           <Col xs={24} md={12}>

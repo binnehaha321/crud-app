@@ -1,35 +1,10 @@
 import { useEffect, useState } from "react";
-import {
-  Form,
-  Input,
-  Select,
-  Upload,
-  Space,
-  Modal,
-  Image,
-  Typography,
-  Tag,
-  DatePicker,
-} from "antd";
+import { Typography } from "antd";
 import { Table } from "~/components";
 import request from "~/utils/request";
 
 function OJTList() {
   const columns = [
-    {
-      title: "",
-      dataIndex: "avatar",
-      key: "avatar",
-      // render: (img) => <Image src={img} width={65} height={55} />,
-      render: () => (
-        <Image
-          src="https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=573"
-          alt="avatar"
-          width={65}
-          height={55}
-        />
-      ),
-    },
     {
       title: "FPT ID",
       dataIndex: "fptId",

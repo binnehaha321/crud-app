@@ -1,17 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { Input, Modal, Space, Form, Typography, Button as Btn } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import { Table, Button } from "~/components";
 import * as icon from "~/assets/images/ActionIcons";
 import request, { get } from "~/utils/request";
-import { useSelector } from "react-redux";
+import { handleMajorDataList } from "~/utils/handleList";
 
 function MajorList() {
   const formRef = useRef();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [id, setId] = useState(null);
+  const [selectedId, setSelectedId] = useState(null);
   const [form] = Form.useForm();
   const [currentMajorValues, setCurrentMajorValues] = useState({});
   const [isLoading, setIsLoading] = useState(false);
@@ -28,22 +29,26 @@ function MajorList() {
       title: "Major Code",
       dataIndex: "majorCode",
       key: "majorCode",
-      render: (majorCode) => <Typography.Text>{majorCode}</Typography.Text>,
-    },
-    {
-      title: "Major Name (EN)",
-      dataIndex: "eName",
-      key: "eName",
-      render: (eName) => (
-        <Typography.Text className="need-capitalize">{eName}</Typography.Text>
+      render: (majorCode) => (
+        <Typography.Text className="need-uppercase">
+          {majorCode}
+        </Typography.Text>
       ),
     },
     {
-      title: "Major Name (VI)",
-      dataIndex: "vName",
-      key: "vName",
-      render: (vName) => (
-        <Typography.Text className="need-capitalize">{vName}</Typography.Text>
+      title: "Major (EN)",
+      dataIndex: "ename",
+      key: "ename",
+      render: (ename) => (
+        <Typography.Text className="need-capitalize">{ename}</Typography.Text>
+      ),
+    },
+    {
+      title: "Major (VI)",
+      dataIndex: "vname",
+      key: "vname",
+      render: (vname) => (
+        <Typography.Text className="need-capitalize">{vname}</Typography.Text>
       ),
     },
     {
@@ -66,32 +71,21 @@ function MajorList() {
       key: 0,
       majorId: "",
       majorCode: "",
-      eName: "",
-      vName: "",
+      ename: "",
+      vname: "",
     },
   ]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
 
-  // GET MAJOR LIST
-  const handleMajorDataList = (majors) => {
-    let majorData = {};
-    return majors?.map((major) => {
-      majorData = {
-        key: major?.majorId,
-        majorId: major?.majorId,
-        majorCode: major?.majorCode,
-        eName: major?.ename,
-        vName: major?.vname,
-      };
-      return majorData;
-    });
-  };
-
-  const handleCallMajorList = async () => {
+  // get major list
+  const handleCallMajorList = async (pageNumber) => {
     setIsLoading(true);
     try {
-      const { data: majors } = await get(`major/all?pageNumber=1`);
-      const result = handleMajorDataList(majors);
+      const res = await get(`major/all?pageNumber=${pageNumber}`);
+      const result = handleMajorDataList(await res?.data);
       setData(result);
+      setTotalPages((await res?.pageNumber) * 15);
       setIsLoading(false);
     } catch (error) {
       console.log(error);
@@ -100,64 +94,75 @@ function MajorList() {
   };
 
   useEffect(() => {
-    handleCallMajorList();
-  }, []);
+    handleCallMajorList(currentPage);
+  }, [currentPage]);
 
   // Get current major's data by id
   useEffect(() => {
     if (formRef.current) form.setFieldsValue(currentMajorValues);
   }, [form, currentMajorValues]);
 
-  const handleGetMajorById = (id) => {
-    setId(id);
-    request
-      .get(`majors?majorId=${id}`)
-      .then((res) => {
-        const major = res?.data?.majors;
-        setCurrentMajorValues({
-          key: major?.majorId,
-          majorId: major?.majorId,
-          eName: major?.eName,
-          vName: major?.vName,
-          description: major?.description,
-        });
-        setIsModalOpen(true);
-      })
-      .catch((err) => {
-        console.log(err);
+  const handleGetMajorById = async (id) => {
+    setSelectedId(id);
+    setIsLoading(true);
+    try {
+      const { data: res } = await get(`major/${id}`);
+      setCurrentMajorValues({
+        key: res?.majorId,
+        majorId: res?.majorId,
+        majorCode: res?.majorCode,
+        ename: res?.ename,
+        vname: res?.vname,
       });
+      setIsModalOpen(true);
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      throw new Error(error);
+    }
   };
 
-  const handleUpdateMajor = (values) => {
-    request
-      .put(`majors?majorId=${id}`, values)
-      .then((res) => {
-        const data = res?.data;
-        const majors = data?.majors;
-        console.log(data);
-        const result = handleMajorDataList(majors);
-        setData(result);
-        toast.success(data?.message);
-        setIsModalOpen(false);
-      })
-      .catch((err) => {
-        toast.error(err?.data?.message);
-      });
+  // handle update major
+  const handleUpdateMajor = async (values) => {
+    setIsLoading(true);
+    if (values) {
+      try {
+        const res = await request.put(`major/edit/${selectedId}`, values);
+        const data = await res?.data;
+        toast.success(await data?.message);
+        const result = handleMajorDataList(await data?.data);
+        setData(await result);
+        handleCloseUpdateModal();
+      } catch (error) {
+        toast.error(error?.response?.data?.message);
+        handleCloseUpdateModal();
+      }
+    } else {
+      setIsLoading(false);
+      return;
+    }
+  };
+
+  // handle close modal update
+  const handleCloseUpdateModal = () => {
+    setIsModalOpen(false);
+    form.resetFields();
+    setIsLoading(false);
   };
 
   // DELETE MAJOR
-  const handleDelete = (id) => {
-    request
-      .delete(`majors?majorId=${id}`)
-      .then((res) => {
-        toast.success(res?.data?.message);
-        const majors = res?.data?.majors;
-        const result = handleMajorDataList(majors);
-        setData(result);
-      })
-      .catch((err) => {
-        toast.error(err?.data?.message);
-      });
+  const handleDelete = async (id) => {
+    try {
+      const res = await request.delete(`major/delete/${id}`);
+      toast.success(res?.data?.message);
+
+      const newData = data.filter((d) => d.majorId !== id);
+      const result = handleMajorDataList(newData);
+      setData(result);
+    } catch (error) {
+      toast.error(error?.data?.message);
+      throw new Error(error);
+    }
   };
 
   // Confirm modal
@@ -176,18 +181,6 @@ function MajorList() {
     });
   };
 
-  // popup add success
-  let { msg, flag } = useSelector((state) => state.major);
-  useEffect(() => {
-    if (msg) {
-      if (flag) {
-        toast.success(msg);
-      } else {
-        toast.error(msg);
-      }
-    }
-  }, [msg, flag]);
-
   return (
     <>
       <Table
@@ -195,6 +188,12 @@ function MajorList() {
         columns={columns}
         dataSource={data}
         loading={isLoading}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onChange={(pageNumber) => {
+          setCurrentPage(pageNumber);
+          handleCallMajorList(pageNumber);
+        }}
       >
         <Link to="./add">
           <Btn type="primary">ADD NEW MAJOR</Btn>
@@ -225,20 +224,16 @@ function MajorList() {
           className="update-major"
         >
           <Form.Item label="Major ID" name="majorId">
+            <Input readOnly />
+          </Form.Item>
+          <Form.Item label="Major Code" name="majorCode">
             <Input className="need-uppercase" />
           </Form.Item>
-          <Form.Item label="Major Name (EN)" name="eName">
+          <Form.Item label="Major (EN)" name="ename">
             <Input className="need-capitalize" />
           </Form.Item>
-          <Form.Item label="Major Name (VI)" name="vName">
+          <Form.Item label="Major (VI)" name="vname">
             <Input className="need-capitalize" />
-          </Form.Item>
-          <Form.Item label="Description" name="description">
-            <Input.TextArea
-              maxLength="255"
-              showCount="true"
-              autoSize={{ minRows: 5 }}
-            />
           </Form.Item>
         </Form>
       </Modal>
