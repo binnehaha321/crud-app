@@ -7,6 +7,7 @@ import userReducer from "./userReduce";
 import paginationReducer from "./paginationReducer";
 import scoreReducer from "./scoreReducer";
 import subjectReducer from "./subjectReducer";
+import studentClassReducer from "./studentClassReducer";
 
 export default combineReducers({
   authen: authenReducer,
@@ -17,4 +18,5 @@ export default combineReducers({
   pagination: paginationReducer,
   score: scoreReducer,
   subject: subjectReducer,
+  studentClass: studentClassReducer,
 });

@@ -57,7 +57,11 @@ const StudentScore = () => {
   // toast
   const { flag, msg } = useSelector((state) => state.score);
   useEffect(() => {
-    if (!flag) toast.error(msg);
+    if (flag) {
+      toast.success(msg);
+    } else {
+      toast.error(msg);
+    }
   }, [msg, flag]);
 
   return (

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Space,
   Input,
@@ -28,6 +28,7 @@ import StudentDetail from "~/components/StudentDetail";
 import FilterSearch from "~/components/FilterSearch/FilterSearch";
 import { handleStudentDataList } from "~/utils/handleList";
 import MajorList from "~/components/MajorList/MajorList";
+import { openAssignModalByFptId } from "~/store/actions/studentClassAction";
 import "./index.scss";
 
 function StudentList() {
@@ -109,11 +110,30 @@ function StudentList() {
           <Button onClick={(e) => showDeleteConfirm(e, id.key)}>
             <img src={icon.DELETE} alt="delete" />
           </Button>
-          <Link to={`/students/score/${id.key}`}>
-            <Btn type={"primary"} icon={<PlusOutlined />} danger>
-              Add score
-            </Btn>
-          </Link>
+          <Popover
+            content={
+              <Space direction="vertical">
+                <Link to={`/students/score/${id.key}`}>
+                  <Btn type={"text"} icon={<PlusOutlined />}>
+                    Add score
+                  </Btn>
+                </Link>
+                <Link to={"/class"}>
+                  <Btn
+                    type={"text"}
+                    icon={<PlusOutlined />}
+                    onClick={() => handleOpenAssignModal(id.key)}
+                  >
+                    Add to class
+                  </Btn>
+                </Link>
+              </Space>
+            }
+            title="Select an action"
+            trigger="click"
+          >
+            <Btn type="primary">Add</Btn>
+          </Popover>
         </Space>
       ),
     },
@@ -281,6 +301,12 @@ function StudentList() {
   const handleCloseFilter = () => {
     setIsFilterSearchOpen(false);
     formFilter.resetFields();
+  };
+
+  // assign modal
+  const dispatch = useDispatch();
+  const handleOpenAssignModal = (fptId) => {
+    dispatch(openAssignModalByFptId(fptId));
   };
 
   return (

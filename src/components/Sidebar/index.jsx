@@ -91,8 +91,8 @@ function Sidebar({ className }) {
     roleId = "";
   if (cookies.get("user_info")) {
     const user = cookies.get("user_info");
-    fullName = user?.data?.fullName;
-    roleId = user?.data?.roles?.map((role) => role);
+    fullName = user?.fullName;
+    roleId = user?.roles?.map((role) => role);
   }
 
   return (

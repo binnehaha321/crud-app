@@ -1,19 +1,34 @@
-import { useEffect, useState } from "react";
-import { Card, Skeleton, Space, Typography, Form, Button as Btn } from "antd";
+import { useEffect, useRef, useState } from "react";
+import {
+  Card,
+  Skeleton,
+  Space,
+  Typography,
+  Form,
+  Button as Btn,
+  Modal,
+} from "antd";
 import {
   DeleteOutlined,
   EditOutlined,
+  ExclamationCircleOutlined,
+  EyeFilled,
   PlusCircleOutlined,
 } from "@ant-design/icons";
 import Meta from "antd/es/card/Meta";
 import request, { post } from "~/utils/request";
 import AssignStudentClass from "../AssignStudentClass";
 import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  closeAssignModal,
+  openAssignModalByClassCode,
+} from "~/store/actions/studentClassAction";
+import { useNavigate } from "react-router";
 
 const ClassList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [classes, setClasses] = useState([]);
-  const [currentValues, setCurrentValues] = useState(null);
 
   // get class list
   const getClassList = async () => {
@@ -37,16 +52,22 @@ const ClassList = () => {
   const [form] = Form.useForm();
 
   // handle close form
+  const { fptId, classCode, isOpen } = useSelector(
+    (state) => state.studentClass
+  );
+  const initialValues = { fptId, classCode };
+  const dispatch = useDispatch();
   const handleCloseForm = () => {
     setIsOpenModal(false);
-    form.resetFields();
+    if (isOpen) dispatch(closeAssignModal());
     setIsLoading(false);
+    form.resetFields();
   };
 
   // handle open form
   const handleOpenForm = (code) => {
     setIsOpenModal(true);
-    setCurrentValues({ ...currentValues, classCode: code });
+    dispatch(openAssignModalByClassCode(code));
   };
 
   // handle assign student to class
@@ -55,7 +76,6 @@ const ClassList = () => {
     try {
       const res = await post("studentClass/add", values);
       toast.success(await res?.data?.message);
-      console.log(res?.data?.classId);
       handleCloseForm();
     } catch (error) {
       toast.error(error?.response?.data?.message);
@@ -63,10 +83,40 @@ const ClassList = () => {
     }
   };
 
+  // handle get data update
+  const handleGetDataUpdate = (id) => {};
 
-  useEffect(() => {
-    console.log("lan 1", currentValues);
-  }, [currentValues]);
+  // remove student from class
+  // const handleDelete = async (classCode) => {
+  //   try {
+  //     const res = await request.delete(`student/delete/${id}`);
+  //     toast.success(await res?.data?.message);
+  //     const newStudentList = data.filter((student) => student?.key !== id);
+  //     setData(newStudentList);
+  //   } catch (error) {
+  //     toast.error(error?.data?.message);
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  // Confirm modal
+  // const showDeleteConfirm = (e, id) => {
+  //   e.stopPropagation();
+  //   Modal.confirm({
+  //     title: "Are you sure delete this student?",
+  //     icon: <ExclamationCircleOutlined />,
+  //     content: "Click No to cancel.",
+  //     okText: "Yes",
+  //     okType: "danger",
+  //     cancelText: "No",
+
+  //     onOk() {
+  //       handleDelete(id);
+  //     },
+  //   });
+  // };
+
+  const navigate = useNavigate()
 
   return (
     <>
@@ -86,22 +136,18 @@ const ClassList = () => {
             key={clx}
             style={{
               width: 300,
-              // height: "100%",
               marginTop: 16,
               backgroundColor: "#EEE",
             }}
             actions={[
-              <PlusCircleOutlined
-                key="add"
-                onClick={() => handleOpenForm(clx)}
-              />,
+              <EyeFilled key="view" onClick={() => navigate(`${clx}/student-list`)} />,
               <EditOutlined
                 key="edit"
-                // onClick={() => handleGetRoleUpdate(role.key)}
+                // onClick={() => handleGetDataUpdate(clx)}
               />,
               <DeleteOutlined
                 key="delete"
-                // onClick={() => showDeleteConfirm(role.key)}
+                // onClick={() => showDeleteConfirm(clx)}
               />,
             ]}
           >
@@ -119,7 +165,7 @@ const ClassList = () => {
         open={isOpenModal}
         onFinish={handleAssignStudent}
         form={form}
-        initialValues={currentValues}
+        initialValues={initialValues}
       />
     </>
   );

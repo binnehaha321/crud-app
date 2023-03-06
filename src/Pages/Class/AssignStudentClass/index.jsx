@@ -1,11 +1,13 @@
+import { useSelector } from "react-redux";
 import { Form, Input, Modal } from "antd";
 
 function AssignStudentClass(props) {
-  const { onOk, onCancel, onFinish, form, open, initialValues } = props;
+  const { onOk, onCancel, onFinish, form, initialValues, open } = props;
+  const { isOpen } = useSelector((state) => state.studentClass);
 
   return (
     <Modal
-      open={open}
+      open={isOpen || open}
       onCancel={onCancel}
       onOk={onOk}
       title="Assign student to a class"

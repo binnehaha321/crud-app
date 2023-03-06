@@ -15,7 +15,7 @@ request.interceptors.request.use((config) => {
 
 const getToken = () => {
   let user_info = cookies.get("user_info");
-  return user_info?.data?.token;
+  return user_info?.token;
 };
 
 export const get = async (path, options = {}) => {

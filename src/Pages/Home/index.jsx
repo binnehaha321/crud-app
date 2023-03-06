@@ -39,29 +39,8 @@ function Home() {
     }
   };
 
-  // MAJORS
-  // const callMajorList = () =>
-  //   request.get("majors").then((res) => {
-  //     setAmountMajor(res?.data?.majors?.length);
-  //   });
-
-  // PAYMENTS
-  // const callPaymentList = () =>
-  //   request.get("payments").then((res) => {
-  //     setAmountPayment(res?.data?.payments?.length);
-  //   });
-
-  // USERS
-  // const callUserList = () =>
-  //   request.get("users").then((res) => {
-  //     setAmountUser(res?.data?.users?.length);
-  //   });
-
   useEffect(() => {
     callStudentList();
-    // callMajorList();
-    // callPaymentList();
-    // callUserList();
   }, []);
 
   const { Title, Text } = Typography;

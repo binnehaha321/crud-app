@@ -89,7 +89,6 @@ export const handleUserDataList = (users) => {
     userData = {
       key: user?.userId,
       userId: user?.userId,
-      avatar: user?.avatar,
       email: user?.email,
       username: user?.username,
       fullName: user?.fullName,
@@ -97,5 +96,20 @@ export const handleUserDataList = (users) => {
       roles: user?.roles,
     };
     return userData;
+  });
+};
+
+// students in class
+export const handleStudentInClassDataList = (students) => {
+  let std_in_class = {};
+  return students?.map((std, index) => {
+    std_in_class = {
+      key: std?.fptId,
+      index: ++index,
+      fptId: std?.fptId,
+      fullName: std?.fullName,
+      classCode: std?.classCode,
+    };
+    return std_in_class;
   });
 };

@@ -22,6 +22,7 @@ import AddNewDepartment from "~/Pages/Department/AddNewDepartment";
 import StudentScore from "~/Pages/Student/Score/Score";
 import AddNewSubject from "~/Pages/Subject/AddNewSubject";
 import AssignStudentClass from "~/Pages/Class/AssignStudentClass";
+import StudentClassDetail from "~/Pages/Class/StudentClassDetail/StudentClassDetail";
 
 const publicRoutes = [
   { path: "sign-in", component: <SignIn /> },
@@ -49,6 +50,7 @@ const privateRoutes = [
   { path: "roles", component: <RoleList /> },
   { path: "programs", component: <ProgramList /> },
   { path: "terms", component: <TermList /> },
+  { path: "class/:classCode/student-list", component: <StudentClassDetail /> },
   { path: "*", component: <NotFound /> },
 ];
 

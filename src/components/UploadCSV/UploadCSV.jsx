@@ -35,9 +35,9 @@ const UploadCSV = ({ url, type, file, danger }) => {
       });
   };
 
-  useEffect(() => {
-    if (!isUploading) return () => toast.success("Uploaded successfully!");
-  }, [isUploading]);
+  // useEffect(() => {
+  //   if (!isUploading) return () => toast.success("Uploaded successfully!");
+  // }, [isUploading]);
 
   const handleFileChange = (e) => {
     if (e.file) {
