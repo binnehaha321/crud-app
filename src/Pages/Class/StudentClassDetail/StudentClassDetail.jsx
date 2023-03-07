@@ -13,6 +13,7 @@ import {
   handleSubjectDataList,
 } from "~/utils/handleList";
 import AssignStudentClass from "../AssignStudentClass";
+import MoveStudentClass from "../MoveStudentClass";
 
 function StudentClassDetail() {
   const [isLoading, setIsLoading] = useState(false);
@@ -57,7 +58,16 @@ function StudentClassDetail() {
       key: "action",
       render: (id) => (
         <Space size="middle">
-          <Button onClick={() => showDeleteConfirm(id.fptId)}>
+          <Button
+            onClick={() => handleMoveStudent(id.fptId)}
+            title="Move student to another class"
+          >
+            <img src={icon.EDIT} alt="edit" />
+          </Button>
+          <Button
+            onClick={() => showDeleteConfirm(id.fptId)}
+            title="Remove student from this class"
+          >
             <img src={icon.DELETE} alt="delete" />
           </Button>
         </Space>
@@ -67,6 +77,7 @@ function StudentClassDetail() {
   const [data, setData] = useState([]);
   const { classCode } = useParams();
   const [form] = Form.useForm();
+  const [formMove] = Form.useForm();
 
   // get students in the class list
   const handleGetStudentsInClass = async (classCode, pageNumber) => {
@@ -169,6 +180,37 @@ function StudentClassDetail() {
     setIsLoading(false);
   };
 
+  // move student to another class
+  const [isOpenMove, setIsOpenMove] = useState(false);
+  const [studentIdMove, setStudentIdMove] = useState(null);
+  const handleMoveStudent = (id) => {
+    setIsOpenMove(true);
+    setStudentIdMove(id);
+  };
+
+  // handle close move modal
+  const handleCloseMove = () => {
+    if (isOpenMove) setIsOpenMove(false);
+    form.resetFields();
+    setIsLoading(false);
+  };
+
+  const handleMoveStd = async (values) => {
+    setIsLoading(true);
+    try {
+      const res = await request.put(
+        `studentClass/edit/${studentIdMove}`, // fptId or classCode???
+        values
+      );
+      console.log(res);
+      handleCloseMove();
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+      handleCloseMove();
+      throw new Error(error);
+    }
+  };
+
   return (
     <>
       <Table
@@ -184,6 +226,8 @@ function StudentClassDetail() {
           ASSIGN NEW STUDENT
         </Btn>
       </Table>
+
+      {/* assign student to class */}
       <AssignStudentClass
         onOk={form.submit}
         onCancel={handleCloseAssign}
@@ -191,6 +235,16 @@ function StudentClassDetail() {
         form={form}
         initialValues={{ classCode }}
         open={isOpenAssign}
+      />
+
+      {/* move student to another class */}
+      <MoveStudentClass
+        onOk={formMove.submit}
+        onCancel={handleCloseMove}
+        onFinish={handleMoveStd}
+        form={formMove}
+        initialValues={{ fptId: studentIdMove }}
+        open={isOpenMove}
       />
     </>
   );

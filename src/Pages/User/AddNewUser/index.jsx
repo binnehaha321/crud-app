@@ -78,7 +78,6 @@ function AddNewUser() {
     }
   };
 
-
   // run toast
   let { msg, flag } = useSelector((state) => state.user);
 
@@ -86,11 +85,13 @@ function AddNewUser() {
     if (msg) {
       if (flag) {
         toast.success(msg);
+        dispatch(addUserSuccess(""));
       } else {
         toast.error(msg);
+        dispatch(addUserFail(""));
       }
     }
-  }, [msg, flag]);
+  }, [msg, flag, dispatch]);
 
   return (
     <Col

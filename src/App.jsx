@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { Spin } from "antd";
@@ -6,47 +6,55 @@ import { toast } from "react-toastify";
 import { publicRoutes, privateRoutes } from "~/routes";
 import DefaultLayout from "./Layout/DefaultLayout";
 import { cookies } from "./utils/cookies";
+import Loading from "./components/Loading/Loading";
+import SignIn from "./Pages/SignIn";
 
 function App() {
-  let { isLoading } = useSelector((state) => state.authen);
-  let { msg, flag } = useSelector((state) => state.student);
-  let isAuthen = cookies.get("user_info")?.token;
+  let { flag } = useSelector((state) => state.authen);
+  let { msg } = useSelector((state) => state.student);
+  let userInfo = cookies.get("user_info");
+  let token = userInfo?.token;
+
+  let isAdmin = userInfo?.roles?.some((role) => role === "ROLE_ADMIN");
+
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    if (flag) {
-      toast.success(msg);
-    } else {
-      toast.error(msg);
+    if (msg) {
+      if (flag) {
+        toast.success(msg);
+      } else {
+        toast.error(msg);
+      }
     }
   }, [msg, flag]);
 
   useEffect(() => {
-    if (!isAuthen && location.pathname === "/") navigate("sign-in");
-    if (isLoading) return <Spin />;
-  }, [location, navigate, isLoading, isAuthen]);
+    if (!token && location.pathname === "/") {
+      navigate("sign-in");
+    }
+  }, [location, navigate, token]);
+
+  if (!token) return <SignIn />;
 
   return (
-    <>
-      {isAuthen ? (
-        <Routes>
-          {privateRoutes.map((route, index) => (
-            <Route
-              key={index}
-              path={route.path}
-              element={<DefaultLayout>{route.component}</DefaultLayout>}
-            />
-          ))}
-        </Routes>
-      ) : (
-        <Routes>
-          {publicRoutes.map((route, index) => (
-            <Route key={index} path={route.path} element={route.component} />
-          ))}
-        </Routes>
-      )}
-    </>
+    <Suspense fallback={<Loading />}>
+      <Routes>
+        {privateRoutes.map((route, index) => (
+          <Route
+            key={index}
+            path={route.path}
+            element={<DefaultLayout>{route.component}</DefaultLayout>}
+          />
+        ))}
+      </Routes>
+      <Routes>
+        {publicRoutes.map((route, index) => (
+          <Route key={index} path={route.path} element={route.component} />
+        ))}
+      </Routes>
+    </Suspense>
   );
 }
 

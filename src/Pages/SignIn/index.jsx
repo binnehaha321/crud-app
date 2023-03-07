@@ -44,9 +44,10 @@ function SignIn() {
         toast.success(msg);
       } else {
         toast.error(msg);
+        dispatch(signInFail(""));
       }
     }
-  }, [msg, flag]);
+  }, [msg, flag, dispatch]);
 
   if (isLoading) {
     return <Loading />;

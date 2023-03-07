@@ -105,6 +105,7 @@ function UserList() {
   const [currentUserValues, setCurrentUserValues] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [username, setUsername] = useState("");
+  const [rolesOption, setRolesOption] = useState(null);
 
   // get user list
   const handleCallUserList = async () => {
@@ -135,6 +136,13 @@ function UserList() {
     }
   }, [form, currentUserValues]);
 
+  const formatRolesOption = (options) => {
+    return options?.map((opt) => ({
+      label: opt.roleName,
+      value: opt.roleId,
+    }));
+  };
+
   // get user to update
   const handleGetUserUpdate = async (username) => {
     setUsername(username);
@@ -148,12 +156,14 @@ function UserList() {
         dob: moment(user?.dob),
         email: user?.email,
         fullName: user?.fullName,
-        departmentId: user?.departmentId?.departmentName,
+        departmentId: user?.departmentId?.departmentId,
         username: user?.username,
         address: user?.address,
         phoneNumber: user?.phoneNumber,
-        roles: [...user?.roles],
+        roles: user?.roles,
       });
+      const roleFormatted = await formatRolesOption(currentUserValues.roles);
+      setRolesOption(roleFormatted);
       await handleGetRoles();
       await handleGetDepartments();
       setIsModalOpen(true);
@@ -178,11 +188,14 @@ function UserList() {
   const [departments, setDepartments] = useState([]);
 
   const handleGetDepartments = async () => {
+    setIsLoading(true);
     try {
       const res = await request.get("department/all?pageNumber=1");
       setDepartments(res?.data?.data);
+      setIsLoading(false);
     } catch (error) {
       console.log(error);
+      setIsLoading(false);
     }
   };
 
@@ -273,10 +286,10 @@ function UserList() {
           className="update-user"
         >
           <Space style={{ display: "flex" }}>
-            <Form.Item label="Role" name="roles">
+            <Form.Item label="Role" name="role">
               <Select allowClear maxTagCount="responsive" mode={"multiple"}>
-                {roles?.map((role, index) => (
-                  <Select.Option value={role.roleName} key={index}>
+                {roles?.map((role) => (
+                  <Select.Option value={role.roleName} key={role.roleId}>
                     {role.roleName}
                   </Select.Option>
                 ))}
@@ -299,9 +312,6 @@ function UserList() {
             <Form.Item label="Phone Number" name="phoneNumber">
               <Input type="number" />
             </Form.Item>
-            <Form.Item label="Username" name="username">
-              <Input />
-            </Form.Item>
           </Space>
           <Form.Item label="Address" name="address">
             <Input.TextArea
@@ -309,36 +319,6 @@ function UserList() {
               showCount="true"
               autoSize={{ minRows: 5 }}
             />
-          </Form.Item>
-          <Form.Item
-            hidden // this function is building
-            label="Avatar"
-            valuePropName="fileList"
-            name="avatar"
-            getValueFromEvent={(e) => {
-              if (Array.isArray(e)) {
-                return e;
-              }
-              return e && e.fileList;
-            }}
-          >
-            <Upload
-              hidden
-              // action={process.env.REACT_APP_BACKEND_URL}
-              listType="picture-card"
-              type="image/*"
-            >
-              <div>
-                <PlusOutlined />
-                <div
-                  style={{
-                    marginTop: 8,
-                  }}
-                >
-                  Upload
-                </div>
-              </div>
-            </Upload>
           </Form.Item>
         </Form>
       </Modal>

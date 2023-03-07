@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { Form, Input, Modal } from "antd";
 
-function AssignStudentClass(props) {
+function MoveStudentClass(props) {
   const { onOk, onCancel, onFinish, form, initialValues, open } = props;
   const { isOpen } = useSelector((state) => state.studentClass);
 
@@ -10,7 +10,7 @@ function AssignStudentClass(props) {
       open={isOpen || open}
       onCancel={onCancel}
       onOk={onOk}
-      title="Assign student to a class"
+      title="Move student to another class"
     >
       <Form
         form={form}
@@ -47,4 +47,4 @@ function AssignStudentClass(props) {
   );
 }
 
-export default AssignStudentClass;
+export default MoveStudentClass;

@@ -6,7 +6,12 @@ import {
   LOG_OUT_SUCCESS,
   LOG_OUT_FAIL,
 } from "../constants/authen";
-import * as CK from "~/utils/cookies";
+import {
+  saveUserInfo,
+  saveLoginStatus,
+  removeUserInfo,
+  removeLoginStatus,
+} from "~/utils/cookies";
 
 const initialState = {
   isLoading: false,
@@ -24,8 +29,8 @@ const authenReducer = (state = initialState, action) => {
       };
     }
     case SIGN_IN_SUCCESS: {
-      CK.saveUserInfo(action.payload.userInfo);
-      CK.saveLoginStatus();
+      saveUserInfo(action.payload.userInfo);
+      saveLoginStatus();
       return {
         ...state,
         isLoading: false,
@@ -50,13 +55,14 @@ const authenReducer = (state = initialState, action) => {
       };
     }
     case LOG_OUT_SUCCESS: {
-      CK.removeUserInfo();
-      CK.removeLoginStatus();
+      removeUserInfo();
+      removeLoginStatus();
       return {
         ...state,
         isLoading: false,
         msg: action.payload,
         userInfo: null,
+        flag: true,
       };
     }
     case LOG_OUT_FAIL: {
@@ -64,6 +70,7 @@ const authenReducer = (state = initialState, action) => {
         ...state,
         isLoading: true,
         msg: action.payload,
+        flag: false,
       };
     }
     default:

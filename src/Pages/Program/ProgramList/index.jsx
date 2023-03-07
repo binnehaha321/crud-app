@@ -140,7 +140,7 @@ const ProgramList = () => {
       setCurrentProgramValues({
         key: program?.programId,
         programId: program?.programId,
-        program: program?.programName,
+        programName: program?.programName,
         description: program?.description,
       });
       setIsOpenUpdateProgram(true);
@@ -268,7 +268,7 @@ const ProgramList = () => {
           className="update-student"
         >
           <Space style={{ display: "flex" }} direction="vertical">
-            <Form.Item label="Program" name="program">
+            <Form.Item label="Program" name="programName">
               <Input readOnly />
             </Form.Item>
             <Form.Item label="Description" name="description">

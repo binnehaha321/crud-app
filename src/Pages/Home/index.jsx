@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Card, Typography, Space, Row, Col, Spin } from "antd";
+import { toast } from "react-toastify";
 import * as icon from "~/assets/images/Home";
 import request from "~/utils/request";
-import { toast } from "react-toastify";
 import "./index.scss";
 
 function Home() {

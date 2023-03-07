@@ -1,15 +1,13 @@
-import { COLLAPSE, SEARCH, BELL } from "~/assets/images/Header";
+import { SEARCH, BELL } from "~/assets/images/Header";
 import "./index.scss";
 
 function Header({ className }) {
   return (
     <div className={`wrapper ${className}`}>
-      <div className="left">
-        {/* <img src={COLLAPSE} alt="collapse-menu" id="collapse-menu" /> */}
-      </div>
+      <div className="left"></div>
       <div className="right">
         <div className="search">
-          <input type="search" placeholder="Search..." />
+          <input placeholder="Search..." />
           <span>
             <img src={SEARCH} alt="search" />
           </span>

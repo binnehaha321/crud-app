@@ -1,4 +1,5 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import {
   Card,
   Skeleton,
@@ -6,15 +7,13 @@ import {
   Typography,
   Form,
   Button as Btn,
-  Spin,
   Pagination,
 } from "antd";
-import { EditOutlined, EyeFilled } from "@ant-design/icons";
+import { EyeFilled } from "@ant-design/icons";
 import Meta from "antd/es/card/Meta";
 import { get, post } from "~/utils/request";
 import AssignStudentClass from "../AssignStudentClass";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { closeAssignModal } from "~/store/actions/studentClassAction";
 
@@ -71,9 +70,6 @@ const ClassList = () => {
     }
   };
 
-  // handle get data update
-  const handleGetDataUpdate = (id) => {};
-
   // get init value (fptId)
   const { fptId } = useSelector((state) => state.studentClass);
   const initialValues = { fptId };
@@ -103,10 +99,6 @@ const ClassList = () => {
               <EyeFilled
                 key="view"
                 onClick={() => navigate(`${clx}/student-list`)}
-              />,
-              <EditOutlined
-                key="edit"
-                // onClick={() => handleGetDataUpdate(clx)}
               />,
             ]}
           >
