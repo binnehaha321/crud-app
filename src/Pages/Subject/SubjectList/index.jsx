@@ -60,7 +60,7 @@ function SubjectList() {
   ];
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
 
   // get subject list
   const handleGetSubjectList = async (pageNumber) => {
@@ -69,7 +69,7 @@ function SubjectList() {
       const res = await get(`subject/all?pageNumber=${pageNumber}`);
       const result = handleSubjectDataList(await res?.data);
       setData(result);
-      setTotalPages((await res?.pageNumber) * 15);
+      setTotalItems((await res?.pageNumber) * 15);
       setIsLoading(false);
     } catch (error) {
       console.log(error);
@@ -149,7 +149,7 @@ function SubjectList() {
   // Confirm modal
   const showDeleteConfirm = (id) => {
     Modal.confirm({
-      title: "Are you sure delete this subject?",
+      title: "Are you sure to delete this subject?",
       icon: <ExclamationCircleOutlined />,
       content: "Click No to cancel.",
       okText: "Yes",
@@ -238,7 +238,7 @@ function SubjectList() {
         dataSource={data}
         loading={isLoading}
         currentPage={currentPage}
-        totalPages={totalPages}
+        totalItems={totalItems}
         onChange={(pageNumber) => {
           setCurrentPage(pageNumber);
           handleGetSubjectList(pageNumber);

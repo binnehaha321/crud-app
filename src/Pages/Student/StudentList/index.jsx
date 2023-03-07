@@ -38,7 +38,7 @@ function StudentList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFilterSearchOpen, setIsFilterSearchOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
   const [selectedId, setSelectedId] = useState("");
   const columns = [
     {
@@ -169,7 +169,7 @@ function StudentList() {
       const students = res?.data;
       const result = handleStudentDataList(students);
       setData(result);
-      setTotalPages(res?.pageNumber * 15);
+      setTotalItems(res?.pageNumber * 15);
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
@@ -256,7 +256,7 @@ function StudentList() {
   const showDeleteConfirm = (e, id) => {
     e.stopPropagation();
     Modal.confirm({
-      title: "Are you sure delete this student?",
+      title: "Are you sure to delete this student?",
       icon: <ExclamationCircleOutlined />,
       content: "Click No to cancel.",
       okText: "Yes",
@@ -293,7 +293,7 @@ function StudentList() {
     setIsLoading(true);
     const res = await get(`student/filter?pageNumber=1&search=${query}`);
     setData(res?.data);
-    setTotalPages(res?.pageNumber * 15);
+    setTotalItems(res?.pageNumber * 15);
     handleCloseFilter();
     setIsLoading(false);
   };
@@ -318,11 +318,8 @@ function StudentList() {
         dataSource={data}
         loading={isLoading}
         currentPage={currentPage}
-        totalPages={totalPages}
-        onChange={(pageNumber) => {
-          setCurrentPage(pageNumber);
-          handleCallStudentList(pageNumber);
-        }}
+        totalItems={totalItems}
+        onChange={(pageNumber) => setCurrentPage(pageNumber)}
         onRow={(record) => {
           return {
             onDoubleClick: () => handleOpenDetailStudent(record),

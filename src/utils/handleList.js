@@ -104,10 +104,25 @@ export const handleStudentInClassDataList = (students) => {
   let std_in_class = {};
   return students?.map((std, index) => {
     std_in_class = {
-      key: std?.fptId,
+      key: index,
       index: ++index,
+      fptId: std?.studentClassId?.fptId?.fptId,
+      fullName: std?.studentClassId?.fptId?.fullName,
+      classCode: std?.studentClassId?.classCode,
+      email: std?.studentClassId?.fptId?.email,
+      gender: std?.studentClassId?.fptId?.gender,
+    };
+    return std_in_class;
+  });
+};
+
+// assign student to class
+export const assignStudentInClassDataList = (students) => {
+  let std_in_class = {};
+  return students?.map((std) => {
+    std_in_class = {
+      key: std?.fptId,
       fptId: std?.fptId,
-      fullName: std?.fullName,
       classCode: std?.classCode,
     };
     return std_in_class;

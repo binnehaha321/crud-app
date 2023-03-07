@@ -106,7 +106,7 @@ const RoleList = () => {
   // Confirm modal
   const showDeleteConfirm = (id) => {
     Modal.confirm({
-      title: "Are you sure delete this role?",
+      title: "Are you sure to delete this role?",
       icon: <ExclamationCircleOutlined />,
       content: "Click No to cancel.",
       okText: "Yes",

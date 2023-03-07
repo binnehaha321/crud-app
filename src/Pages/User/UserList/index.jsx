@@ -108,16 +108,16 @@ function UserList() {
 
   // get user list
   const handleCallUserList = async () => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
       const res = await request.get("users/all?pageNumber=1");
       const users = await res?.data?.data;
       const result = handleUserDataList(await users);
       setData(result);
       setIsLoading(false);
     } catch (error) {
-      console.log(error);
       setIsLoading(false);
+      throw new Error(error);
     }
   };
 
@@ -152,7 +152,7 @@ function UserList() {
         username: user?.username,
         address: user?.address,
         phoneNumber: user?.phoneNumber,
-        roles: user?.roles,
+        roles: [...user?.roles],
       });
       await handleGetRoles();
       await handleGetDepartments();
@@ -223,7 +223,7 @@ function UserList() {
   // Confirm modal
   const showDeleteConfirm = (id) => {
     Modal.confirm({
-      title: "Are you sure delete this user?",
+      title: "Are you sure to delete this user?",
       icon: <ExclamationCircleOutlined />,
       content: "Click No to cancel.",
       okText: "Yes",

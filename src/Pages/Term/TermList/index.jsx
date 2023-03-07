@@ -110,7 +110,7 @@ const TermList = () => {
   // Confirm modal
   const showDeleteConfirm = (id) => {
     Modal.confirm({
-      title: "Are you sure delete this term?",
+      title: "Are you sure to delete this term?",
       icon: <ExclamationCircleOutlined />,
       content: "Click No to cancel.",
       okText: "Yes",

@@ -76,7 +76,7 @@ function MajorList() {
     },
   ]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
 
   // get major list
   const handleCallMajorList = async (pageNumber) => {
@@ -85,7 +85,7 @@ function MajorList() {
       const res = await get(`major/all?pageNumber=${pageNumber}`);
       const result = handleMajorDataList(await res?.data);
       setData(result);
-      setTotalPages((await res?.pageNumber) * 15);
+      setTotalItems((await res?.pageNumber) * 15);
       setIsLoading(false);
     } catch (error) {
       console.log(error);
@@ -168,7 +168,7 @@ function MajorList() {
   // Confirm modal
   const showDeleteConfirm = (id) => {
     Modal.confirm({
-      title: "Are you sure delete this major?",
+      title: "Are you sure to delete this major?",
       icon: <ExclamationCircleOutlined />,
       content: "Click No to cancel.",
       okText: "Yes",
@@ -189,7 +189,7 @@ function MajorList() {
         dataSource={data}
         loading={isLoading}
         currentPage={currentPage}
-        totalPages={totalPages}
+        totalItems={totalItems}
         onChange={(pageNumber) => {
           setCurrentPage(pageNumber);
           handleCallMajorList(pageNumber);

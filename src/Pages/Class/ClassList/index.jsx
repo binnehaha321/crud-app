@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   Card,
   Skeleton,
@@ -6,36 +6,32 @@ import {
   Typography,
   Form,
   Button as Btn,
-  Modal,
+  Spin,
+  Pagination,
 } from "antd";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  ExclamationCircleOutlined,
-  EyeFilled,
-  PlusCircleOutlined,
-} from "@ant-design/icons";
+import { EditOutlined, EyeFilled } from "@ant-design/icons";
 import Meta from "antd/es/card/Meta";
-import request, { post } from "~/utils/request";
+import { get, post } from "~/utils/request";
 import AssignStudentClass from "../AssignStudentClass";
 import { toast } from "react-toastify";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  closeAssignModal,
-  openAssignModalByClassCode,
-} from "~/store/actions/studentClassAction";
 import { useNavigate } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import { closeAssignModal } from "~/store/actions/studentClassAction";
 
 const ClassList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [classes, setClasses] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const navigate = useNavigate();
 
   // get class list
-  const getClassList = async () => {
+  const getClassList = async (pageNumber) => {
     setIsLoading(true);
     try {
-      const res = await request.get("studentClass/all?pageNumber=1");
+      const res = await get(`studentClass/all?pageNumber=${pageNumber}`);
       setClasses(await res?.data);
+      setTotalItems(res?.pageNumber * 15);
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
@@ -44,30 +40,20 @@ const ClassList = () => {
   };
 
   useEffect(() => {
-    getClassList();
-  }, []);
+    getClassList(currentPage);
+  }, [currentPage]);
 
   // add new class
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [form] = Form.useForm();
 
   // handle close form
-  const { fptId, classCode, isOpen } = useSelector(
-    (state) => state.studentClass
-  );
-  const initialValues = { fptId, classCode };
   const dispatch = useDispatch();
   const handleCloseForm = () => {
     setIsOpenModal(false);
-    if (isOpen) dispatch(closeAssignModal());
+    dispatch(closeAssignModal());
     setIsLoading(false);
     form.resetFields();
-  };
-
-  // handle open form
-  const handleOpenForm = (code) => {
-    setIsOpenModal(true);
-    dispatch(openAssignModalByClassCode(code));
   };
 
   // handle assign student to class
@@ -75,9 +61,11 @@ const ClassList = () => {
     setIsLoading(true);
     try {
       const res = await post("studentClass/add", values);
-      toast.success(await res?.data?.message);
+      toast.success(await res?.message);
       handleCloseForm();
     } catch (error) {
+      if (error?.response?.status === 500)
+        toast.error("The class does not exist!");
       toast.error(error?.response?.data?.message);
       handleCloseForm();
     }
@@ -86,37 +74,9 @@ const ClassList = () => {
   // handle get data update
   const handleGetDataUpdate = (id) => {};
 
-  // remove student from class
-  // const handleDelete = async (classCode) => {
-  //   try {
-  //     const res = await request.delete(`student/delete/${id}`);
-  //     toast.success(await res?.data?.message);
-  //     const newStudentList = data.filter((student) => student?.key !== id);
-  //     setData(newStudentList);
-  //   } catch (error) {
-  //     toast.error(error?.data?.message);
-  //     setIsLoading(false);
-  //   }
-  // };
-
-  // Confirm modal
-  // const showDeleteConfirm = (e, id) => {
-  //   e.stopPropagation();
-  //   Modal.confirm({
-  //     title: "Are you sure delete this student?",
-  //     icon: <ExclamationCircleOutlined />,
-  //     content: "Click No to cancel.",
-  //     okText: "Yes",
-  //     okType: "danger",
-  //     cancelText: "No",
-
-  //     onOk() {
-  //       handleDelete(id);
-  //     },
-  //   });
-  // };
-
-  const navigate = useNavigate()
+  // get init value (fptId)
+  const { fptId } = useSelector((state) => state.studentClass);
+  const initialValues = { fptId };
 
   return (
     <>
@@ -140,14 +100,13 @@ const ClassList = () => {
               backgroundColor: "#EEE",
             }}
             actions={[
-              <EyeFilled key="view" onClick={() => navigate(`${clx}/student-list`)} />,
+              <EyeFilled
+                key="view"
+                onClick={() => navigate(`${clx}/student-list`)}
+              />,
               <EditOutlined
                 key="edit"
                 // onClick={() => handleGetDataUpdate(clx)}
-              />,
-              <DeleteOutlined
-                key="delete"
-                // onClick={() => showDeleteConfirm(clx)}
               />,
             ]}
           >
@@ -157,6 +116,16 @@ const ClassList = () => {
           </Card>
         ))}
       </Space>
+      {!isLoading && (
+        <Pagination
+          current={currentPage}
+          pageSize={15}
+          showSizeChanger={false}
+          total={totalItems}
+          onChange={(pageNumber) => setCurrentPage(pageNumber)}
+          style={{ marginTop: "2rem" }}
+        />
+      )}
 
       {/* assign student to class */}
       <AssignStudentClass

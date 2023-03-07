@@ -8,7 +8,7 @@ function Table({
   columns,
   dataSource,
   loading,
-  totalPages,
+  totalItems,
   currentPage,
   onChange,
   onRow,
@@ -17,7 +17,7 @@ function Table({
   const paginationConfig = {
     pageSize: 15,
     current: currentPage,
-    total: totalPages,
+    total: totalItems,
     showSizeChanger: false,
     onChange: onChange,
     hideOnSinglePage: true,

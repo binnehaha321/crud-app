@@ -1,21 +1,23 @@
-import { useEffect, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Input, Modal, Space, Form, Typography, Button as Btn } from "antd";
+import { Modal, Space, Button as Btn, Form, Typography } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import { Table, Button } from "~/components";
 import * as icon from "~/assets/images/ActionIcons";
-import request, { get } from "~/utils/request";
+import request, { get, post } from "~/utils/request";
 import {
+  assignStudentInClassDataList,
   handleStudentInClassDataList,
   handleSubjectDataList,
 } from "~/utils/handleList";
+import AssignStudentClass from "../AssignStudentClass";
 
 function StudentClassDetail() {
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(null);
+  const [totalItems, setTotalItems] = useState(null);
   const columns = [
     {
       title: "No.",
@@ -36,13 +38,26 @@ function StudentClassDetail() {
       title: "FPT ID",
       dataIndex: "fptId",
       key: "fptId",
+      render: (fptId) => (
+        <Typography.Text className="need-uppercase">{fptId}</Typography.Text>
+      ),
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+    },
+    {
+      title: "Gender",
+      dataIndex: "gender",
+      key: "gender",
     },
     {
       title: "",
       key: "action",
       render: (id) => (
         <Space size="middle">
-          <Button onClick={() => showDeleteConfirm(id.key)}>
+          <Button onClick={() => showDeleteConfirm(id.fptId)}>
             <img src={icon.DELETE} alt="delete" />
           </Button>
         </Space>
@@ -50,16 +65,19 @@ function StudentClassDetail() {
     },
   ];
   const [data, setData] = useState([]);
+  const { classCode } = useParams();
+  const [form] = Form.useForm();
 
   // get students in the class list
-  const { classCode } = useParams();
-  const handleGetStudentsInClass = async (classCode) => {
+  const handleGetStudentsInClass = async (classCode, pageNumber) => {
     setIsLoading(true);
     try {
-      const res = await get(`studentClass/${classCode}`);
+      const res = await get(
+        `studentClass/${classCode}?pageNumber=${pageNumber}`
+      );
       const result = handleStudentInClassDataList(await res?.data);
       setData(result);
-      setTotalPages(res?.pageNumber * 15);
+      setTotalItems(res?.pageNumber * 15);
       setIsLoading(false);
     } catch (error) {
       console.log(error);
@@ -68,16 +86,22 @@ function StudentClassDetail() {
   };
 
   useEffect(() => {
-    handleGetStudentsInClass(classCode);
-  }, [classCode]);
+    handleGetStudentsInClass(classCode, currentPage);
+  }, [classCode, currentPage]);
 
-  // DELETE SUBJECT
-  const handleDelete = async (id) => {
+  // DELETE STUDENT IN CLASS
+  const navigate = useNavigate();
+  const handleDelete = async (fptId) => {
     try {
-      const res = await request.delete(`subject/delete/${id}`);
+      const res = await request.delete(
+        `studentClass/delete/${classCode}/${fptId}`
+      );
       toast.success(res?.data?.message);
-      const newData = data.filter((d) => d.subjectCode !== id);
-      const result = handleSubjectDataList(newData);
+      const newData = data.filter((d) => d.fptId !== fptId);
+      const result = handleStudentInClassDataList(newData);
+      if (result.length === 0) {
+        navigate("../class");
+      }
       setData(result);
     } catch (error) {
       toast.error(error?.data?.message);
@@ -88,7 +112,7 @@ function StudentClassDetail() {
   // Confirm modal
   const showDeleteConfirm = (id) => {
     Modal.confirm({
-      title: "Are you sure delete this subject?",
+      title: "Are you sure to remove this student?",
       icon: <ExclamationCircleOutlined />,
       content: "Click No to cancel.",
       okText: "Yes",
@@ -102,7 +126,7 @@ function StudentClassDetail() {
   };
 
   // popup add success
-  let { msg, flag } = useSelector((state) => state.subject);
+  let { msg, flag } = useSelector((state) => state.studentClass);
   useEffect(() => {
     if (msg) {
       if (flag) {
@@ -113,24 +137,61 @@ function StudentClassDetail() {
     }
   }, [msg, flag]);
 
+  // assign new student to class
+  const [isOpenAssign, setIsOpenAssign] = useState(false);
+  const handleAssignNewStd = async (values) => {
+    setIsLoading(true);
+    try {
+      const res = await post(`studentClass/add`, values);
+      // const newData = assignStudentInClassDataList(await res?.data?.classId);
+      console.log(res?.data?.classId);
+      // console.log([...data, { newData }]);
+      // setData([...data, { newData }]);
+      toast.success(await res?.message);
+      handleCloseAssign();
+    } catch (error) {
+      if (error?.response?.status === 500)
+        toast.error("The student does not exist!");
+      toast.error(error?.response?.data?.message);
+      handleCloseAssign();
+    }
+  };
+
+  // handle open assign modal
+  const handleOpenAssign = () => {
+    setIsOpenAssign(true);
+  };
+
+  // handle close assign modal
+  const handleCloseAssign = () => {
+    if (isOpenAssign) setIsOpenAssign(false);
+    form.resetFields();
+    setIsLoading(false);
+  };
+
   return (
     <>
       <Table
-        caption="Subject List"
+        caption="Student List"
         columns={columns}
         dataSource={data}
         loading={isLoading}
         currentPage={currentPage}
-        totalPages={totalPages}
-        onChange={(pageNumber) => {
-          setCurrentPage(pageNumber);
-          handleGetStudentsInClass(pageNumber);
-        }}
+        totalItems={totalItems}
+        onChange={(pageNumber) => setCurrentPage(pageNumber)}
       >
-        <Link to="./add">
-          <Btn type="primary">ASSIGN NEW STUDENT</Btn>
-        </Link>
+        <Btn type="primary" onClick={handleOpenAssign}>
+          ASSIGN NEW STUDENT
+        </Btn>
       </Table>
+      <AssignStudentClass
+        onOk={form.submit}
+        onCancel={handleCloseAssign}
+        onFinish={handleAssignNewStd}
+        form={form}
+        initialValues={{ classCode }}
+        open={isOpenAssign}
+      />
     </>
   );
 }

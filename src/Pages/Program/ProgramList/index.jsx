@@ -110,7 +110,7 @@ const ProgramList = () => {
   // Confirm modal
   const showDeleteConfirm = (id) => {
     Modal.confirm({
-      title: "Are you sure delete this program?",
+      title: "Are you sure to delete this program?",
       icon: <ExclamationCircleOutlined />,
       content: "Click No to cancel.",
       okText: "Yes",
