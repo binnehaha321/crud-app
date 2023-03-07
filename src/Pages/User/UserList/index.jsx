@@ -160,7 +160,7 @@ function UserList() {
         username: user?.username,
         address: user?.address,
         phoneNumber: user?.phoneNumber,
-        roles: user?.roles,
+        role: user?.roles,
       });
       const roleFormatted = await formatRolesOption(currentUserValues.roles);
       setRolesOption(roleFormatted);
