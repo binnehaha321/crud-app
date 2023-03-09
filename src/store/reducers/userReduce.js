@@ -8,12 +8,16 @@ import {
   DELETE_USER,
   DELETE_USER_SUCCESS,
   DELETE_USER_FAIL,
+  STORE_DEPARTMENT_LIST,
+  STORE_ROLE_LIST,
 } from "../constants/user";
 
 const initialState = {
   isLoading: false,
   msg: null,
   flag: false,
+  departments: [],
+  roles: [],
 };
 
 const userReducer = (state = initialState, action) => {
@@ -85,6 +89,18 @@ const userReducer = (state = initialState, action) => {
         isLoading: false,
         msg: action.payload,
         flag: false,
+      };
+    }
+    case STORE_DEPARTMENT_LIST: {
+      return {
+        ...state,
+        departments: action.payload,
+      };
+    }
+    case STORE_ROLE_LIST: {
+      return {
+        ...state,
+        roles: action.payload,
       };
     }
     default:

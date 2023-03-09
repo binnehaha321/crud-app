@@ -4,7 +4,6 @@ import {
   Form,
   Input,
   Select,
-  Upload,
   Space,
   Modal,
   Typography,
@@ -12,17 +11,19 @@ import {
   DatePicker,
   Button as Btn,
 } from "antd";
-import { ExclamationCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import moment from "moment";
 import * as icon from "~/assets/images/ActionIcons";
 import { Table, Button } from "~/components";
-import request from "~/utils/request";
+import request, { get } from "~/utils/request";
 import { ADMIN, USER } from "~/constants/role";
 import { UPDATE_USER_FAIL } from "~/utils/message";
 import DepartmentSelect from "~/components/DepartmentSelect/DepartmentSelect";
 import "./index.scss";
 import { handleUserDataList } from "~/utils/handleList";
+import { useDispatch, useSelector } from "react-redux";
+import { storeDepartmentList, storeRoleList } from "~/store/actions/userAction";
 
 function UserList() {
   const formRef = useRef();
@@ -105,7 +106,8 @@ function UserList() {
   const [currentUserValues, setCurrentUserValues] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [username, setUsername] = useState("");
-  const [rolesOption, setRolesOption] = useState(null);
+  const dispatch = useDispatch();
+  const { roles, departments } = useSelector((state) => state.user);
 
   // get user list
   const handleCallUserList = async () => {
@@ -124,6 +126,8 @@ function UserList() {
 
   useEffect(() => {
     handleCallUserList();
+    handleGetDepartments();
+    handleGetRoles();
   }, []);
 
   // UPDATE USER
@@ -135,13 +139,6 @@ function UserList() {
       form.setFieldsValue(currentUserValues);
     }
   }, [form, currentUserValues]);
-
-  const formatRolesOption = (options) => {
-    return options?.map((opt) => ({
-      label: opt.roleName,
-      value: opt.roleId,
-    }));
-  };
 
   // get user to update
   const handleGetUserUpdate = async (username) => {
@@ -160,12 +157,9 @@ function UserList() {
         username: user?.username,
         address: user?.address,
         phoneNumber: user?.phoneNumber,
-        role: user?.roles,
+        role: user?.roles?.map((role) => role.roleName),
       });
-      const roleFormatted = await formatRolesOption(currentUserValues.roles);
-      setRolesOption(roleFormatted);
-      await handleGetRoles();
-      await handleGetDepartments();
+
       setIsModalOpen(true);
     } catch (error) {
       throw new Error(error);
@@ -173,29 +167,32 @@ function UserList() {
   };
 
   // get role list
-  const [roles, setRoles] = useState([]);
-
   const handleGetRoles = async () => {
     try {
-      const res = await request.get("role/all?pageNumber=1");
-      setRoles(res?.data);
+      const res = await get("role/all?pageNumber=1");
+      // setRoles(res);
+      dispatch(storeRoleList(await res));
     } catch (error) {
       console.log(error);
     }
   };
 
-  // get department list
-  const [departments, setDepartments] = useState([]);
+  // handle close modal
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setIsLoading(false);
+  };
 
+  // get department list
   const handleGetDepartments = async () => {
     setIsLoading(true);
     try {
-      const res = await request.get("department/all?pageNumber=1");
-      setDepartments(res?.data?.data);
+      const res = await get("department/all?pageNumber=1");
+      dispatch(storeDepartmentList(await res?.data));
       setIsLoading(false);
     } catch (error) {
-      console.log(error);
       setIsLoading(false);
+      throw new Error(error);
     }
   };
 
@@ -205,16 +202,11 @@ function UserList() {
     try {
       const res = await request.put(`users/edit/${username}`, values);
       const data = await res?.data;
-      const users = await data?.users;
-      const result = handleUserDataList(users);
-      setData(result);
       toast.success(await data?.message);
-      setIsModalOpen(false);
-      setIsLoading(false);
+      handleCloseModal();
     } catch (error) {
       toast.error(UPDATE_USER_FAIL);
-      setIsModalOpen(false);
-      setIsLoading(false);
+      handleCloseModal();
       throw new Error(error);
     }
   };

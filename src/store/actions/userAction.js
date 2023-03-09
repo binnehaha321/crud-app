@@ -8,6 +8,8 @@ import {
   DELETE_USER,
   DELETE_USER_SUCCESS,
   DELETE_USER_FAIL,
+  STORE_DEPARTMENT_LIST,
+  STORE_ROLE_LIST,
 } from "../constants/user";
 
 // add
@@ -63,6 +65,20 @@ export const deleteUserSuccess = (payload) => {
 export const deleteUserFail = (payload) => {
   return {
     type: DELETE_USER_FAIL,
+    payload,
+  };
+};
+
+// store list
+export const storeDepartmentList = (payload) => {
+  return {
+    type: STORE_DEPARTMENT_LIST,
+    payload,
+  };
+};
+export const storeRoleList = (payload) => {
+  return {
+    type: STORE_ROLE_LIST,
     payload,
   };
 };

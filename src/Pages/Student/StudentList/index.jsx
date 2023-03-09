@@ -98,7 +98,7 @@ function StudentList() {
           }
           file={"scores"}
           type={"dashed"}
-          danger
+          upload_name={"Upload Scores"}
         />
       ),
       key: "action",
@@ -337,6 +337,7 @@ function StudentList() {
               <UploadCSV
                 url="https://webapp-backend-379318.as.r.appspot.com/student/insert/file"
                 file={"students"}
+                upload_name={"Upload Students"}
               />
             </Space>
           }

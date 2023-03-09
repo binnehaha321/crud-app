@@ -28,9 +28,10 @@ const publicRoutes = [
   { path: "sign-in", component: <SignIn /> },
   { path: "reset-password", component: <ResetPassword /> },
   { path: "confirm-password", component: <ConfirmPassword /> },
+  { path: "*", component: <NotFound /> },
 ];
 const privateRoutes = [
-  { path: "/", component: <Home /> },
+  { path: "/", component: <Home />, exact: true, index: true },
   { path: "students", component: <StudentList /> },
   { path: "students/honour", component: <HonourList /> },
   { path: "students/ojt", component: <OJTList /> },
@@ -51,7 +52,6 @@ const privateRoutes = [
   { path: "programs", component: <ProgramList /> },
   { path: "terms", component: <TermList /> },
   { path: "class/:classCode/student-list", component: <StudentClassDetail /> },
-  { path: "*", component: <NotFound /> },
 ];
 
 export { publicRoutes, privateRoutes };
