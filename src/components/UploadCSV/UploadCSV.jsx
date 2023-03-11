@@ -1,7 +1,7 @@
 import { Button, Upload, message } from "antd";
 import axios from "axios";
 import { UploadOutlined } from "@ant-design/icons";
-import { cookies } from "~/utils/cookies";
+// import { cookies } from "~/utils/cookies";
 import { saveAs } from "file-saver";
 
 const UploadCSV = ({ url, type, upload_name }) => {
@@ -26,7 +26,7 @@ const UploadCSV = ({ url, type, upload_name }) => {
         responseType: "blob",
         headers: {
           authorization: `Bearer ${
-            cookies ? JSON.parse(cookies.cookies.user_info)?.token : null
+            JSON.parse(localStorage.getItem("user_info"))?.token
           }`,
           "Content-Type": "multipart/form-data",
         },

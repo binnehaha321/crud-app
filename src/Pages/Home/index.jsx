@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Card, Typography, Space, Row, Col, Spin} from "antd";
+import { Card, Typography, Space, Row, Col, Skeleton } from "antd";
 import { toast } from "react-toastify";
 import * as icon from "~/assets/images/Home";
 import request from "~/utils/request";
@@ -81,37 +81,29 @@ function Home() {
   ];
 
   return (
-    <>
-      {isLoading ? (
-        <Spin />
-      ) : (
-        <Row
-          gutter={[8, 8]}
-          justify="space-between"
-          style={{ paddingTop: "1rem" }}
-        >
-          {items.map((item, index) => (
-            <Col key={index}>
-              <Link to={item.path}>
-                <Card
-                  hoverable
-                  style={{
-                    width: 240,
-                    background: item.bgColor,
-                  }}
-                >
-                  <Space direction="vertical">
-                    <img src={item.icon} alt={item.label} />
-                    <Text style={{ color: item.color }}>{item.label}</Text>
-                  </Space>
-                  <Title level={4}>{item.amount}</Title>
-                </Card>
-              </Link>
-            </Col>
-          ))}
-        </Row>
-      )}
-    </>
+    <Row gutter={[8, 8]} justify="space-between" style={{ paddingTop: "1rem" }}>
+      <Skeleton loading={isLoading}>
+        {items.map((item, index) => (
+          <Col key={index}>
+            <Link to={item.path}>
+              <Card
+                hoverable
+                style={{
+                  width: 240,
+                  background: item.bgColor,
+                }}
+              >
+                <Space direction="vertical">
+                  <img src={item.icon} alt={item.label} />
+                  <Text style={{ color: item.color }}>{item.label}</Text>
+                </Space>
+                <Title level={4}>{item.amount}</Title>
+              </Card>
+            </Link>
+          </Col>
+        ))}
+      </Skeleton>
+    </Row>
   );
 }
 

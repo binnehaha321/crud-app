@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Typography } from "antd";
 import { Table } from "~/components";
-import request from "~/utils/request";
+import { get } from "~/utils/request";
+import { handleFailSubjectData } from "~/utils/handleList";
 
 function FailSubjectList() {
   const columns = [
@@ -55,8 +56,9 @@ function FailSubjectList() {
   const getFailSubjectList = async () => {
     setIsLoading(true);
     try {
-      const res = await request("student/get/getFailSubjectList");
-      setData(res?.data?.data);
+      const { data: res } = await get("student/get/getFailSubjectList");
+      const result = handleFailSubjectData(await res);
+      setData(await result);
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);

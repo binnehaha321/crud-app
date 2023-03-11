@@ -128,3 +128,21 @@ export const assignStudentInClassDataList = (students) => {
     return std_in_class;
   });
 };
+
+// fail subject
+export const handleFailSubjectData = (students) => {
+  let std_fail = {};
+  return students?.map((std, index) => {
+    std_fail = {
+      key: index,
+      fptId: std?.fptId,
+      fullName: std?.fullName,
+      majorName: std?.majorName,
+      subjectCode: std?.subjectCode,
+      termCode: std?.termCode,
+      programName: std?.programName,
+      mark: std?.mark,
+    };
+    return std_fail;
+  });
+};

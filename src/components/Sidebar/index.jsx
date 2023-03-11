@@ -24,7 +24,7 @@ import Heading from "../Heading";
 import Button from "../Button";
 import * as icon from "~/assets/images/Sidebar";
 import { logOut, logOutSuccess } from "~/store/actions/authenAction";
-import { cookies } from "~/utils/cookies";
+// import { cookies } from "~/utils/cookies";
 import "./index.scss";
 
 function Sidebar({ className }) {
@@ -89,8 +89,8 @@ function Sidebar({ className }) {
 
   let fullName = "",
     roleId = "";
-  if (cookies.get("user_info")) {
-    const user = cookies.get("user_info");
+  if (localStorage.getItem("user_info")) {
+    const user = localStorage.getItem("user_info");
     fullName = user?.fullName;
     roleId = user?.roles?.map((role) => role);
   }

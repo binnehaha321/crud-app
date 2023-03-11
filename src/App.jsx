@@ -4,15 +4,14 @@ import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import { publicRoutes, privateRoutes } from "~/routes";
 import DefaultLayout from "./Layout/DefaultLayout";
-import { cookies } from "./utils/cookies";
 import Loading from "./components/Loading/Loading";
-import SignIn from "./Pages/SignIn";
+import { getToken } from "./utils/request";
 
 function App() {
   let { flag } = useSelector((state) => state.authen);
   let { msg } = useSelector((state) => state.student);
-  let userInfo = cookies.get("user_info");
-  let token = userInfo?.token;
+  let userInfo = JSON.parse(localStorage.getItem("user_info"));
+  let token = getToken();
 
   let isAdmin = userInfo?.roles?.some((role) => role === "ROLE_ADMIN");
 

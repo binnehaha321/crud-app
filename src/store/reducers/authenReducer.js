@@ -6,12 +6,7 @@ import {
   LOG_OUT_SUCCESS,
   LOG_OUT_FAIL,
 } from "../constants/authen";
-import {
-  saveUserInfo,
-  saveLoginStatus,
-  removeUserInfo,
-  removeLoginStatus,
-} from "~/utils/cookies";
+import { saveUserInfo, removeUserInfo } from "~/utils/localStorage";
 
 const initialState = {
   isLoading: false,
@@ -30,7 +25,7 @@ const authenReducer = (state = initialState, action) => {
     }
     case SIGN_IN_SUCCESS: {
       saveUserInfo(action.payload.userInfo);
-      saveLoginStatus();
+      // saveLoginStatus();
       return {
         ...state,
         isLoading: false,
@@ -56,7 +51,7 @@ const authenReducer = (state = initialState, action) => {
     }
     case LOG_OUT_SUCCESS: {
       removeUserInfo();
-      removeLoginStatus();
+      // removeLoginStatus();
       return {
         ...state,
         isLoading: false,
