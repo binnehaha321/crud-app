@@ -5,6 +5,12 @@ import { UploadOutlined } from "@ant-design/icons";
 import { saveAs } from "file-saver";
 
 const UploadCSV = ({ url, type, upload_name }) => {
+  // config message popup
+  message.config({
+    duration: 30,
+    maxCount: 1,
+  });
+
   const handleBeforeUpload = () => {
     return true;
   };
