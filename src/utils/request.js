@@ -2,7 +2,7 @@ import axios from "axios";
 // import { cookies } from "./cookies";
 
 const request = axios.create({
-  baseURL: "https://webapp-backend-379318.as.r.appspot.com/",
+  baseURL: "http://14.225.210.206:8080/",
   headers: {
     "Content-Type": "application/json",
   },
