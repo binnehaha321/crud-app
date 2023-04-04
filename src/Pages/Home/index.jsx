@@ -17,11 +17,11 @@ function Home() {
     payment: 0,
   });
 
-  // useEffect(() => {
-  //   if (msg) {
-  //     toast.success(msg);
-  //   }
-  // }, [msg]);
+  useEffect(() => {
+    if (msg) {
+      toast.success(msg);
+    }
+  }, [msg]);
 
   // STUDENTS
   const callStudentList = async () => {

@@ -18,7 +18,6 @@ import {
   addStudentSuccess,
   addStudentFail,
 } from "~/store/actions/studentAction";
-import moment from "moment";
 import GenderSelect from "~/components/GenderSelect/GenderSelect";
 import MajorList from "~/components/MajorList/MajorList";
 

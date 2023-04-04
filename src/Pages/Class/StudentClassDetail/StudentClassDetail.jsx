@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Modal, Space, Button as Btn, Form, Typography } from "antd";
@@ -8,9 +8,7 @@ import { Table, Button } from "~/components";
 import * as icon from "~/assets/images/ActionIcons";
 import request, { get, post } from "~/utils/request";
 import {
-  assignStudentInClassDataList,
   handleStudentInClassDataList,
-  handleSubjectDataList,
 } from "~/utils/handleList";
 import AssignStudentClass from "../AssignStudentClass";
 import MoveStudentClass from "../MoveStudentClass";

@@ -1,14 +1,13 @@
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Row, Col, Typography, Form, Input, Button, Spin } from "antd";
+import { Row, Col, Typography, Form, Input, Button } from "antd";
 import { MailOutlined } from "@ant-design/icons";
 import { toast } from "react-toastify";
 import Heading from "~/components/Heading";
 import { post } from "~/utils/request";
 import { SIGN_IN_SUCCESS_MSG } from "~/constants/msg";
 import { signInSuccess, signInFail } from "~/store/actions/authenAction";
-import Loading from "~/components/Loading/Loading";
 import styles from "./index.module.scss";
 
 function SignIn() {

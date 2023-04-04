@@ -2,6 +2,7 @@
   "name": "crud-app",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://103.67.199.56:8083/",
   "homepage": "https://binnehaha321.github.io/",
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
