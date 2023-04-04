@@ -16,13 +16,14 @@ import {
   ExclamationCircleOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
-import request, { get, post } from "~/utils/request";
+import request, { get, getRole, post } from "~/utils/request";
 import Meta from "antd/lib/card/Meta";
 import { ENGLISH, BTEC } from "~/constants/program";
 import { toast } from "react-toastify";
 import AddNewCardItem from "~/components/AddNewCardItem/AddNewCardItem";
 
 const ProgramList = () => {
+  const admin = getRole();
   const [loading, setLoading] = useState(false);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [programs, setPrograms] = useState([
@@ -192,9 +193,11 @@ const ProgramList = () => {
         <Typography.Title level={3} style={{ marginBlock: "1rem" }}>
           Program List
         </Typography.Title>
-        <Btn type={"primary"} onClick={() => setIsOpenModal(true)}>
-          ADD NEW PROGRAM
-        </Btn>
+        {admin &&
+          <Btn type={"primary"} onClick={() => setIsOpenModal(true)}>
+            ADD NEW PROGRAM
+          </Btn>
+        }
       </Space>
       <Divider style={{ margin: "0" }} />
       <Space wrap>

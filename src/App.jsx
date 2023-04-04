@@ -5,15 +5,12 @@ import { toast } from "react-toastify";
 import { publicRoutes, privateRoutes } from "~/routes";
 import DefaultLayout from "./Layout/DefaultLayout";
 import Loading from "./components/Loading/Loading";
-import { getToken } from "./utils/request";
+import { getRole, getToken } from "./utils/request";
 
 function App() {
   let { flag } = useSelector((state) => state.authen);
   let { msg } = useSelector((state) => state.student);
-  let userInfo = JSON.parse(localStorage.getItem("user_info"));
   let token = getToken();
-
-  let isAdmin = userInfo?.roles?.some((role) => role === "ROLE_ADMIN");
 
   const navigate = useNavigate();
   const location = useLocation();

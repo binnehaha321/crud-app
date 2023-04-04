@@ -11,13 +11,14 @@ import {
 } from "antd";
 import { EyeFilled } from "@ant-design/icons";
 import Meta from "antd/es/card/Meta";
-import { get, post } from "~/utils/request";
+import { get, getRole, post } from "~/utils/request";
 import AssignStudentClass from "../AssignStudentClass";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { closeAssignModal } from "~/store/actions/studentClassAction";
 
 const ClassList = () => {
+  const admin = getRole();
   const [isLoading, setIsLoading] = useState(false);
   const [classes, setClasses] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -80,13 +81,13 @@ const ClassList = () => {
         <Typography.Title level={3} style={{ marginBlock: "1rem" }}>
           Class List
         </Typography.Title>
-        <Btn type="primary" onClick={() => setIsOpenModal(true)}>
+        {admin && <Btn type="primary" onClick={() => setIsOpenModal(true)}>
           ADD NEW CLASS
-        </Btn>
+        </Btn>}
       </Space>
 
       <Space wrap>
-        {classes?.map((clx) => (
+        {classes ? classes?.map((clx) => (
           <Card
             loading={isLoading}
             key={clx}
@@ -106,7 +107,7 @@ const ClassList = () => {
               <Meta title={clx} />
             </Skeleton>
           </Card>
-        ))}
+        )) : <p>No data</p>}
       </Space>
       {!isLoading && (
         <Pagination
@@ -116,6 +117,7 @@ const ClassList = () => {
           total={totalItems}
           onChange={(pageNumber) => setCurrentPage(pageNumber)}
           style={{ marginTop: "2rem" }}
+          hideOnSinglePage
         />
       )}
 

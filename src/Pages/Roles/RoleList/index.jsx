@@ -16,13 +16,14 @@ import {
   ExclamationCircleOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
-import request, { get, post } from "~/utils/request";
+import request, { get, getRole, post } from "~/utils/request";
 import Meta from "antd/lib/card/Meta";
 import { ADMIN, TEACHER } from "~/constants/role";
 import { toast } from "react-toastify";
 import AddNewCardItem from "~/components/AddNewCardItem/AddNewCardItem";
 
 const RoleList = () => {
+  const admin = getRole();
   const [loading, setLoading] = useState(false);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [roles, setRoles] = useState([
@@ -186,9 +187,9 @@ const RoleList = () => {
         <Typography.Title level={3} style={{ marginBlock: "1rem" }}>
           Role List
         </Typography.Title>
-        <Btn type={"primary"} onClick={() => setIsOpenModal(true)}>
+        {admin && <Btn type={"primary"} onClick={() => setIsOpenModal(true)}>
           ADD NEW ROLE
-        </Btn>
+        </Btn>}
       </Space>
       <Divider style={{ margin: "0" }} />
       <Space wrap>

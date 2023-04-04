@@ -23,6 +23,7 @@ import StudentScore from "~/Pages/Student/Score/Score";
 import AddNewSubject from "~/Pages/Subject/AddNewSubject";
 import AssignStudentClass from "~/Pages/Class/AssignStudentClass";
 import StudentClassDetail from "~/Pages/Class/StudentClassDetail/StudentClassDetail";
+import RoleLayout from "~/Layout/RoleLayout";
 
 const publicRoutes = [
   { path: "sign-in", component: <SignIn /> },
@@ -34,20 +35,20 @@ const privateRoutes = [
   { path: "/", component: <Home />, exact: true, index: true },
   { path: "students", component: <StudentList /> },
   { path: "students/honour", component: <HonourList /> },
-  { path: "students/ojt", component: <OJTList /> },
-  { path: "students/fail-subject", component: <FailSubjectList /> },
+  { path: "students/ojt", component: <RoleLayout><OJTList /></RoleLayout> },
+  { path: "students/fail-subject", component: <RoleLayout><FailSubjectList /></RoleLayout> },
   { path: "students/score/:id", component: <StudentScore /> },
   { path: "departments", component: <DepartmentList /> },
-  { path: "departments/add", component: <AddNewDepartment /> },
-  { path: "students/add", component: <AddNewStudent /> },
+  { path: "departments/add", component: <RoleLayout><AddNewDepartment /></RoleLayout> },
+  { path: "students/add", component: <RoleLayout><AddNewStudent /></RoleLayout> },
   { path: "users", component: <UserList /> },
-  { path: "users/add", component: <AddNewUser /> },
+  { path: "users/add", component: <RoleLayout><AddNewUser /></RoleLayout> },
   { path: "majors", component: <MajorList /> },
-  { path: "majors/add", component: <AddNewMajor /> },
+  { path: "majors/add", component: <RoleLayout><AddNewMajor /></RoleLayout> },
   { path: "subjects", component: <SubjectList /> },
-  { path: "subjects/add", component: <AddNewSubject /> },
+  { path: "subjects/add", component: <RoleLayout><AddNewSubject /></RoleLayout> },
   { path: "class", component: <ClassList /> },
-  { path: "class/add", component: <AssignStudentClass /> },
+  { path: "class/add", component: <RoleLayout><AssignStudentClass /></RoleLayout> },
   { path: "roles", component: <RoleList /> },
   { path: "programs", component: <ProgramList /> },
   { path: "terms", component: <TermList /> },

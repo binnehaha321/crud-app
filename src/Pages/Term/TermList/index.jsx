@@ -16,13 +16,13 @@ import {
   ExclamationCircleOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
-import request, { get, post } from "~/utils/request";
+import request, { get, getRole, post } from "~/utils/request";
 import Meta from "antd/lib/card/Meta";
-// import { ENGLISH, BTEC } from "~/constants/term";
 import { toast } from "react-toastify";
 import AddNewCardItem from "~/components/AddNewCardItem/AddNewCardItem";
 
 const TermList = () => {
+  const admin = getRole();
   const [loading, setLoading] = useState(false);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [terms, setTerms] = useState([
@@ -192,9 +192,9 @@ const TermList = () => {
         <Typography.Title level={3} style={{ marginBlock: "1rem" }}>
           Term List
         </Typography.Title>
-        <Btn type={"primary"} onClick={() => setIsOpenModal(true)}>
+        {admin && <Btn type={"primary"} onClick={() => setIsOpenModal(true)}>
           ADD NEW TERM
-        </Btn>
+        </Btn>}
       </Space>
       <Divider style={{ margin: "0" }} />
       <Space wrap>

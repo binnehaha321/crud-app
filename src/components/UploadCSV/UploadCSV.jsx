@@ -1,7 +1,6 @@
 import { Button, Upload, message } from "antd";
 import axios from "axios";
 import { UploadOutlined } from "@ant-design/icons";
-// import { cookies } from "~/utils/cookies";
 import { saveAs } from "file-saver";
 
 const UploadCSV = ({ url, type, upload_name }) => {
