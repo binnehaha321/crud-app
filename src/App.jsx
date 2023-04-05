@@ -2,10 +2,10 @@ import { Suspense, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
-import { publicRoutes, privateRoutes } from "~/routes";
+import { privateRoutes, publicRoutes } from "./routes";
 import DefaultLayout from "./Layout/DefaultLayout";
 import Loading from "./components/Loading/Loading";
-import { getRole, getToken } from "./utils/request";
+import { getToken } from "./utils/request";
 
 function App() {
   let { flag } = useSelector((state) => state.authen);

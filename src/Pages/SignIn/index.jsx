@@ -31,7 +31,7 @@ function SignIn() {
       setIsLoading(false);
       navigate("/");
     } catch (error) {
-      dispatch(signInFail(error?.response?.data?.message));
+      dispatch(signInFail(error?.response?.data?.message || error?.message));
       setIsLoading(false);
     }
   };
