@@ -3,7 +3,6 @@ import { getRole } from '~/utils/request';
 
 const RoleLayout = ({ children }) => {
   const admin = getRole();
-  console.log(admin);
 
   return (
     <div>
